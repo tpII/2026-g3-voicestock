@@ -44,6 +44,7 @@ pytest
 - [Guía de contribución](CONTRIBUTING.md)
 - [Flujo de trabajo de desarrollo](docs/development-workflow.md)
 - [Arquitectura](docs/architecture.md)
+- [Bitácora](docs/bitacora.md)
 
 ## Licencia
 

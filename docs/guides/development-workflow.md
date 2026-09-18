@@ -4,7 +4,7 @@ Esta guía explica cómo trabajar en VoiceStock si todavía no tenés mucha prá
 
 El objetivo es que puedas clonar el repositorio, crear una rama, commitear, abrir una Pull Request y llegar a `develop` sin adivinar el proceso.
 
-Las convenciones (nombres, commits, ramas y versionado) están en [CONTRIBUTING.md](../CONTRIBUTING.md).
+Las convenciones (nombres, commits, ramas y versionado) están en [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 ## Mapa rápido
 

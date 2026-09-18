@@ -6,7 +6,7 @@ El objetivo es mantener un repositorio consistente, entendible y fácil de mante
 
 Estas reglas deben ser respetadas por todos los integrantes del equipo.
 
-La guía práctica paso a paso (clonar, entorno, ramas, commits, Pull Requests y CI) está en [docs/development-workflow.md](docs/development-workflow.md).
+La guía práctica paso a paso (clonar, entorno, ramas, commits, Pull Requests y CI) está en [docs/guides/development-workflow.md](docs/guides/development-workflow.md).
 
 ---
 
@@ -247,7 +247,7 @@ pytest
 
 Después de clonar el repositorio hay que instalar los hooks de pre-commit **una vez**. Los scripts `scripts/setup.sh` y `scripts/setup.ps1` lo hacen. A partir de ese momento, cada `git commit` ejecuta formato, lint y validaciones básicas antes de crear el commit.
 
-Si pre-commit modifica archivos, hay que revisarlos, volver a hacer `git add` y commitear de nuevo. El detalle de ese ciclo está en [docs/development-workflow.md](docs/development-workflow.md).
+Si pre-commit modifica archivos, hay que revisarlos, volver a hacer `git add` y commitear de nuevo. El detalle de ese ciclo está en [docs/guides/development-workflow.md](docs/guides/development-workflow.md).
 
 ---
 

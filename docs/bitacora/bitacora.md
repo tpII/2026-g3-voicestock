@@ -4,7 +4,7 @@ Este documento registra el proceso de diseño, implementación, pruebas e iterac
 
 ---
 
-# 01/09/2026
+## 01/09/2026
 
 ### Avance
 
@@ -12,7 +12,7 @@ Se creó el repositorio del proyecto **VoiceStock**, un sistema de gestión de i
 
 ---
 
-# 10/09/2026
+## 10/09/2026
 
 ### Avance
 
@@ -42,3 +42,9 @@ Se armó la base del monorepo, dejando preparado el entorno de desarrollo antes 
 
 - **¿Contamos con un parlante o con un buzzer? Con parlante se pediría la confirmación por audio; con buzzer simplemente se emitiría un sonido indicando que se registró y luego se pediría la confirmación por la web.**
   En principio no sería necesario el parlante. Se deja como objetivo secundario.
+
+## 17/09/2026
+
+### Avance
+
+Se realizó la guía de documentación del proyecto (disponible en [Guía de documentación](../guides/documentation-guide.md)). Además, se organizaron los archivos de documentación ya existentes en el lugar correspondiente del repositorio: el flujo de trabajo quedó en `docs/guides/development-workflow.md` y la bitácora en `docs/bitacora/bitacora.md`. Se comenzó a definir las tareas necesarias para las diferentes áreas del proyecto; se utilizará la plataforma ClickUp como centro de gestión y se adoptó la convención 1 tarea = 1 commit.

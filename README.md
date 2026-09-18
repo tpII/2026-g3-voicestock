@@ -42,9 +42,9 @@ pytest
 ## Documentación
 
 - [Guía de contribución](CONTRIBUTING.md)
-- [Flujo de trabajo de desarrollo](docs/development-workflow.md)
-- [Arquitectura](docs/architecture.md)
-- [Bitácora](docs/bitacora.md)
+- [Guía de documentación](docs/guides/documentation-guide.md)
+- [Flujo de trabajo de desarrollo](docs/guides/development-workflow.md)
+- [Bitácora](docs/bitacora/bitacora.md)
 
 ## Licencia
 

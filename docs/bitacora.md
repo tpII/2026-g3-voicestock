@@ -18,27 +18,85 @@ Se creó el repositorio del proyecto **VoiceStock**, un sistema de gestión de i
 
 Se armó la base del monorepo, dejando preparado el entorno de desarrollo antes de escribir lógica de aplicación:
 
-- **Python 3.11+** como versión mínima, gestionado con un entorno virtual (`.venv`) creado por `scripts/setup.sh` (Linux / Raspberry Pi) y `scripts/setup.ps1` (Windows).
-- **Ruff** para lint y formateo (reglas `E`, `F`, `I`; `line-length = 88`; comillas dobles).
-- **Pytest** + **pytest-cov**, con un test de humo (`tests/test_smoke.py`) que valida que el paquete `voicestock` se pueda importar.
-- **pre-commit**, con hooks de `pre-commit-hooks` (trailing whitespace, end-of-file, YAML/TOML, detección de claves privadas, conflictos de merge) y de `ruff-pre-commit` (`ruff-check --fix`, `ruff-format`).
-- **CI en GitHub Actions** (`.github/workflows/ci.yml`): corre en pushes y Pull Requests hacia `main` y `develop`, instala el proyecto con `pip install -e ".[dev]"` y ejecuta `pre-commit run --all-files` y `pytest --cov=voicestock`. Todavía no hay un umbral mínimo de cobertura.
-- Se documentó el flujo de trabajo completo (branching `feature/*` / `fix/*` / `release/*` / `hotfix/*` desde `develop`, Conventional Commits, Squash and Merge) en `CONTRIBUTING.md` y `docs/development-workflow.md`.
-- Se dejó `docs/architecture.md` como documento vivo para registrar decisiones de arquitectura a medida que se tomen.
-- Se agregó `.env.example` con las variables previstas para la integración con el LLM (`LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL`), todavía sin valores porque el proveedor no está definido.
+- **Python 3.11+** con entorno virtual y scripts de setup para Linux/Raspberry Pi y Windows.
+- **Ruff**, **Pytest**, **pytest-cov** y **pre-commit** para calidad y pruebas.
+- **CI en GitHub Actions** sobre `main` y `develop`.
+- Se documentó el flujo de branching, commits y merges.
+- Se dejó `docs/architecture.md` como documento vivo.
+- Se agregó `.env.example` para la futura integración con el LLM.
 
 ### Decisiones técnicas
 
-- **Docker queda fuera del arranque inicial.** Las partes que dependen del hardware de la Raspberry Pi (por ejemplo el micrófono) se van a ejecutar de forma nativa al principio, para no sumar la complejidad de contenedores sobre dispositivos físicos. Se podría reconsiderar más adelante para servicios de software o para un LLM local, si aporta un beneficio concreto.
-- **SQLite** como motor de persistencia, acorde a un sistema pensado para correr en un único dispositivo (Raspberry Pi), sin necesidad de un servidor de base de datos separado.
+- **Docker queda fuera del arranque inicial**, principalmente para no complicar el acceso al hardware de la Raspberry Pi.
+- **SQLite** como motor de persistencia.
 
 ### Preguntas
 
-- **En cuanto a la alimentación del prototipo, ¿se busca que sea portable (alimentado por ejemplo a pilas o baterías) o un sistema fijo alimentado por una fuente de pared?**
-  La idea es que, al ser algo estático (sin movimiento) por ahora, puede ser alimentación fija. Como objetivo secundario, se puede contemplar que sea portable con powerbank o pilas.
+- Se consultó sobre alimentación fija o portable. Por ahora se apunta a alimentación fija, dejando portabilidad como objetivo secundario.
+- Se planteó el trade-off entre **LLM local y API externa**, a discutir con la cátedra por ser una decisión central de arquitectura.
+- El parlante se deja como objetivo secundario; la confirmación podrá realizarse inicialmente mediante la web.
 
-- **En la estructura pensada, la Raspberry Pi se encarga de servir la web, manejar la base de datos, capturar el audio del micrófono y pasarlo a texto, para luego enviarlo a un LLM que procese ese texto y genere un output formateado en JSON que se procesa en la placa (además de un string de confirmación que la placa traduce a audio para pedir confirmación al usuario). En cuanto al LLM, ¿recomiendan usar un modelo local corriendo en alguna de nuestras computadoras con acceso SSH, o utilizar una API de un modelo estilo GPT/Gemini?**
-  Ese trade-off se charla en la clase, porque es el corazón de la arquitectura del proyecto.
+---
 
-- **¿Contamos con un parlante o con un buzzer? Con parlante se pediría la confirmación por audio; con buzzer simplemente se emitiría un sonido indicando que se registró y luego se pediría la confirmación por la web.**
-  En principio no sería necesario el parlante. Se deja como objetivo secundario.
+# 19/09/2026
+
+### Avance
+
+Se descompuso el sistema en features y se organizó el trabajo en ClickUp, separando tareas de **Raspberry Pi, PC, Web & DataBase, documentación y pruebas**.
+
+Se definieron como principales bloques: `PushToTalk`, `SpeechToText`, `RaspberryPiPCCommunication`, `InterpretationService`, `StructuredCommandInterpretation`, `OperationContractValidation`, `PendingOperationFlow` y `PendingOperationWeb`.
+
+---
+
+# 23/09/2026
+
+### Avance
+
+Se comenzaron la mayoría de las tareas iniciales de investigación definidas en ClickUp.
+
+Entre ellas:
+
+- alternativas de STT para Raspberry Pi 3;
+- comunicación Raspberry Pi–PC;
+- modelo local vs API externa para interpretación;
+- captura Push-to-Talk;
+- stack para servidor HTTP e interfaz web;
+- definición del contrato entre componentes.
+
+Se decidió mantener los módulos desacoplados mediante interfaces para poder reemplazar tecnologías sin modificar todo el sistema.
+
+---
+
+# 24/09/2026
+
+### Avance
+
+Se terminó de definir de forma preliminar el flujo principal:
+
+**pulsador → audio → STT → PC → interpretación → validación → operación pendiente → confirmación web**
+
+Se estableció que una interpretación válida **no modifica directamente el inventario**, sino que primero genera una operación pendiente que debe ser confirmada.
+
+También se comenzó a trabajar sobre un **contrato JSON versionado** con validación estructural y semántica.
+
+---
+
+# 25/09/2026
+
+### Avance
+
+Se continuó refinando el backlog y las tareas de implementación en ClickUp.
+
+Se avanzó en la definición de:
+
+- comunicación cliente/servidor entre Raspberry Pi y PC;
+- `InterpretationService` desacoplado del proveedor;
+- validación de productos y operaciones;
+- estado `WAIT_CONFIRMATION`;
+- interfaz web para consultar, confirmar o cancelar operaciones pendientes.
+
+Como parte de la investigación del modelo local, se realizaron pruebas con **Qwen 3.5 4B** clasificando productos en categorías de supermercado.
+
+Los resultados fueron correctos en los casos probados, con un tiempo aproximado de **15 segundos por consulta**, por lo que se considera una alternativa viable para seguir evaluando frente al uso de APIs externas.
+
+---

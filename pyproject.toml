@@ -12,9 +12,17 @@ requires-python = ">=3.11"
 authors = [
     { name = "VoiceStock contributors" },
 ]
+dependencies = [
+    "fastapi==0.142.2",
+    "uvicorn==0.54.0",
+]
+
+[project.scripts]
+voicestock-pc-server = "voicestock.communication.server:main"
 
 [project.optional-dependencies]
 dev = [
+    "httpx==0.28.1",
     "ruff>=0.16",
     "pytest>=8.0",
     "pytest-cov>=6.0",

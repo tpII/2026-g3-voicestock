@@ -76,3 +76,19 @@ y la decisión estable en
   `ServiceResult<ContractPayload>` sin que la comunicación conozca su semántica.
 - El framework HTTP, el endpoint y el esquema ejecutable definitivo se
   resolverán en la tarea de implementación del servidor.
+
+### Implementación
+
+Se implementó el primer servidor de comunicación de la PC con **FastAPI** y
+**Uvicorn**. El endpoint versionado `POST /api/v1/interpret` recibe texto
+reconocido, invoca un handler sustituible y devuelve un
+`TransportEnvelope<T>` sin inspeccionar la semántica del payload.
+
+El servidor incluye un stub ejecutable, configuración de host y puerto mediante
+variables de entorno y respuestas tipadas para JSON inválido, request inválido,
+tipo de contenido no soportado, fallos del handler y errores de serialización.
+
+Se agregaron 20 tests del nuevo módulo, además del test de humo existente. La
+suite completa alcanzó **21 tests aprobados** y **92 % de cobertura**. También se
+realizó una prueba HTTP real contra el servidor local, verificando una respuesta
+exitosa y el rechazo de un request inválido.

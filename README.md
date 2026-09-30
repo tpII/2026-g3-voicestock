@@ -4,7 +4,9 @@ Sistema de gestión de inventario asistido por voz, pensado para ejecutarse en u
 
 La Raspberry Pi capturará audio, hará Speech-to-Text, se comunicará con un modelo de lenguaje a través de una interfaz independiente del proveedor, validará respuestas estructuradas, administrará el inventario, persistirá datos en SQLite y expondrá una interfaz web.
 
-Este repositorio está en la etapa inicial: todavía no hay lógica de aplicación. Lo que hay es la base del monorepo (Python 3.11, Ruff, Pytest, pre-commit, CI y la guía de contribución).
+El proyecto está en una etapa inicial. Ya incluye el primer servidor de
+comunicación en la PC, mientras que captura de audio, STT, interpretación,
+inventario e interfaz web continúan en desarrollo.
 
 ## Requisitos
 
@@ -39,11 +41,29 @@ ruff check .
 pytest
 ```
 
+### Servidor de comunicación de la PC
+
+El servidor inicial utiliza un handler stub y escucha solamente en localhost:
+
+```bash
+voicestock-pc-server
+```
+
+Para exponerlo en la red local y elegir otro puerto:
+
+```bash
+VOICESTOCK_PC_HOST=0.0.0.0 VOICESTOCK_PC_PORT=8123 voicestock-pc-server
+```
+
+El contrato y los ejemplos están en la
+[interfaz de comunicación Raspberry Pi–PC](docs/interfaces/pc-communication.md).
+
 ## Documentación
 
 - [Guía de contribución](CONTRIBUTING.md)
 - [Guía de documentación](docs/guides/documentation-guide.md)
 - [Flujo de trabajo de desarrollo](docs/guides/development-workflow.md)
+- [Comunicación Raspberry Pi–PC](docs/interfaces/pc-communication.md)
 - [Bitácora](docs/bitacora/bitacora.md)
 
 ## Licencia

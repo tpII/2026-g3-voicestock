@@ -48,3 +48,31 @@ Se armó la base del monorepo, dejando preparado el entorno de desarrollo antes 
 ### Avance
 
 Se realizó la guía de documentación del proyecto (disponible en [Guía de documentación](../guides/documentation-guide.md)). Además, se organizaron los archivos de documentación ya existentes en el lugar correspondiente del repositorio: el flujo de trabajo quedó en `docs/guides/development-workflow.md` y la bitácora en `docs/bitacora/bitacora.md`. Se comenzó a definir las tareas necesarias para las diferentes áreas del proyecto; se utilizará la plataforma ClickUp como centro de gestión y se adoptó la convención 1 tarea = 1 commit.
+
+---
+
+## 30/09/2026
+
+### Avance
+
+Se evaluaron las alternativas para la comunicación entre la Raspberry Pi y la PC
+en la red local aislada. La comparación incluyó HTTP, WebSocket, gRPC y un
+protocolo TCP propio, considerando simplicidad, recursos, latencia, manejo de
+errores, testabilidad y desacoplamiento respecto de `InterpretationService`.
+
+La investigación quedó registrada en
+[Raspberry Pi–PC communication protocol comparison](../research/raspberry-pi-pc-communication.md)
+y la decisión estable en
+[ADR-0001](../decisions/0001-use-http-json-for-pi-pc-communication.md).
+
+### Decisiones técnicas
+
+- Se eligió **HTTP/1.1 con JSON UTF-8** para el intercambio request/response del
+  MVP.
+- La Raspberry Pi actuará como cliente y la PC como servidor dentro de la red
+  local.
+- La capa de transporte será responsable únicamente de
+  `TransportEnvelope<T>`; el payload permanecerá opaco y podrá transportar
+  `ServiceResult<ContractPayload>` sin que la comunicación conozca su semántica.
+- El framework HTTP, el endpoint y el esquema ejecutable definitivo se
+  resolverán en la tarea de implementación del servidor.

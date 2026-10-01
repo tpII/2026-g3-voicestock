@@ -11,7 +11,7 @@ from gpiozero import Button
 from gpiozero.pins.mock import MockFactory, MockPin
 from tests.pi.input.conftest import SimulatedClock
 
-from voicestock.pi.input.push_to_talk_button import PushToTalkButton
+from pi.input.push_to_talk_button import PushToTalkButton
 
 # Arbitrary BCM pin that exists on the mock Pi. The product pin is undecided.
 PIN = 17

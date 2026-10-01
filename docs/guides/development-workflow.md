@@ -236,7 +236,7 @@ commit
 GitHub Actions
    |
    +-- pre-commit run --all-files
-   +-- pytest --cov=voicestock
+   +-- pytest --cov
    |
    v
 Pull Request can be merged only if required checks pass
@@ -353,7 +353,7 @@ pytest
 
 # lo mismo que corre CI
 pre-commit run --all-files
-pytest --cov=voicestock
+pytest --cov
 
 # git
 git switch develop

@@ -4,12 +4,31 @@ Sistema de gestión de inventario asistido por voz, pensado para ejecutarse en u
 
 La Raspberry Pi capturará audio, hará Speech-to-Text, se comunicará con un modelo de lenguaje a través de una interfaz independiente del proveedor, validará respuestas estructuradas, administrará el inventario, persistirá datos en SQLite y expondrá una interfaz web.
 
-Este repositorio está en la etapa inicial: todavía no hay lógica de aplicación. Lo que hay es la base del monorepo (Python 3.11, Ruff, Pytest, pre-commit, CI y la guía de contribución).
+El proyecto está en una etapa inicial. Ya incluye el servidor de comunicación
+de la PC conectado a un servicio de interpretación con proveedor intercambiable
+(por ahora un stub), mientras que captura de audio, STT, el modelo de lenguaje,
+inventario e interfaz web continúan en desarrollo.
 
 ## Requisitos
 
 - Python 3.11 o superior
 - Git
+
+## Estructura del código
+
+El código está dividido según la máquina donde corre
+([ADR-0002](docs/decisions/0002-split-source-by-runtime-pc-pi-shared.md)):
+
+```text
+src/
+├── pc/       lo que corre en la PC: servidor HTTP e interpretación
+├── pi/       lo que corre en la Raspberry Pi: cliente de la PC (y luego STT, web, base de datos)
+└── shared/   contratos que intercambian ambas (TransportEnvelope)
+```
+
+`pc` y `pi` no se importan entre sí y `shared` no importa a ninguno; un test lo
+verifica. Los tests siguen la misma división (`tests/pc`, `tests/pi`,
+`tests/shared`, más `tests/integration` para pruebas que usan ambos lados).
 
 ## Arranque rápido
 
@@ -39,11 +58,49 @@ ruff check .
 pytest
 ```
 
+### Servidor de comunicación de la PC
+
+El servidor recibe texto por HTTP y lo pasa al servicio de interpretación. Por
+defecto usa el proveedor `stub` y escucha solamente en localhost:
+
+```bash
+voicestock-pc-server
+```
+
+Para exponerlo en la red local y elegir otro puerto:
+
+```bash
+VOICESTOCK_PC_HOST=0.0.0.0 VOICESTOCK_PC_PORT=8123 voicestock-pc-server
+```
+
+### Cliente de la Raspberry Pi
+
+La Raspberry Pi envía el texto con `HttpInterpretationClient`. Para probar el
+viaje completo desde una terminal, con el servidor corriendo:
+
+```bash
+voicestock-pi-client "agregá dos paquetes de arroz"
+```
+
+El destino y el timeout se configuran con variables de entorno (por defecto
+`http://127.0.0.1:8000` y 10 segundos):
+
+```bash
+VOICESTOCK_PC_URL=http://<ip-de-la-pc>:8123 VOICESTOCK_PC_TIMEOUT=10 \
+  voicestock-pi-client "agregá dos paquetes de arroz"
+```
+
+El contrato, la puesta en marcha en la red local y el catálogo de errores con
+ejemplos están en la
+[interfaz de comunicación Raspberry Pi–PC](docs/interfaces/pc-communication.md).
+
 ## Documentación
 
 - [Guía de contribución](CONTRIBUTING.md)
 - [Guía de documentación](docs/guides/documentation-guide.md)
 - [Flujo de trabajo de desarrollo](docs/guides/development-workflow.md)
+- [Comunicación Raspberry Pi–PC](docs/interfaces/pc-communication.md)
+- [Servicio de interpretación](docs/interfaces/interpretation-service.md)
 - [Bitácora](docs/bitacora/bitacora.md)
 
 ## Licencia

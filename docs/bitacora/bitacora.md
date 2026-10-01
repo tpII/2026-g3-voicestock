@@ -295,3 +295,29 @@ servidor y cliente y reproducir el viaje completo solo con el repositorio:
 
 Queda pendiente la prueba física entre la PC y la Raspberry, que depende de la
 red de `LocalNetworkInfra`.
+
+### Reorganización del código en `pc`, `pi` y `shared`
+
+Siguiendo lo acordado en el equipo, se reorganizó `src/` según la máquina donde
+corre cada parte, en lugar del paquete único `voicestock` dividido por
+funcionalidad:
+
+- `src/pc`: servidor HTTP, `InterpretationService` y proveedores, y el comando
+  `voicestock-pc-server`.
+- `src/pi`: cliente de comunicación y el comando `voicestock-pi-client`. Más
+  adelante se sumarán Push-to-Talk, SpeechToText, operaciones pendientes, base
+  de datos y web.
+- `src/shared`: el contrato que intercambian ambas máquinas
+  (`TransportEnvelope`, `InterpretationRequest`), con una sola definición para
+  que la PC y la Raspberry no se desincronicen.
+
+Se eligió `src/pc` y `src/pi` como paquetes de primer nivel, tal como se había
+planteado, en lugar de `src/voicestock/pc`. La decisión, sus alternativas y sus
+consecuencias quedaron en el ADR-0002. Un nuevo test de arquitectura verifica
+que `pc` y `pi` no se importen entre sí y que `shared` no importe a ninguno. Los
+tests se reorganizaron con la misma división.
+
+No cambió el comportamiento: los comandos conservan su nombre y la suite pasó
+de 97 a **101 tests aprobados** (por los nuevos chequeos de imports), con
+**97 % de cobertura**. Tras actualizar el repositorio hay que reinstalar el
+paquete (`pip install -e ".[dev]"`).

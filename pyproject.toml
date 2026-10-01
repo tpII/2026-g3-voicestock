@@ -19,8 +19,11 @@ dependencies = [
 ]
 
 [project.scripts]
-voicestock-pc-server = "voicestock.pc_server:main"
-voicestock-pi-client = "voicestock.pi_client:main"
+voicestock-pc-server = "pc.main:main"
+voicestock-pi-client = "pi.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pc", "src/pi", "src/shared"]
 
 [project.optional-dependencies]
 dev = [
@@ -44,7 +47,7 @@ select = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["voicestock"]
+known-first-party = ["pc", "pi", "shared"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -59,7 +62,7 @@ addopts = ["-ra", "--tb=short"]
 pythonpath = ["src"]
 
 [tool.coverage.run]
-source = ["voicestock"]
+source = ["pc", "pi", "shared"]
 branch = true
 
 [tool.coverage.report]

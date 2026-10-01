@@ -4,10 +4,11 @@ Sistema de gestión de inventario asistido por voz, pensado para ejecutarse en u
 
 La Raspberry Pi capturará audio, hará Speech-to-Text, se comunicará con un modelo de lenguaje a través de una interfaz independiente del proveedor, validará respuestas estructuradas, administrará el inventario, persistirá datos en SQLite y expondrá una interfaz web.
 
-El proyecto está en una etapa inicial. Ya incluye el servidor de comunicación
-de la PC conectado a un servicio de interpretación con proveedor intercambiable
-(por ahora un stub), mientras que captura de audio, STT, el modelo de lenguaje,
-inventario e interfaz web continúan en desarrollo.
+El proyecto está en una etapa inicial. Ya incluye la captura push-to-talk en la
+Raspberry Pi y el servidor de comunicación de la PC, conectado a un servicio de
+interpretación con proveedor intercambiable (por ahora un stub). STT, el modelo
+de lenguaje, inventario e interfaz web continúan en desarrollo. La prueba física
+del pulsador y del micrófono USB todavía no se hizo.
 
 ## Requisitos
 
@@ -22,7 +23,7 @@ El código está dividido según la máquina donde corre
 ```text
 src/
 ├── pc/       lo que corre en la PC: servidor HTTP e interpretación
-├── pi/       lo que corre en la Raspberry Pi: cliente de la PC (y luego STT, web, base de datos)
+├── pi/       lo que corre en la Raspberry Pi: push-to-talk y cliente de la PC
 └── shared/   contratos que intercambian ambas (TransportEnvelope)
 ```
 
@@ -94,6 +95,15 @@ El contrato, la puesta en marcha en la red local y el catálogo de errores con
 ejemplos están en la
 [interfaz de comunicación Raspberry Pi–PC](docs/interfaces/pc-communication.md).
 
+### Push-to-talk
+
+La Raspberry Pi graba un WAV al pulsar y soltar un botón. La decisión de stack,
+el contrato de audio y la prueba en la placa están separados:
+
+- [Decisión de arquitectura](docs/decisions/0003-use-event-driven-gpio-and-sounddevice-for-ptt-capture.md)
+- [Interfaz de captura](docs/interfaces/push-to-talk-capture.md)
+- [Conexión, configuración y prueba manual](docs/setup/push-to-talk.md)
+
 ## Documentación
 
 - [Guía de contribución](CONTRIBUTING.md)
@@ -101,6 +111,8 @@ ejemplos están en la
 - [Flujo de trabajo de desarrollo](docs/guides/development-workflow.md)
 - [Comunicación Raspberry Pi–PC](docs/interfaces/pc-communication.md)
 - [Servicio de interpretación](docs/interfaces/interpretation-service.md)
+- [Captura push-to-talk](docs/interfaces/push-to-talk-capture.md)
+- [Prueba manual de push-to-talk](docs/setup/push-to-talk.md)
 - [Bitácora](docs/bitacora/bitacora.md)
 
 ## Licencia

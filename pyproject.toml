@@ -20,6 +20,7 @@ dependencies = [
 
 [project.scripts]
 voicestock-pc-server = "voicestock.pc_server:main"
+voicestock-pi-client = "voicestock.pi_client:main"
 
 [project.optional-dependencies]
 dev = [

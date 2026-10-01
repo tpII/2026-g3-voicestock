@@ -37,8 +37,11 @@ product, quantity or unit, and they deliver the payload intact even when its
 domain content is invalid.
 
 The server's handler is `InterpretationService.interpret`, wired in
-`src/voicestock/pc_server.py`. That module is the only one that knows both
-layers: the communication package does not import the interpretation package.
+`src/pc/main.py`. That module is the only one that knows both layers:
+`pc.communication` does not import `pc.interpretation`. The code is split by
+where it runs: the server in `src/pc`, the client in `src/pi` and the
+envelope both exchange in `src/shared` (see
+[ADR-0002](../decisions/0002-split-source-by-runtime-pc-pi-shared.md)).
 
 ## Quick start: local roundtrip
 
@@ -208,7 +211,7 @@ failure. The caller checks the outer `status` and, on success, hands `payload`
 to the next layer, which reads the inner `ServiceResult`:
 
 ```python
-from voicestock.communication import ClientSettings, HttpInterpretationClient
+from pi.communication import ClientSettings, HttpInterpretationClient
 
 with HttpInterpretationClient(ClientSettings.from_environment()) as client:
     envelope = client.interpret("agregá dos paquetes de arroz")
@@ -313,7 +316,7 @@ not valid Unicode is rejected before anything is sent:
 
 ```bash
 python -c '
-from voicestock.communication import ClientSettings, HttpInterpretationClient
+from pi.communication import ClientSettings, HttpInterpretationClient
 with HttpInterpretationClient(ClientSettings.from_environment()) as client:
     print(client.interpret("arroz \ud800").model_dump_json(indent=2))'
 ```
@@ -365,9 +368,9 @@ the stub provider cannot produce. Automated tests verify them:
 
 | Code | Test |
 |---|---|
-| `handler_failure` | `tests/communication/test_server.py::test_interpret_converts_handler_exception_to_transport_error` |
-| `serialization_failure` | `tests/communication/test_server.py::test_interpret_rejects_non_serializable_handler_result` |
-| `invalid_response_encoding`, `invalid_envelope`, `unexpected_status` | `tests/communication/test_client.py::test_malformed_responses_are_distinguishable` |
+| `handler_failure` | `tests/pc/communication/test_server.py::test_interpret_converts_handler_exception_to_transport_error` |
+| `serialization_failure` | `tests/pc/communication/test_server.py::test_interpret_rejects_non_serializable_handler_result` |
+| `invalid_response_encoding`, `invalid_envelope`, `unexpected_status` | `tests/pi/communication/test_client.py::test_malformed_responses_are_distinguishable` |
 
 ## Replaceable handler
 
@@ -388,25 +391,28 @@ handler is `InterpretationService.interpret`, which always returns a
 ## Automated verification
 
 ```bash
-pytest tests/communication tests/test_pc_server.py \
-  tests/test_client_roundtrip.py tests/test_pi_client.py
+pytest tests/pc/communication tests/pc/test_pc_main.py tests/pi \
+  tests/shared tests/integration tests/test_architecture.py
 ```
 
-- `tests/communication/test_server.py` exercises the FastAPI request/response
+- `tests/pc/communication/test_server.py` exercises the FastAPI request/response
   path through HTTPX's ASGI transport: valid Spanish text, malformed JSON,
   invalid request shapes, unsupported media type, handler failure and
   serialization failure.
-- `tests/communication/test_client.py` uses HTTPX's `MockTransport`: happy
+- `tests/pi/communication/test_client.py` uses HTTPX's `MockTransport`: happy
   path, UTF-8 encoding, payload and server error pass-through, every client
   error code and the absence of retries.
-- `tests/communication/test_contracts.py` and `test_settings.py` cover envelope
-  invariants and configuration.
-- `tests/test_pc_server.py` covers the path PC server → `InterpretationService`
-  → provider, plus import checks ensuring the communication package does not
-  know the interpretation package and that no second HTTP server exists.
-- `tests/test_client_roundtrip.py` and `tests/test_pi_client.py` use real
-  localhost sockets: a roundtrip through the actual PC server, a refused
-  connection and a silent socket that must end in `timeout`.
+- `tests/shared/communication/test_contracts.py` covers envelope invariants;
+  `tests/pc/communication/test_server_settings.py` and
+  `tests/pi/communication/test_client_settings.py` cover configuration.
+- `tests/pc/test_pc_main.py` covers the path PC server →
+  `InterpretationService` → provider.
+- `tests/integration/test_pi_pc_roundtrip.py` and `tests/pi/test_pi_main.py`
+  use real localhost sockets: a roundtrip through the actual PC server, a
+  refused connection and a silent socket that must end in `timeout`.
+- `tests/test_architecture.py` checks the import boundaries: `pc` and `pi`
+  never import each other, `shared` imports neither, `pc.communication` does
+  not know `pc.interpretation` and no second HTTP server exists.
 
 ## Pending physical verification
 

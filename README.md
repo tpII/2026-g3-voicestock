@@ -14,6 +14,22 @@ inventario e interfaz web continúan en desarrollo.
 - Python 3.11 o superior
 - Git
 
+## Estructura del código
+
+El código está dividido según la máquina donde corre
+([ADR-0002](docs/decisions/0002-split-source-by-runtime-pc-pi-shared.md)):
+
+```text
+src/
+├── pc/       lo que corre en la PC: servidor HTTP e interpretación
+├── pi/       lo que corre en la Raspberry Pi: cliente de la PC (y luego STT, web, base de datos)
+└── shared/   contratos que intercambian ambas (TransportEnvelope)
+```
+
+`pc` y `pi` no se importan entre sí y `shared` no importa a ninguno; un test lo
+verifica. Los tests siguen la misma división (`tests/pc`, `tests/pi`,
+`tests/shared`, más `tests/integration` para pruebas que usan ambos lados).
+
 ## Arranque rápido
 
 ```bash

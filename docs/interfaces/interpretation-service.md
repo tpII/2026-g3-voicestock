@@ -25,7 +25,7 @@ InterpretationProvider.interpret(text)
    └── external API provider               pending
 ```
 
-The HTTP server calls the service through `src/voicestock/pc_server.py`, and
+The HTTP server calls the service through `src/pc/main.py`, and
 each `ServiceResult` travels as the payload of a successful `TransportEnvelope`.
 See the [Raspberry Pi–PC communication interface](pc-communication.md).
 
@@ -101,7 +101,7 @@ contains every provider shipped with VoiceStock. The service receives the
 registry and the active provider name, and resolves the provider itself:
 
 ```python
-from voicestock.interpretation import (
+from pc.interpretation import (
     InterpretationService,
     InterpretationSettings,
     default_registry,
@@ -127,7 +127,7 @@ VOICESTOCK_INTERPRETATION_PROVIDER=stub
 ## Automated verification
 
 ```bash
-pytest tests/interpretation
+pytest tests/pc/interpretation
 ```
 
 The tests use in-memory providers only and never access the network. They

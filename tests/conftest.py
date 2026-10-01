@@ -7,8 +7,8 @@ from collections.abc import Iterator
 import pytest
 import uvicorn
 
-from voicestock.interpretation import default_registry
-from voicestock.pc_server import create_pc_app
+from pc.interpretation import default_registry
+from pc.main import create_pc_app
 
 
 @pytest.fixture

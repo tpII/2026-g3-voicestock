@@ -92,3 +92,52 @@ Se agregaron 20 tests del nuevo módulo, además del test de humo existente. La
 suite completa alcanzó **21 tests aprobados** y **92 % de cobertura**. También se
 realizó una prueba HTTP real contra el servidor local, verificando una respuesta
 exitosa y el rechazo de un request inválido.
+
+---
+
+## 01/10/2026
+
+### Implementación
+
+Se implementó el núcleo de `InterpretationService`, independiente del proveedor
+que realice la interpretación. El servicio resuelve el proveedor activo desde un
+registro, le delega el texto reconocido y siempre devuelve un `ServiceResult`
+tipado, incluso cuando la entrada es inválida o el proveedor falla.
+
+La interfaz está documentada en
+[InterpretationService interface](../interfaces/interpretation-service.md).
+
+### Decisiones técnicas
+
+- Los proveedores implementan un único método `interpret(text)`. Un modelo
+  local y una API externa entran en el mismo puerto, porque cada proveedor
+  maneja su propia configuración, red y timeouts.
+- `ServiceResult` distingue éxito y tres categorías de error estables:
+  `invalid_input`, `provider_not_configured` y `provider_failure`. El campo
+  `detail` es solo diagnóstico.
+- Cualquier excepción inesperada del proveedor se informa como
+  `provider_failure` sin exponer el mensaje interno.
+- Un error del servicio es un resultado transportado con éxito: la capa HTTP no
+  lo convierte en error de transporte.
+- El proveedor activo se elige con `VOICESTOCK_INTERPRETATION_PROVIDER`
+  (por defecto `stub`). Un nombre vacío o no registrado no rompe el arranque:
+  cada llamada devuelve `provider_not_configured`.
+- El servicio todavía no está conectado al servidor HTTP; eso corresponde a
+  `InterpretationService-02`.
+
+### Pruebas
+
+Se agregaron 25 tests que usan solamente proveedores en memoria, sin acceso a
+red, incluyendo la sustitución de proveedor y un chequeo de imports que
+garantiza que el módulo no depende de HTTP ni de otro transporte. La suite
+completa alcanzó **46 tests aprobados** y **96 % de cobertura**.
+
+### Problemas encontrados
+
+- Al agregar `tests/interpretation/test_settings.py`, Pytest falló porque ya
+  existía un archivo con el mismo nombre en `tests/communication/` y las
+  carpetas de tests no son paquetes. Se resolvió usando nombres de archivo
+  únicos.
+- El servidor MCP oficial de ClickUp devolvió un error de límite de uso al
+  conectarlo desde Claude Code. Se optó por acceder a la API REST de ClickUp
+  con un token personal guardado fuera del repositorio.

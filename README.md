@@ -64,6 +64,7 @@ El contrato y los ejemplos están en la
 - [Guía de documentación](docs/guides/documentation-guide.md)
 - [Flujo de trabajo de desarrollo](docs/guides/development-workflow.md)
 - [Comunicación Raspberry Pi–PC](docs/interfaces/pc-communication.md)
+- [Servicio de interpretación](docs/interfaces/interpretation-service.md)
 - [Bitácora](docs/bitacora/bitacora.md)
 
 ## Licencia

@@ -274,3 +274,24 @@ conexión pero nunca responde, que debe terminar en `timeout`. La suite alcanzó
 Tras actualizar el repositorio hay que reinstalar el paquete
 (`pip install -e ".[dev]"`), porque `httpx` pasó a ser dependencia de
 ejecución.
+
+### Documentación de la comunicación Raspberry Pi–PC
+
+Se completó la documentación de la interfaz de comunicación
+(`RaspberryPiPCCommunication-04`) para que cualquier integrante pueda levantar
+servidor y cliente y reproducir el viaje completo solo con el repositorio:
+
+- Se agregó el comando `voicestock-pi-client "texto"`, que envía un texto a la
+  PC e imprime el `TransportEnvelope` resultante. Es el equivalente del lado de
+  la Raspberry a `voicestock-pc-server` y sirve para pruebas manuales.
+- Se documentó cómo operar en la red local: el servidor escuchando en
+  `0.0.0.0`, cómo obtener la IP de la PC y cómo apuntar el cliente desde la
+  Raspberry. La IP definitiva queda a cargo de `LocalNetworkInfra`.
+- Se armó un catálogo único de errores de comunicación (del servidor y del
+  cliente), con un comando para reproducir cada uno y la salida obtenida al
+  ejecutarlo. Los que el proveedor stub no puede provocar se enlazan a su test.
+- Se dejó explícito que la capa de comunicación no inspecciona operación,
+  producto, cantidad ni unidad.
+
+Queda pendiente la prueba física entre la PC y la Raspberry, que depende de la
+red de `LocalNetworkInfra`.

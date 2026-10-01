@@ -170,3 +170,42 @@ sobre exitoso (`200`).
 Tras actualizar el repositorio hay que reinstalar el paquete
 (`pip install -e ".[dev]"`), porque cambió el módulo del comando
 `voicestock-pc-server`.
+
+### Cliente de comunicación en la Raspberry Pi
+
+Se implementó el cliente que usa la Raspberry Pi para enviar el texto
+reconocido a la PC (`RaspberryPiPCCommunication-03`). Con él queda completo en
+código el viaje Raspberry → PC → Raspberry; falta probarlo en el hardware real.
+
+Decisiones:
+
+- El resto del sistema depende del protocolo `InterpretationClient`, con un
+  único método `interpret(text) -> TransportEnvelope`. No conoce HTTP, de modo
+  que el transporte se puede cambiar sin tocar a quien lo usa.
+- El cliente nunca lanza excepciones por problemas de comunicación: todo
+  resultado es un `TransportEnvelope`. Así aparece un tercer nivel de error,
+  detectado en la propia Raspberry cuando no llega una respuesta usable:
+  `timeout`, `connection_failed`, `unexpected_status`,
+  `invalid_response_encoding`, `invalid_envelope` y
+  `request_encoding_failure`. Estos códigos no se superponen con los del
+  servidor, y los errores que informa el servidor llegan sin cambios.
+- El cliente no valida el texto ni inspecciona el payload, y no hace
+  reintentos: esas decisiones corresponden a capas superiores.
+- Destino y timeout se configuran con `VOICESTOCK_PC_URL` (por defecto
+  `http://127.0.0.1:8000`) y `VOICESTOCK_PC_TIMEOUT` (por defecto 10 segundos).
+  La IP definitiva de la PC depende de `LocalNetworkInfra`, que todavía no fijó
+  el plan de direcciones.
+- `httpx` pasó de dependencia de desarrollo a dependencia de ejecución, porque
+  ahora la usa el cliente.
+
+### Pruebas del cliente
+
+Se agregaron tests con un transporte simulado (`httpx.MockTransport`) para cada
+respuesta rota posible, y tests con sockets reales en localhost: un viaje
+completo contra el servidor real, un puerto cerrado y un socket que acepta la
+conexión pero nunca responde, que debe terminar en `timeout`. La suite alcanzó
+**94 tests aprobados** y **97 % de cobertura**; el cliente tiene 100 %.
+
+Tras actualizar el repositorio hay que reinstalar el paquete
+(`pip install -e ".[dev]"`), porque `httpx` pasó a ser dependencia de
+ejecución.

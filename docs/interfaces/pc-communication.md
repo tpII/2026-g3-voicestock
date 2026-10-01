@@ -111,8 +111,8 @@ used for program flow.
 | `500` | `serialization_failure` | The handler returned a value that cannot be encoded as JSON. |
 
 Connection refusal, connection loss and client-side timeout do not produce an
-HTTP response or a `TransportEnvelope`; the Raspberry client must represent them
-as local transport failures.
+HTTP response or a `TransportEnvelope`; the Raspberry client represents them as
+local transport failures (see [client error codes](#client-error-codes)).
 
 ## Run the server
 
@@ -207,12 +207,119 @@ successful envelope, transport errors that never reach the service, and import
 checks ensuring the communication package does not know the interpretation
 package and that no second HTTP server exists.
 
-## Pending Raspberry client work
+## Raspberry Pi client
 
-The Raspberry client, destination address and timeout policy are not implemented
-yet. Once available, this document must add:
+`HttpInterpretationClient` is the Raspberry Pi side of this interface. The rest
+of the Raspberry system must depend on the `InterpretationClient` protocol, not
+on HTTP:
 
-- client setup and configuration;
-- exact timeout behavior;
-- connection-refused and connection-loss examples;
-- a physical PC–Raspberry roundtrip over `LocalNetworkInfra`.
+```python
+class InterpretationClient(Protocol):
+    def interpret(self, text: str) -> TransportEnvelope: ...
+```
+
+Every call returns a `TransportEnvelope` and never raises for a communication
+failure. The caller checks the outer `status` (did the message travel?) and,
+on success, hands `payload` to the next layer, which reads the inner
+`ServiceResult`.
+
+```python
+from voicestock.communication import ClientSettings, HttpInterpretationClient
+
+with HttpInterpretationClient(ClientSettings.from_environment()) as client:
+    envelope = client.interpret("agregá dos paquetes de arroz")
+
+if envelope.status == "success":
+    service_result = envelope.payload
+else:
+    handle_communication_error(envelope.error.code)
+```
+
+What the client does and does not do:
+
+- it accepts any string, including blank text: the server decides whether the
+  request is valid and its error envelope reaches the caller unchanged;
+- it sends `{"text": ...}` as UTF-8 JSON with
+  `Content-Type: application/json; charset=utf-8`;
+- it validates only HTTP status, encoding, JSON and the `TransportEnvelope`
+  shape: the payload is returned intact, even if its domain content is invalid;
+- it does not know interpretation providers or the operation schema;
+- it makes exactly one request per call: no retries and no flow recovery;
+- it does not need Internet, only a route to the PC on the local network.
+
+### Configuration
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `VOICESTOCK_PC_URL` | `http://127.0.0.1:8000` | Base URL of the PC server. |
+| `VOICESTOCK_PC_TIMEOUT` | `10` | Seconds; must be finite and positive. |
+
+`VOICESTOCK_PC_URL` must be an `http` or `https` URL with a host. The client
+only consumes this address: assigning the PC a stable IP on the isolated
+network belongs to `LocalNetworkInfra`, which has not fixed the addressing
+plan yet. Until then, use the PC's current LAN IP and the port chosen with
+`VOICESTOCK_PC_PORT`:
+
+```bash
+VOICESTOCK_PC_URL=http://<pc-ip>:8123
+```
+
+The timeout applies separately to each phase of the request: connecting,
+sending and waiting for the response. A server that is down or silent
+therefore returns an error to the caller instead of blocking indefinitely.
+The default leaves room for a slow interpretation provider.
+
+### Client error codes
+
+Errors detected on the Raspberry use their own codes, which never collide with
+the server codes above. In both cases the envelope has `status: "error"` and
+`payload: null`.
+
+| Error code | Meaning |
+|---|---|
+| `timeout` | Connecting, sending or waiting for the response exceeded the timeout. |
+| `connection_failed` | Connection refused, reset or lost; nothing usable was received. |
+| `request_encoding_failure` | The text cannot be encoded as UTF-8 JSON (for example, a lone surrogate); nothing was sent. |
+| `unexpected_status` | The HTTP status does not match the envelope, or a non-200 response has no error envelope (for example, a 404 page from a wrong URL). |
+| `invalid_response_encoding` | A 200 response body is not UTF-8 JSON. |
+| `invalid_envelope` | A 200 response body is JSON but not a valid `TransportEnvelope`. |
+
+Server error envelopes (`invalid_request`, `handler_failure`, etc.) are passed
+through unchanged.
+
+### Manual client check
+
+With the server running (`voicestock-pc-server`):
+
+```bash
+python -c '
+from voicestock.communication import ClientSettings, HttpInterpretationClient
+with HttpInterpretationClient(ClientSettings.from_environment()) as client:
+    print(client.interpret("agregá dos paquetes de arroz").model_dump_json())
+'
+```
+
+Expected output: a success envelope whose inner `ServiceResult` echoes the
+text. With the server stopped, the same command prints an error envelope with
+code `connection_failed`.
+
+### Automated client verification
+
+```bash
+pytest tests/communication/test_client.py tests/test_client_roundtrip.py
+```
+
+`tests/communication/test_client.py` uses HTTPX's `MockTransport` to cover the
+happy path, UTF-8 encoding, payload pass-through, server error pass-through,
+every client error code and the absence of retries.
+
+`tests/test_client_roundtrip.py` uses real localhost sockets: a roundtrip
+through the actual PC server and `InterpretationService`, a refused
+connection on a closed port, and a socket that accepts the connection but
+never answers, which must end in `timeout`.
+
+## Pending physical verification
+
+The client has not yet been run on the Raspberry Pi hardware. Once
+`LocalNetworkInfra` provides the isolated network, this document must add the
+PC address to use and the evidence of a physical PC–Raspberry roundtrip.

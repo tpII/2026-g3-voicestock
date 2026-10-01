@@ -141,3 +141,32 @@ completa alcanzó **46 tests aprobados** y **96 % de cobertura**.
 - El servidor MCP oficial de ClickUp devolvió un error de límite de uso al
   conectarlo desde Claude Code. Se optó por acceder a la API REST de ClickUp
   con un token personal guardado fuera del repositorio.
+
+### Integración servidor–servicio
+
+Se conectó `InterpretationService` al servidor de comunicación de la PC. Ahora
+una solicitud `POST /api/v1/interpret` recorre el camino completo servidor →
+servicio → proveedor, y la respuesta tiene dos niveles:
+
+- el `TransportEnvelope` externo indica si el mensaje viajó correctamente;
+- el `ServiceResult` interno indica si el texto pudo interpretarse.
+
+Un error del servicio, como `provider_not_configured`, viaja dentro de un sobre
+exitoso con HTTP 200. Un error de transporte, como un texto vacío, se rechaza
+antes de llegar al servicio.
+
+La unión de ambas capas se hace en un único módulo nuevo,
+`src/voicestock/pc_server.py`, que pasa a ser el punto de entrada del comando
+`voicestock-pc-server`. Se eliminó el stub que vivía dentro de la capa de
+comunicación, que ahora no importa nada del paquete de interpretación.
+
+Se agregaron 7 tests del camino integrado, incluyendo chequeos de imports que
+verifican que la comunicación no conoce la interpretación y que no existe un
+segundo servidor HTTP. La suite alcanzó **53 tests aprobados** y **96 % de
+cobertura**. Además se levantó el servidor real y se verificó con `curl` un
+éxito, un rechazo de transporte (`422`) y un error de servicio dentro de un
+sobre exitoso (`200`).
+
+Tras actualizar el repositorio hay que reinstalar el paquete
+(`pip install -e ".[dev]"`), porque cambió el módulo del comando
+`voicestock-pc-server`.

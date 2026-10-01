@@ -25,8 +25,13 @@ InterpretationProvider.interpret(text)
    └── external API provider               pending
 ```
 
-The service is not connected to the HTTP server yet; that happens in
-`InterpretationService-02`.
+The HTTP server calls the service through `src/voicestock/pc_server.py`, and
+each `ServiceResult` travels as the payload of a successful `TransportEnvelope`.
+See the [Raspberry Pi–PC communication interface](pc-communication.md).
+
+An empty or blank text is rejected by the HTTP layer as `invalid_request`
+before reaching the service; `invalid_input` protects callers that use the
+service directly.
 
 ## ServiceResult
 

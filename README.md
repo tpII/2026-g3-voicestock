@@ -4,8 +4,9 @@ Sistema de gestión de inventario asistido por voz, pensado para ejecutarse en u
 
 La Raspberry Pi capturará audio, hará Speech-to-Text, se comunicará con un modelo de lenguaje a través de una interfaz independiente del proveedor, validará respuestas estructuradas, administrará el inventario, persistirá datos en SQLite y expondrá una interfaz web.
 
-El proyecto está en una etapa inicial. Ya incluye el primer servidor de
-comunicación en la PC, mientras que captura de audio, STT, interpretación,
+El proyecto está en una etapa inicial. Ya incluye el servidor de comunicación
+de la PC conectado a un servicio de interpretación con proveedor intercambiable
+(por ahora un stub), mientras que captura de audio, STT, el modelo de lenguaje,
 inventario e interfaz web continúan en desarrollo.
 
 ## Requisitos
@@ -43,7 +44,8 @@ pytest
 
 ### Servidor de comunicación de la PC
 
-El servidor inicial utiliza un handler stub y escucha solamente en localhost:
+El servidor recibe texto por HTTP y lo pasa al servicio de interpretación. Por
+defecto usa el proveedor `stub` y escucha solamente en localhost:
 
 ```bash
 voicestock-pc-server

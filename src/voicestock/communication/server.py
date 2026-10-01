@@ -3,7 +3,6 @@
 from collections.abc import Callable
 from typing import Any
 
-import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic_core import PydanticSerializationError
@@ -12,7 +11,6 @@ from voicestock.communication.contracts import (
     InterpretationRequest,
     TransportEnvelope,
 )
-from voicestock.communication.settings import ServerSettings
 
 InterpretationHandler = Callable[[str], Any]
 
@@ -71,22 +69,3 @@ def _error_response(status_code: int, code: str, detail: str) -> JSONResponse:
     return JSONResponse(
         status_code=status_code, content=envelope.model_dump(mode="json")
     )
-
-
-def stub_handler(text: str) -> dict[str, str]:
-    """Return an opaque deterministic payload until InterpretationService exists."""
-    return {"recognized_text": text}
-
-
-def main() -> None:
-    """Run the development server with the replaceable stub handler."""
-    settings = ServerSettings.from_environment()
-    uvicorn.run(
-        create_app(stub_handler),
-        host=settings.host,
-        port=settings.port,
-    )
-
-
-if __name__ == "__main__":
-    main()

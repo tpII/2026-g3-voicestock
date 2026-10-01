@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [project.scripts]
-voicestock-pc-server = "voicestock.communication.server:main"
+voicestock-pc-server = "voicestock.pc_server:main"
 
 [project.optional-dependencies]
 dev = [

@@ -43,11 +43,76 @@ Se armó la base del monorepo, dejando preparado el entorno de desarrollo antes 
 - **¿Contamos con un parlante o con un buzzer? Con parlante se pediría la confirmación por audio; con buzzer simplemente se emitiría un sonido indicando que se registró y luego se pediría la confirmación por la web.**
   En principio no sería necesario el parlante. Se deja como objetivo secundario.
 
+---
+
 ## 17/09/2026
 
 ### Avance
 
 Se realizó la guía de documentación del proyecto (disponible en [Guía de documentación](../guides/documentation-guide.md)). Además, se organizaron los archivos de documentación ya existentes en el lugar correspondiente del repositorio: el flujo de trabajo quedó en `docs/guides/development-workflow.md` y la bitácora en `docs/bitacora/bitacora.md`. Se comenzó a definir las tareas necesarias para las diferentes áreas del proyecto; se utilizará la plataforma ClickUp como centro de gestión y se adoptó la convención 1 tarea = 1 commit.
+
+---
+
+## 19/09/2026
+
+### Avance
+
+Se descompuso el sistema en features y se organizó el trabajo en ClickUp, separando tareas de **Raspberry Pi, PC, Web & DataBase, documentación y pruebas**.
+
+Se definieron como principales bloques: `PushToTalk`, `SpeechToText`, `RaspberryPiPCCommunication`, `InterpretationService`, `StructuredCommandInterpretation`, `OperationContractValidation`, `PendingOperationFlow` y `PendingOperationWeb`.
+
+---
+
+## 23/09/2026
+
+### Avance
+
+Se comenzaron la mayoría de las tareas iniciales de investigación definidas en ClickUp.
+
+Entre ellas:
+
+- alternativas de STT para Raspberry Pi 3;
+- comunicación Raspberry Pi–PC;
+- modelo local vs API externa para interpretación;
+- captura Push-to-Talk;
+- stack para servidor HTTP e interfaz web;
+- definición del contrato entre componentes.
+
+Se decidió mantener los módulos desacoplados mediante interfaces para poder reemplazar tecnologías sin modificar todo el sistema.
+
+---
+
+## 24/09/2026
+
+### Avance
+
+Se terminó de definir de forma preliminar el flujo principal:
+
+**pulsador → audio → STT → PC → interpretación → validación → operación pendiente → confirmación web**
+
+Se estableció que una interpretación válida **no modifica directamente el inventario**, sino que primero genera una operación pendiente que debe ser confirmada.
+
+También se comenzó a trabajar sobre un **contrato JSON versionado** con validación estructural y semántica.
+
+---
+
+## 25/09/2026
+
+### Avance
+
+Se continuó refinando el backlog y las tareas de implementación en ClickUp.
+
+Se avanzó en la definición de:
+
+- comunicación cliente/servidor entre Raspberry Pi y PC;
+- `InterpretationService` desacoplado del proveedor;
+- validación de productos y operaciones;
+- estado `WAIT_CONFIRMATION`;
+- interfaz web para consultar, confirmar o cancelar operaciones pendientes.
+
+Como parte de la investigación del modelo local, se realizaron pruebas con **Qwen 3.5 4B** clasificando productos en categorías de supermercado.
+
+Los resultados fueron correctos en los casos probados, con un tiempo aproximado de **15 segundos por consulta**, por lo que se considera una alternativa viable para seguir evaluando frente al uso de APIs externas.
 
 ---
 

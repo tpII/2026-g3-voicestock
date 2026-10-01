@@ -57,7 +57,17 @@ Para exponerlo en la red local y elegir otro puerto:
 VOICESTOCK_PC_HOST=0.0.0.0 VOICESTOCK_PC_PORT=8123 voicestock-pc-server
 ```
 
-El contrato y los ejemplos están en la
+### Cliente de la Raspberry Pi
+
+La Raspberry Pi envía el texto con `HttpInterpretationClient`. El destino y el
+timeout se configuran con variables de entorno (por defecto
+`http://127.0.0.1:8000` y 10 segundos):
+
+```bash
+VOICESTOCK_PC_URL=http://<ip-de-la-pc>:8123 VOICESTOCK_PC_TIMEOUT=10
+```
+
+El contrato, el uso del cliente y los ejemplos están en la
 [interfaz de comunicación Raspberry Pi–PC](docs/interfaces/pc-communication.md).
 
 ## Documentación

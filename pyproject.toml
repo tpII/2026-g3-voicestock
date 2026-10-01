@@ -12,6 +12,9 @@ requires-python = ">=3.11"
 authors = [
     { name = "VoiceStock contributors" },
 ]
+dependencies = [
+    "gpiozero>=2.0.1",
+]
 
 [project.optional-dependencies]
 dev = [

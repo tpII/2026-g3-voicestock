@@ -321,19 +321,3 @@ No cambió el comportamiento: los comandos conservan su nombre y la suite pasó
 de 97 a **101 tests aprobados** (por los nuevos chequeos de imports), con
 **97 % de cobertura**. Tras actualizar el repositorio hay que reinstalar el
 paquete (`pip install -e ".[dev]"`).
-
----
-
-## 01/10/2026
-
-### Avance
-
-Quedó documentada la captura push-to-talk ya implementada en `src/pi/`, sin
-cambiar el código. El stack elegido es GPIO Zero con callbacks que solo
-encolan el gesto, y `sounddevice` sobre PortAudio/ALSA para el micrófono USB.
-El contrato de salida es WAV PCM firmado, mono, 16 bit, 16 kHz. La interfaz
-estable (`AudioCaptureResult`, artifact y duración máxima) y el procedimiento
-de cableado y prueba manual quedaron separados de la investigación previa.
-
-La prueba física en la Raspberry Pi (pulsador, micrófono USB y escucha del WAV)
-sigue pendiente.

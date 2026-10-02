@@ -5,7 +5,7 @@ import wave
 from pathlib import Path
 
 import pytest
-from tests.pi.audio.scripted_backend import ScriptedPcmBackend
+from scripted_backend import ScriptedPcmBackend
 
 from pi.audio import (
     AudioArtifact,

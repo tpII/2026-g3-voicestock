@@ -9,7 +9,6 @@ from collections.abc import Callable
 
 from gpiozero import Button
 from gpiozero.pins.mock import MockFactory, MockPin
-from tests.pi.input.conftest import SimulatedClock
 
 from pi.input.push_to_talk_button import PushToTalkButton
 
@@ -84,7 +83,7 @@ def test_press_notifies_pressed_once(mock_pin_factory: MockFactory) -> None:
 
 def test_release_notifies_released_once_after_press(
     mock_pin_factory: MockFactory,
-    simulated_clock: SimulatedClock,
+    simulated_clock,
 ) -> None:
     """After a press, driving the pin from low to high notifies released once."""
     events, on_pressed, on_released = _callbacks()
@@ -101,7 +100,7 @@ def test_release_notifies_released_once_after_press(
 
 def test_press_then_release_notifies_in_semantic_order(
     mock_pin_factory: MockFactory,
-    simulated_clock: SimulatedClock,
+    simulated_clock,
 ) -> None:
     """A full press and release cycle notifies pressed, then released."""
     events, on_pressed, on_released = _callbacks()
@@ -118,7 +117,7 @@ def test_press_then_release_notifies_in_semantic_order(
 
 def test_repeated_cycles_notify_each_valid_transition(
     mock_pin_factory: MockFactory,
-    simulated_clock: SimulatedClock,
+    simulated_clock,
 ) -> None:
     """Each real edge notifies once. Holding a level does not repeat it."""
     events, on_pressed, on_released = _callbacks()
@@ -142,7 +141,7 @@ def test_repeated_cycles_notify_each_valid_transition(
 
 def test_bounce_within_window_notifies_press_once(
     mock_pin_factory: MockFactory,
-    simulated_clock: SimulatedClock,
+    simulated_clock,
 ) -> None:
     """Chatter inside the bounce window does not emit extra callbacks."""
     events, on_pressed, on_released = _callbacks()
@@ -164,7 +163,7 @@ def test_bounce_within_window_notifies_press_once(
 
 def test_transition_after_bounce_window_is_detected(
     mock_pin_factory: MockFactory,
-    simulated_clock: SimulatedClock,
+    simulated_clock,
 ) -> None:
     """A later edge is reported once the bounce interval has elapsed."""
     events, on_pressed, on_released = _callbacks()

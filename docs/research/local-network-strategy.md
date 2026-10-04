@@ -37,11 +37,10 @@ be dedicated to VoiceStock. That physical arrangement is the constraint this
 decision is built on. The choice is about how two nearby machines are linked,
 not about a general-purpose wireless network.
 
-Earlier interface notes still describe the PC address as something
-`LocalNetworkInfra` had not fixed, and they mention a Raspberry Pi access
-point as a possible way to find that address. This research closes that gap.
 The addressing plan below is the source for the VoiceStock local network.
-Application features keep using the network; they do not choose it.
+The procedure that applies it is the
+[Ethernet setup guide](../setup/local-network.md). Application features keep
+using the network; they do not choose it.
 
 ## Evaluation criteria
 

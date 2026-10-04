@@ -113,6 +113,7 @@ el contrato de audio y la prueba en la placa están separados:
 - [Servicio de interpretación](docs/interfaces/interpretation-service.md)
 - [Captura push-to-talk](docs/interfaces/push-to-talk-capture.md)
 - [Prueba manual de push-to-talk](docs/setup/push-to-talk.md)
+- [Red Ethernet local](docs/setup/local-network.md)
 - [Bitácora](docs/bitacora/bitacora.md)
 
 ## Licencia

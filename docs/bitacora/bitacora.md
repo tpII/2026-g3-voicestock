@@ -94,6 +94,37 @@ Se estableció que una interpretación válida **no modifica directamente el inv
 
 También se comenzó a trabajar sobre un **contrato JSON versionado** con validación estructural y semántica.
 
+### Investigación de Push-to-Talk
+
+Se avanzó en la investigación del stack necesario para implementar la primera parte del flujo en la Raspberry Pi: detección del pulsador y captura de audio desde un micrófono USB.
+
+Para GPIO se compararon alternativas de acceso desde Python y se eligió **GPIO Zero**, utilizando un modelo orientado a eventos en lugar de polling. El pulsador se conectará entre un GPIO configurable y GND utilizando el pull-up interno de la Raspberry Pi.
+
+El estado eléctrico será:
+
+- pulsador liberado → GPIO HIGH;
+- pulsador presionado → GPIO LOW.
+
+GPIO Zero abstraerá estos niveles mediante eventos semánticos de pulsación y liberación.
+
+Se estableció además que los callbacks GPIO deben ser mínimos y no bloqueantes: únicamente notificarán cambios de estado. La captura de audio se ejecutará fuera de estos callbacks.
+
+### Investigación de audio
+
+Para la adquisición desde el micrófono USB se evaluaron alternativas como `arecord`, PyAudio y `python-sounddevice`.
+
+Se eligió **python-sounddevice** sobre PortAudio y ALSA, utilizando `RawInputStream` para disponer de control explícito sobre el inicio y finalización de la captura. `arecord` se conservará como herramienta de diagnóstico, pero no como backend de la aplicación.
+
+Se definió como contrato de audio para las siguientes etapas:
+
+- contenedor WAV;
+- PCM lineal sin compresión;
+- 16 kHz;
+- mono;
+- signed 16-bit.
+
+No se asumirá que cualquier micrófono USB soporte directamente esta configuración. La implementación deberá comprobar las capacidades del dispositivo seleccionado y fallar explícitamente si no puede cumplir el contrato. El resampling queda fuera del alcance inicial.
+
 ---
 
 ## 25/09/2026
@@ -113,6 +144,26 @@ Se avanzó en la definición de:
 Como parte de la investigación del modelo local, se realizaron pruebas con **Qwen 3.5 4B** clasificando productos en categorías de supermercado.
 
 Los resultados fueron correctos en los casos probados, con un tiempo aproximado de **15 segundos por consulta**, por lo que se considera una alternativa viable para seguir evaluando frente al uso de APIs externas.
+
+### Implementación inicial de Push-to-Talk
+
+Se implementó la detección de pulsación y liberación mediante `PushToTalkButton`.
+
+El componente encapsula GPIO Zero y se limita a adaptar el hardware físico a dos eventos de aplicación: press y release. No contiene lógica de captura de audio, Speech-to-Text ni conocimiento del pipeline general.
+
+El pin BCM y el tiempo de debounce son configurables. La polaridad queda fijada mediante el pull-up interno (`pull_up=True`) y el pulsador conectado a GND.
+
+Se agregaron tests utilizando los mock pins de GPIO Zero para verificar:
+
+- pulsación;
+- liberación;
+- orden de los eventos;
+- ciclos repetidos;
+- debounce;
+- aceptación de una transición válida posterior al debounce;
+- liberación de recursos mediante `close()`.
+
+De esta forma, la lógica GPIO puede validarse automáticamente sin disponer de una Raspberry Pi física durante CI.
 
 ---
 
@@ -157,6 +208,42 @@ Se agregaron 20 tests del nuevo módulo, además del test de humo existente. La
 suite completa alcanzó **21 tests aprobados** y **92 % de cobertura**. También se
 realizó una prueba HTTP real contra el servidor local, verificando una respuesta
 exitosa y el rechazo de un request inválido.
+
+### Implementación de captura de audio USB
+
+Se implementó la captura de audio desde micrófono USB, manteniéndola desacoplada tanto del GPIO como del futuro motor de Speech-to-Text.
+
+`AudioCapture` expone un ciclo explícito `start()` / `stop()` y depende de una interfaz `AudioInputBackend`. La implementación de producción utiliza `SoundDeviceBackend`, mientras que los tests pueden sustituirla por un backend simulado.
+
+La captura se realiza progresivamente, evitando mantener toda la grabación en memoria. Esto reduce el uso de RAM y resulta apropiado para la Raspberry Pi 3 utilizada por el proyecto.
+
+### Lifecycle del artifact
+
+Cada captura utiliza un identificador UUID y comienza escribiendo sobre un archivo temporal:
+
+`<uuid>.recording`
+
+Al detenerse la captura se finaliza el WAV, se validan sus parámetros y sólo entonces se publica mediante una operación atómica como:
+
+`<uuid>.wav`
+
+Por lo tanto, un archivo con extensión `.wav` representa un artifact correctamente finalizado.
+
+`AudioArtifact` mantiene un identificador independiente del path y expone `cleanup()` para que el propietario pueda eliminar el archivo cuando deje de necesitarlo.
+
+### Selección del micrófono
+
+El dispositivo de entrada se selecciona mediante una descripción configurable y no mediante un índice PortAudio persistente, ya que esos índices pueden cambiar al reiniciar o reconectar dispositivos.
+
+Se definieron errores específicos para distinguir:
+
+- dispositivo no encontrado;
+- selector ambiguo;
+- configuración de audio no soportada;
+- fallos del stream;
+- operaciones inválidas según el estado de la captura.
+
+Antes de abrir el stream se valida que el dispositivo seleccionado pueda utilizar el contrato actual de 16 kHz, mono y signed 16-bit. No se agregó resampling automático.
 
 ---
 
@@ -321,3 +408,148 @@ No cambió el comportamiento: los comandos conservan su nombre y la suite pasó
 de 97 a **101 tests aprobados** (por los nuevos chequeos de imports), con
 **97 % de cobertura**. Tras actualizar el repositorio hay que reinstalar el
 paquete (`pip install -e ".[dev]"`).
+
+### Integración completa de Push-to-Talk
+
+Sobre la nueva estructura `pc`, `pi` y `shared`, se integraron los componentes
+de Push-to-Talk dentro del runtime de la Raspberry Pi:
+
+- `src/pi/input` contiene la adaptación del pulsador físico;
+- `src/pi/audio` contiene configuración, backend, captura y artifacts de audio;
+- `src/pi/push_to_talk` contiene la orquestación del gesto Push-to-Talk y el
+  resultado entregado al siguiente componente.
+
+Estos módulos permanecen dentro de `pi` y no en `shared`, ya que son
+responsabilidades específicas de la Raspberry Pi.
+
+`PushToTalkController` conecta los eventos del pulsador con `AudioCapture`.
+Los callbacks GPIO no realizan operaciones de audio directamente: `PRESSED`,
+`RELEASED` y los eventos de timeout ingresan a una cola y son procesados
+secuencialmente por un único worker.
+
+El flujo implementado queda:
+
+**pulsación → `PRESSED` → inicio de captura → liberación → `RELEASED` → finalización del WAV → `AudioCaptureResult`**
+
+`AudioCaptureResult` contiene el artifact generado, la duración real obtenida
+desde el WAV, el formato de audio y el motivo de finalización.
+
+### Duración máxima y máquina de estados
+
+Se incorporó una duración máxima configurable, con un valor por defecto de
+**60 segundos**, para evitar grabaciones indefinidas ante un pulsador trabado o
+una liberación no detectada.
+
+El controlador utiliza los estados:
+
+- `IDLE`;
+- `RECORDING`;
+- `WAITING_FOR_RELEASE`.
+
+Si vence el timeout mientras el botón continúa presionado, se finaliza la
+captura y se entrega un artifact válido con
+`TerminationReason.MAX_DURATION`. El controlador pasa entonces a
+`WAITING_FOR_RELEASE` y no permite comenzar otra captura hasta detectar la
+liberación física del pulsador.
+
+El timer no ejecuta `stop()` directamente: únicamente coloca el evento en la
+misma cola utilizada por el resto del controlador. Cada ciclo utiliza además
+una identificación interna para impedir que un timeout atrasado perteneciente
+a una grabación anterior detenga una captura posterior.
+
+### Ownership del audio
+
+Durante una grabación, `AudioCapture` es responsable del archivo temporal.
+
+Después de finalizar correctamente el WAV y construir `AudioArtifact`, el
+artifact se incorpora a `AudioCaptureResult` y se entrega mediante el callback
+de finalización.
+
+A partir de ese momento el ownership pertenece al consumidor. El controlador
+Push-to-Talk no elimina automáticamente artifacts entregados exitosamente.
+
+Esta separación permite que el futuro orquestador de Speech-to-Text decida
+cuándo procesar, conservar o eliminar el archivo sin acoplar esa política a la
+captura.
+
+### Pruebas de Push-to-Talk
+
+Se agregaron tests automatizados para los principales escenarios del
+controlador:
+
+- ciclo normal press–talk–release;
+- timeout por duración máxima;
+- eventos redundantes;
+- errores al iniciar la captura;
+- errores al detenerla;
+- carreras entre release y timeout;
+- timeouts atrasados pertenecientes a ciclos anteriores;
+- cierre durante una grabación activa;
+- excepciones producidas por el consumidor;
+- lifecycle y ownership del artifact.
+
+Los componentes GPIO y audio pueden sustituirse por implementaciones simuladas,
+por lo que la suite no requiere una Raspberry Pi, un pulsador ni un micrófono
+USB.
+
+### Documentación de Push-to-Talk
+
+Se completó la documentación estable de la feature.
+
+La decisión arquitectónica quedó registrada en el **ADR-0003**, documentando:
+
+- GPIO Zero con detección orientada a eventos;
+- callbacks GPIO mínimos;
+- cola y worker único para la orquestación;
+- `python-sounddevice` sobre PortAudio y ALSA;
+- `RawInputStream` para captura;
+- WAV PCM de 16 kHz, mono y 16 bits como contrato actual.
+
+La interfaz de Push-to-Talk documenta las responsabilidades de
+`PushToTalkButton`, `AudioCapture` y `PushToTalkController`, además de
+`AudioArtifact`, `AudioCaptureResult`, `AudioFormat`, `TerminationReason`, la
+máquina de estados y las reglas de ownership.
+
+También se agregó una guía de setup y prueba manual para conectar el pulsador,
+seleccionar el micrófono USB y ejecutar el nuevo comando:
+
+`voicestock-pi-ptt`
+
+El comando permite configurar pin BCM, debounce, dispositivo de entrada,
+directorio de salida y duración máxima.
+
+La guía incluye procedimientos para comprobar el WAV generado y reproducir el
+caso `MAX_DURATION`, además de diagnóstico para dispositivos inexistentes,
+selectores ambiguos, formatos no soportados y problemas de wiring o debounce.
+
+### Problemas encontrados en CI
+
+Al ejecutar la suite de Push-to-Talk en GitHub Actions, Pytest falló durante
+collection por imports internos de tests que utilizaban rutas del tipo
+`tests.pi...`.
+
+Estos imports funcionaban en el entorno local utilizado durante el desarrollo,
+pero dependían de que `tests` fuese importable como paquete raíz, condición que
+no estaba garantizada en un checkout limpio de CI.
+
+Se corrigió la organización/importación de los helpers de tests para eliminar
+esa dependencia del entorno local, sin modificar el workflow ni agregar
+`tests` artificialmente a `PYTHONPATH`.
+
+### Estado de Push-to-Talk
+
+Con la investigación, implementación, integración, tests y documentación
+completados, Push-to-Talk queda preparado a nivel de software para conectarse
+posteriormente con Speech-to-Text.
+
+Queda pendiente la validación física sobre la Raspberry Pi 3 del proyecto con
+el pulsador y el micrófono USB reales. Se deberá comprobar:
+
+- detección física de pulsación y liberación;
+- debounce con el pulsador real;
+- disponibilidad de PortAudio/ALSA en la imagen utilizada;
+- detección del micrófono USB;
+- soporte real de captura a 16 kHz, mono y 16 bits;
+- calidad del WAV resultante;
+- ciclo press–talk–release;
+- finalización por duración máxima.

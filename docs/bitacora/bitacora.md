@@ -553,3 +553,72 @@ el pulsador y el micrófono USB reales. Se deberá comprobar:
 - calidad del WAV resultante;
 - ciclo press–talk–release;
 - finalización por duración máxima.
+
+---
+
+## 04/10/2026
+
+### Red local: investigación (`LocalNetworkInfra-01`)
+
+Se reconsideró el enfoque original de usar la Raspberry Pi como punto de
+acceso Wi-Fi. La arquitectura elegida es un enlace Ethernet directo entre la
+PC y la Raspberry Pi 3. El Wi-Fi de la PC queda libre para Internet.
+
+El plan quedó así:
+
+- subred dedicada `192.168.50.0/24`;
+- Raspberry Pi en `192.168.50.1/24`;
+- PC en `192.168.50.2/24`;
+- direcciones estáticas;
+- sin puerta de enlace ni DNS en la Ethernet de VoiceStock;
+- sin DHCP, sin NAT y sin reenvío IP;
+- la Raspberry Pi no actúa como punto de acceso Wi-Fi.
+
+La decisión y sus motivos están en
+[estrategia de red local](../research/local-network-strategy.md).
+
+### Configuración Ethernet estática (`LocalNetworkInfra-02`)
+
+Se agregaron scripts reproducibles para aplicar esas direcciones en cada
+máquina. Se pueden ejecutar más de una vez. Cada script guarda la
+configuración con el mecanismo persistente de su sistema; el reinicio en el
+hardware real todavía no se probó.
+
+En la Raspberry Pi, `scripts/setup_pi_ethernet.sh` usa NetworkManager
+(`nmcli`). Crea o actualiza el perfil persistente `voicestock-ethernet` con
+`192.168.50.1/24`, sin puerta de enlace, sin DNS y con `ipv4.never-default`.
+Solo modifica la interfaz Ethernet elegida: si hay una sola, la usa; si hay
+más de una, hay que indicarla.
+
+En la PC, `scripts/setup_pc_ethernet.ps1` exige el `InterfaceAlias` exacto y
+no elige un adaptador por su cuenta. En ese adaptador deja `192.168.50.2/24`,
+desactiva el DHCP IPv4, no configura puerta de enlace y no modifica el Wi-Fi.
+
+Al revisar el script de Windows se corrigió el DNS. `ResetServerAddresses`
+volvía a los servidores que entrega DHCP. Ahora el adaptador dedicado guarda
+una lista DNS IPv4 estática y vacía, de modo que no queda ningún servidor DNS
+en esa interfaz.
+
+### Documentación operativa (`LocalNetworkInfra-03`)
+
+Se completó la guía de operación en
+[setup de la red Ethernet](../setup/local-network.md). Cubre la topología
+esperada, la preparación del hardware, la configuración de la Raspberry Pi y
+de Windows, la verificación local de direcciones y rutas, el orden de
+arranque, el diagnóstico de fallos habituales y una lista de comprobación
+antes de una demo.
+
+También se actualizó
+[la interfaz de comunicación Raspberry Pi–PC](../interfaces/pc-communication.md)
+para usar la dirección fija de la PC, `192.168.50.2`, y dejar de indicar el
+punto de acceso Wi-Fi que se había considerado antes.
+
+### Estado de LocalNetworkInfra
+
+- `LocalNetworkInfra-01` completada.
+- `LocalNetworkInfra-02` completada.
+- `LocalNetworkInfra-03` completada.
+- `LocalNetworkInfra-04` pendiente: falta la validación física con la PC, la
+  Raspberry Pi y el cable Ethernet reales. Todavía no se comprobó en hardware
+  la conectividad de punta a punta, el aislamiento de Internet ni que la
+  configuración sobreviva a un reinicio.

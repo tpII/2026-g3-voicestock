@@ -65,6 +65,18 @@ function Test-VoiceStockAddress {
     return ($Address.IPAddress -eq $VoiceStockAddress -and $Address.PrefixLength -eq $VoiceStockPrefixLength)
 }
 
+function Clear-InterfaceIPv4DnsServers {
+    param([string]$Alias)
+
+    # ResetServerAddresses restores the DHCP DNS list. address=none stores a
+    # static IPv4 DNS configuration with no servers on this adapter only.
+    Write-Info "Setting no IPv4 DNS servers on '$Alias'..."
+    & netsh.exe interface ipv4 set dnsservers "name=$Alias" source=static address=none validate=no | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw "Could not configure '$Alias' with no IPv4 DNS servers."
+    }
+}
+
 if (-not (Test-Administrator)) {
     throw "Administrator permissions are required. Open PowerShell as Administrator and run this script again."
 }
@@ -76,10 +88,13 @@ if ([string]::IsNullOrWhiteSpace($InterfaceAlias)) {
     throw "InterfaceAlias is required. Example: .\scripts\setup_pc_ethernet.ps1 -InterfaceAlias `"Ethernet`""
 }
 
-foreach ($commandName in @("Get-NetAdapter", "New-NetIPAddress", "Set-DnsClientServerAddress")) {
+foreach ($commandName in @("Get-NetAdapter", "New-NetIPAddress", "Get-DnsClientServerAddress")) {
     if (-not (Get-Command $commandName -ErrorAction SilentlyContinue)) {
         throw "Windows networking cmdlets are unavailable ($commandName). Run this script on Windows PowerShell."
     }
+}
+if (-not (Get-Command netsh.exe -ErrorAction SilentlyContinue)) {
+    throw "netsh.exe is required to configure the selected adapter with no IPv4 DNS servers."
 }
 
 $adapter = Get-SelectedAdapter -Alias $InterfaceAlias
@@ -105,8 +120,7 @@ foreach ($route in $defaultRoutes) {
     Remove-NetRoute -InterfaceAlias $InterfaceAlias -DestinationPrefix "0.0.0.0/0" -NextHop $route.NextHop -Confirm:$false
 }
 
-Write-Info "Clearing DNS servers on '$InterfaceAlias'..."
-Set-DnsClientServerAddress -InterfaceAlias $InterfaceAlias -ResetServerAddresses -Confirm:$false
+Clear-InterfaceIPv4DnsServers -Alias $InterfaceAlias
 
 $addresses = @(Get-IPv4Addresses -Alias $InterfaceAlias)
 $exactAddresses = @($addresses | Where-Object { Test-VoiceStockAddress $_ })

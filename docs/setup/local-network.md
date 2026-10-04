@@ -135,7 +135,7 @@ On that adapter only, the script:
 - disables IPv4 DHCP;
 - sets `192.168.50.2/24`;
 - removes any IPv4 default route;
-- clears IPv4 DNS servers;
+- sets a static IPv4 DNS list with no servers;
 - removes other IPv4 addresses so a second run does not accumulate them.
 
 Windows stores this in the persistent adapter configuration, so it remains

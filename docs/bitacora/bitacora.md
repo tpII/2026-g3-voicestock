@@ -622,3 +622,40 @@ punto de acceso Wi-Fi que se había considerado antes.
   Raspberry Pi y el cable Ethernet reales. Todavía no se comprobó en hardware
   la conectividad de punta a punta, el aislamiento de Internet ni que la
   configuración sobreviva a un reinicio.
+
+---
+
+## 06/10/2026
+
+### Interfaz web de la operación pendiente (`PendingOperationWeb-01`)
+
+Se eligió el stack y la topología del servidor que va a mostrar la operación
+pendiente en el navegador de la PC. La PC llega a la Raspberry Pi por el
+enlace Ethernet ya definido (`192.168.50.1` y `192.168.50.2`). No se vuelve a
+usar un punto de acceso Wi-Fi.
+
+La decisión quedó así:
+
+- FastAPI como framework HTTP y Uvicorn como servidor ASGI;
+- HTML, CSS y JavaScript vanilla, servidos como archivos estáticos por la
+  misma aplicación;
+- un solo proceso Python en la Raspberry Pi, dueño del orquestador, de la
+  máquina de estados y de `PendingOperation`;
+- HTTP solo como adaptador: consulta y resolución pasan por puertos de
+  aplicación, sin modificar la FSM desde las rutas.
+
+FastAPI se eligió por el contrato HTTP explícito (modelos, validación y un
+API que las tareas siguientes pueden implementar), no por rendimiento. El
+proceso único se eligió para no introducir IPC ni un segundo dueño del
+estado.
+
+Quedaron fuera de este incremento React, Vue, Angular, un frontend
+separado, Node.js, un segundo proceso HTTP, Redis, SQLite como canal entre
+HTTP y el orquestador, WebSockets, nginx y Docker para publicar esta
+interfaz.
+
+La comparación está en
+[pending operation web stack](../research/pending-operation-web-stack.md)
+y la decisión en
+[ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md).
+Esta tarea no implementa el servidor, el API ni la página.

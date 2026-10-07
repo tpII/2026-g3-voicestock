@@ -12,6 +12,21 @@ requires-python = ">=3.11"
 authors = [
     { name = "VoiceStock contributors" },
 ]
+dependencies = [
+    "fastapi==0.142.2",
+    "gpiozero>=2.0.1",
+    "httpx==0.28.1",
+    "sounddevice>=0.5.2",
+    "uvicorn==0.54.0",
+]
+
+[project.scripts]
+voicestock-pc-server = "pc.main:main"
+voicestock-pi-client = "pi.main:main"
+voicestock-pi-ptt = "pi.push_to_talk.manual:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pc", "src/pi", "src/shared"]
 
 [project.optional-dependencies]
 dev = [
@@ -41,7 +56,7 @@ select = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["voicestock"]
+known-first-party = ["pc", "pi", "shared"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -56,7 +71,7 @@ addopts = ["-ra", "--tb=short"]
 pythonpath = ["src"]
 
 [tool.coverage.run]
-source = ["voicestock"]
+source = ["pc", "pi", "shared"]
 branch = true
 
 [tool.coverage.report]

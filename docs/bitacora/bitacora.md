@@ -659,3 +659,36 @@ La comparación está en
 y la decisión en
 [ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md).
 Esta tarea no implementa el servidor, el API ni la página.
+
+---
+
+## 07/10/2026
+
+### Puertos de la operación pendiente (`PendingOperationWeb-02`)
+
+Se definió la frontera que va a usar la web para consultar y resolver la
+operación pendiente, sin implementar `PendingOperationFlow`. Esa feature sigue
+siendo la dueña futura de la operación y de la máquina de estados. Acá no se
+creó un segundo modelo de dominio ni una FSM paralela.
+
+El código quedó en `pi.pending_operation`:
+
+- `PendingOperationQueryPort.get_current()` devuelve un
+  `PendingOperationView` o nada;
+- `PendingOperationResolutionPort` expone `confirm(operation_id)` y
+  `cancel(operation_id)`, con `ResolutionResult` en lugar de un booleano;
+- `PendingOperationGateway` aplica esa política con un único lock;
+- `ProvisionalOperationExecutor` responde éxito y no toca inventario;
+- el estado real entra por `PendingOperationSlot`, que Flow tiene que
+  implementar.
+
+Confirmar solo cierra la pendiente después de una ejecución exitosa. Cancelar
+no ejecuta inventario. Un reintento de la misma acción devuelve
+`already_resolved` y no vuelve a ejecutar; la acción contraria devuelve
+`conflict`. Esa memoria es solo la resolución anterior en el proceso y se
+pierde al reiniciar.
+
+El registro para integrar Flow está en
+[pending operation web flow contract](../research/pending-operation-web-flow-contract.md).
+No se agregó un ADR nuevo: la topología y el rol de HTTP ya están en ADR-0004,
+y este contrato es el hand-off hasta que Flow exista.

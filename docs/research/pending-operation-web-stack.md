@@ -283,8 +283,9 @@ directly would violate this decision even if it lives in the same process.
 
 - **PendingOperationWeb-02** defines the application ports used to query the
   current pending operation and to resolve it (`confirm` / `cancel`). Those
-  ports are the only write path the HTTP adapter may call. This task does
-  not name the Python types.
+  ports are the only write path the HTTP adapter may call. The types and the
+  hand-off to `PendingOperationFlow` are in the
+  [flow contract](pending-operation-web-flow-contract.md).
 - **PendingOperationWeb-03** creates the FastAPI application, runs it with
   Uvicorn in the Pi process, and mounts the static files. It also updates
   `tests/test_architecture.py`: `test_only_one_http_server_exists` currently

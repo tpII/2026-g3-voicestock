@@ -102,9 +102,10 @@ and Docker as the way to publish this UI.
   imports for the PC server. The Pi adapter has to be allowed explicitly,
   still without importing `pc`.
 - Handlers share a process with the FSM. They must call ports and must not
-  mutate orchestrator state, including under concurrent requests. How the
-  application serializes that access is an implementation choice for a later
-  task.
+  mutate orchestrator state, including under concurrent requests.
+  `PendingOperationWeb-02` serializes resolution with one lock on the
+  application gateway. See the
+  [flow contract](../research/pending-operation-web-flow-contract.md).
 - In-memory pending state dies with the process. This ADR does not add a
   recovery store.
 - Uvicorn is the process that accepts browser connections. Putting nginx or
@@ -112,7 +113,9 @@ and Docker as the way to publish this UI.
 
 ### Follow-up
 
-- `PendingOperationWeb-02` defines query and resolution ports.
+- `PendingOperationWeb-02` defined the query and resolution ports. The
+  integration contract for `PendingOperationFlow` is the
+  [flow contract](../research/pending-operation-web-flow-contract.md).
 - `PendingOperationWeb-03` adds the FastAPI application, Uvicorn startup, and
   static files in the Pi process.
 - `PendingOperationWeb-04` implements the versioned HTTP API.

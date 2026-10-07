@@ -20,6 +20,12 @@ dev = [
     "pytest-cov>=6.0",
     "pre-commit>=4.0",
 ]
+benchmark = [
+    "psutil>=5.9",
+]
+gemini = [
+    "google-genai>=1.0",
+]
 
 [tool.ruff]
 line-length = 88

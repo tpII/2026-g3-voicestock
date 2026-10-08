@@ -1,7 +1,8 @@
 # Raspberry Pi web server
 
-How to start the operator web server and check that it answers. The page is a
-placeholder. It does not show or resolve a pending operation.
+How to start the operator web server and check that it answers. `/` is the
+pending-operation page. What it does with each HTTP result is the
+[pending operation page](../interfaces/pending-operation-web-ui.md).
 
 Why this stack exists is
 [ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md).
@@ -73,7 +74,7 @@ http://192.168.50.1:8000/
 http://192.168.50.1:8000/health
 ```
 
-`/` shows that VoiceStock Web is up. `/health` returns:
+`/` is the operator page. `/health` returns:
 
 ```json
 {"status": "ok"}
@@ -119,6 +120,5 @@ Then open `http://127.0.0.1:8123/` and `http://127.0.0.1:8123/health`.
 
 ## What is not here yet
 
-- The page that calls the API.
 - Wiring this app into the orchestrator process, which is what supplies the ports.
 - TLS, authentication, and a reverse proxy.

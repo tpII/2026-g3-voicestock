@@ -11,8 +11,9 @@ pending operation, clear it, change the FSM, or execute inventory. Those
 rules live in `pi.pending_operation`, described in the
 [flow contract](../research/pending-operation-web-flow-contract.md).
 
-The page that will call this API is not part of this contract. `/` is still
-a placeholder.
+The page that calls this API is described in the
+[pending operation page](pending-operation-web-ui.md). This document is only
+the HTTP contract.
 
 ## Base path
 

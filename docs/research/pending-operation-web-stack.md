@@ -298,7 +298,8 @@ directly would violate this decision even if it lives in the same process.
   [pending-operation web API](../interfaces/pending-operation-web-api.md).
 - **PendingOperationWeb-05** implements the page in vanilla JavaScript that
   calls that API. It does not import Python and it does not embed domain
-  transitions.
+  transitions. The page behavior is the
+  [pending operation page](../interfaces/pending-operation-web-ui.md).
 - **PendingOperationWeb-06** documents the resulting architecture and the
   HTTP contract, including how the browser on `192.168.50.2` reaches the Pi
   on `192.168.50.1`. The contract's source of truth will be that interface

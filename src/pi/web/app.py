@@ -42,7 +42,7 @@ def create_app(
 
     @app.get("/")
     def index() -> FileResponse:
-        """Serve the placeholder page. The pending-operation UI is later."""
+        """Serve the operator page. It talks to the HTTP API only."""
         return FileResponse(INDEX_FILE)
 
     app.mount(

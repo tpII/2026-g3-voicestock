@@ -50,7 +50,7 @@ and it should not keep a second copy of the resolution rules.
 `pi.web` stores the two ports and, when they are present, the versioned
 routes call them. The HTTP status map is the
 [pending-operation web API](../interfaces/pending-operation-web-api.md).
-The current page is still a placeholder. Without ports the API returns
+The page polls and resolves through that API. Without ports the API returns
 `application_not_ready` and `/health` stays a liveness check.
 
 The code lives in `pi.pending_operation`, because both the future UI and the

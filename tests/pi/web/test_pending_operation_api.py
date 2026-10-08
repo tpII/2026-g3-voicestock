@@ -312,7 +312,7 @@ async def test_openapi_lists_the_pending_operation_routes() -> None:
     assert "/api/v1/pending-operation/{operation_id}/cancel" in paths
 
 
-async def test_health_and_placeholder_still_work_without_ports() -> None:
+async def test_health_and_operator_page_still_work_without_ports() -> None:
     async with client_for() as client:
         health = await client.get("/health")
         page = await client.get("/")
@@ -321,5 +321,6 @@ async def test_health_and_placeholder_still_work_without_ports() -> None:
     assert health.status_code == 200
     assert health.json() == {"status": "ok"}
     assert page.status_code == 200
-    assert "VoiceStock Web está funcionando." in page.text
+    assert "Listo para escuchar" in page.text
+    assert "VoiceStock Web está funcionando." not in page.text
     assert styles.status_code == 200

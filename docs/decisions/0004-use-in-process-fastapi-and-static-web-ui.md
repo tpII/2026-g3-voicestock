@@ -124,6 +124,7 @@ and Docker as the way to publish this UI.
 - `PendingOperationWeb-04` implemented the versioned HTTP API. The status
   map is the
   [pending-operation web API](../interfaces/pending-operation-web-api.md).
-- `PendingOperationWeb-05` consumes that API from vanilla JavaScript.
+- `PendingOperationWeb-05` consumes that API from vanilla JavaScript. See the
+  [pending operation page](../interfaces/pending-operation-web-ui.md).
 - `PendingOperationWeb-06` documents the resulting architecture and the HTTP
   contract.

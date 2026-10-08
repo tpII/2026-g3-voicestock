@@ -1,4 +1,4 @@
-"""The Pi web app answers health checks and serves the local placeholder."""
+"""The Pi web app answers health checks and serves the operator page."""
 
 from collections.abc import AsyncIterator
 
@@ -51,15 +51,23 @@ async def test_health_reports_the_http_server_is_up(client: httpx.AsyncClient) -
     assert response.json() == {"status": "ok"}
 
 
-async def test_root_serves_the_placeholder_page(client: httpx.AsyncClient) -> None:
+async def test_root_serves_the_operator_page(client: httpx.AsyncClient) -> None:
     response = await client.get("/")
 
     assert response.status_code == 200
     assert "text/html" in response.headers["content-type"]
     body = response.text
-    assert "VoiceStock Web está funcionando." in body
+    assert "<header" in body
+    assert 'id="connection-label"' in body
+    assert "Listo para escuchar" in body
+    assert 'id="confirm-button"' in body
+    assert 'id="cancel-button"' in body
+    assert "Operación pendiente" in body
+    assert "Texto reconocido" in body
     assert 'href="/static/styles.css"' in body
     assert 'src="/static/app.js"' in body
+    assert "VoiceStock Web está funcionando." not in body
+    assert "https://" not in body
     assert "Coca-Cola" not in body
 
 
@@ -71,7 +79,14 @@ async def test_static_assets_are_served_from_the_application(
 
     assert styles.status_code == 200
     assert "text/css" in styles.headers["content-type"]
-    assert ".status-panel" in styles.text
+    assert ".operation-card" in styles.text
+    assert "https://" not in styles.text
     assert script.status_code == 200
     assert "javascript" in script.headers["content-type"]
-    assert "serverStatus" in script.text
+    page_script = script.text
+    assert "/api/v1/pending-operation" in page_script
+    assert "textContent" in page_script
+    assert "setTimeout" in page_script
+    assert "setInterval" not in page_script
+    assert "innerHTML" not in page_script
+    assert "https://" not in page_script

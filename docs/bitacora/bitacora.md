@@ -732,3 +732,20 @@ El contrato está en
 [API de la operación pendiente](../interfaces/pending-operation-web-api.md).
 No se creó un ADR: el mapeo es el contrato HTTP, y la decisión de que HTTP
 es un adaptador ya está en ADR-0004.
+
+### Interfaz de la operación pendiente (`PendingOperationWeb-05`)
+
+La página dejó de ser un marcador de posición. Muestra la frase de
+confirmación, los datos estructurados y el texto reconocido. Si no hay
+operación, pide usar el botón físico. Confirmar y cancelar llaman al API
+con el `operation_id` visible.
+
+La consulta se repite cerca de una vez por segundo, esperando a que termine
+la anterior. Un reintento exitoso se muestra como confirmación o
+cancelación, no como error. Si la operación cambió, la página se actualiza.
+Si la ejecución falla, la tarjeta sigue y se pueden reintentar los botones.
+Si la aplicación no está lista o se corta la red, el encabezado dice que no
+está disponible y sigue reintentando.
+
+El comportamiento está en
+[página de la operación pendiente](../interfaces/pending-operation-web-ui.md).

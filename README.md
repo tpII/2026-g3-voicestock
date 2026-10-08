@@ -130,6 +130,7 @@ contrato en [API de la operación pendiente](docs/interfaces/pending-operation-w
 - [Red Ethernet local](docs/setup/local-network.md)
 - [Servidor web de la Raspberry Pi](docs/setup/pi-web.md)
 - [API de la operación pendiente](docs/interfaces/pending-operation-web-api.md)
+- [Página de la operación pendiente](docs/interfaces/pending-operation-web-ui.md)
 - [Bitácora](docs/bitacora/bitacora.md)
 
 ## Licencia

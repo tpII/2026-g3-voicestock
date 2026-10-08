@@ -7,13 +7,67 @@
     <link rel="stylesheet" href="/static/styles.css">
   </head>
   <body>
-    <main class="status-panel">
-      <h1>VoiceStock</h1>
-      <p id="server-status">VoiceStock Web está funcionando.</p>
-      <p class="status-note">
-        La pantalla de la operación pendiente se agrega en una etapa posterior.
-      </p>
-    </main>
+    <div class="app-shell">
+      <header class="app-header">
+        <p class="brand">VoiceStock</p>
+        <p id="connection-status" class="connection" data-state="connecting" role="status">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="connection-label">Conectando</span>
+        </p>
+      </header>
+      <main class="workspace">
+        <p id="loading-message" class="workspace-message">Conectando...</p>
+        <p id="system-message" class="workspace-message" hidden></p>
+        <section id="empty-state" class="empty-state" hidden>
+          <svg class="empty-icon" viewBox="0 0 48 48" aria-hidden="true">
+            <circle cx="24" cy="24" r="18"></circle>
+            <path d="M24 14v10"></path>
+            <path d="M18 32c1.8 2 4 3 6 3s4.2-1 6-3"></path>
+            <circle cx="24" cy="22" r="2"></circle>
+          </svg>
+          <h1>Listo para escuchar</h1>
+          <p>Presioná el botón físico y hablá para registrar una operación.</p>
+        </section>
+        <section id="pending-card" class="operation-card" hidden aria-labelledby="confirmation-message">
+          <p id="operation-notice" class="operation-notice" hidden></p>
+          <p class="eyebrow">Operación pendiente</p>
+          <h1 id="confirmation-message"></h1>
+          <dl class="operation-details">
+            <div>
+              <dt>Producto</dt>
+              <dd id="field-product"></dd>
+            </div>
+            <div>
+              <dt>Operación</dt>
+              <dd id="field-operation"></dd>
+            </div>
+            <div>
+              <dt>Cantidad</dt>
+              <dd id="field-quantity"></dd>
+            </div>
+            <div>
+              <dt>Unidad</dt>
+              <dd id="field-unit"></dd>
+            </div>
+          </dl>
+          <div class="recognized">
+            <p class="eyebrow">Texto reconocido</p>
+            <blockquote class="recognized-quote">
+              <span aria-hidden="true">“</span><span id="recognized-text"></span><span aria-hidden="true">”</span>
+            </blockquote>
+          </div>
+          <div class="actions">
+            <button type="button" id="cancel-button" class="button button-secondary">
+              Cancelar
+            </button>
+            <button type="button" id="confirm-button" class="button button-primary">
+              Confirmar
+            </button>
+          </div>
+        </section>
+      </main>
+    </div>
+    <p id="feedback" class="feedback" role="status" hidden></p>
     <script src="/static/app.js"></script>
   </body>
 </html>

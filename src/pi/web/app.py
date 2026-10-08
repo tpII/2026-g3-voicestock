@@ -1,8 +1,8 @@
 """FastAPI application for the Raspberry Pi operator UI.
 
-Routes in this module are the HTTP adapter. They do not own a pending
-operation. Query and resolution ports are accepted so a later task can add
-the API without moving this factory. No route reads them yet.
+This module builds the app. Pending-operation routes live in ``pi.web.api``
+and only call application ports. Health and static files do not need those
+ports, so the temporary ``voicestock-pi-web`` command can still start.
 """
 
 from pathlib import Path
@@ -15,6 +15,7 @@ from pi.pending_operation import (
     PendingOperationQueryPort,
     PendingOperationResolutionPort,
 )
+from pi.web.api import register_exception_handlers, router
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 INDEX_FILE = STATIC_DIR / "index.html"
@@ -24,13 +25,15 @@ def create_app(
     query_port: PendingOperationQueryPort | None = None,
     resolution_port: PendingOperationResolutionPort | None = None,
 ) -> FastAPI:
-    """Build the web app. The ports are stored and not called."""
+    """Build the web app and keep the ports for the versioned API."""
     if not INDEX_FILE.is_file():
         raise FileNotFoundError(f"web index was not found at {INDEX_FILE}")
 
     app = FastAPI(title="VoiceStock Web", version="0.1.0")
     app.state.query_port = query_port
     app.state.resolution_port = resolution_port
+    register_exception_handlers(app)
+    app.include_router(router)
 
     @app.get("/health")
     def health() -> dict[str, str]:

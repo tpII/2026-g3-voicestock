@@ -114,7 +114,9 @@ VOICESTOCK_WEB_HOST=127.0.0.1 voicestock-pi-web
 ```
 
 El comando es temporal, para desarrollo y validación, hasta que el orquestador
-exista. La guía está en [servidor web de la Raspberry Pi](docs/setup/pi-web.md).
+exista. Sin ese runtime el API responde que la aplicación no está lista. La
+guía está en [servidor web de la Raspberry Pi](docs/setup/pi-web.md) y el
+contrato en [API de la operación pendiente](docs/interfaces/pending-operation-web-api.md).
 
 ## Documentación
 
@@ -127,6 +129,7 @@ exista. La guía está en [servidor web de la Raspberry Pi](docs/setup/pi-web.md
 - [Prueba manual de push-to-talk](docs/setup/push-to-talk.md)
 - [Red Ethernet local](docs/setup/local-network.md)
 - [Servidor web de la Raspberry Pi](docs/setup/pi-web.md)
+- [API de la operación pendiente](docs/interfaces/pending-operation-web-api.md)
 - [Bitácora](docs/bitacora/bitacora.md)
 
 ## Licencia

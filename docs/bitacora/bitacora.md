@@ -714,3 +714,21 @@ orquestador. Cómo se componen ambos queda pendiente.
 La guía está en [servidor web de la Raspberry Pi](../setup/pi-web.md).
 Los frameworks HTTP siguen permitidos solo en el servidor de la PC y en
 `pi/web`.
+
+### API de la operación pendiente (`PendingOperationWeb-04`)
+
+Se agregó el API versionado en `pi.web`: `GET /api/v1/pending-operation`,
+`POST .../confirm` y `POST .../cancel`. Las rutas llaman a los puertos de
+aplicación y traducen `ResolutionResult` a HTTP. No hay body en confirm ni
+cancel. Un GET sin pendiente responde `204`. Un reintento de la misma acción
+responde `200` con `already_resolved`. Conflicto y id viejo responden `409`.
+Un fallo de ejecución responde `503` sin texto de excepción.
+
+Si `voicestock-pi-web` arranca sin puertos, `/health` sigue en `200` y el
+API responde `503` con `application_not_ready`. Un `operation_id` en blanco
+responde `422`.
+
+El contrato está en
+[API de la operación pendiente](../interfaces/pending-operation-web-api.md).
+No se creó un ADR: el mapeo es el contrato HTTP, y la decisión de que HTTP
+es un adaptador ya está en ADR-0004.

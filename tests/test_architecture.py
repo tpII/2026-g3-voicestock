@@ -83,3 +83,17 @@ def test_http_frameworks_stay_in_http_adapters() -> None:
     assert not any(name.startswith("pi/communication/") for name in users)
     assert not any(name.startswith("pi/audio/") for name in users)
     assert not any(name.startswith("shared/") for name in users)
+
+
+def test_pending_operation_does_not_import_web_libraries() -> None:
+    """HTTP schemas stay in pi.web. The application layer does not import them."""
+    forbidden = {"fastapi", "starlette", "uvicorn", "pydantic"}
+    offending = {
+        f"{name}: {module}"
+        for name, modules in _imports_by_file().items()
+        if name.startswith("pi/pending_operation/")
+        for module in modules
+        if module.split(".")[0] in forbidden
+    }
+
+    assert offending == set()

@@ -84,6 +84,17 @@ the button, the PC, the inventory, or the FSM.
 
 `/static/styles.css` and `/static/app.js` are served by the same process.
 
+`voicestock-pi-web` does not receive the pending-operation ports. `/health`
+stays `200`. The API then answers `503` with `application_not_ready` until a
+later runtime passes those ports into `create_app`. The contract is the
+[pending-operation web API](../interfaces/pending-operation-web-api.md).
+
+```text
+GET  /api/v1/pending-operation
+POST /api/v1/pending-operation/{operation_id}/confirm
+POST /api/v1/pending-operation/{operation_id}/cancel
+```
+
 ## Run on a development machine
 
 The default host is the Pi address. A laptop usually does not have
@@ -108,6 +119,6 @@ Then open `http://127.0.0.1:8123/` and `http://127.0.0.1:8123/health`.
 
 ## What is not here yet
 
-- The pending-operation API and page.
-- Wiring this app into the orchestrator process.
+- The page that calls the API.
+- Wiring this app into the orchestrator process, which is what supplies the ports.
 - TLS, authentication, and a reverse proxy.

@@ -121,7 +121,9 @@ and Docker as the way to publish this UI.
   Uvicorn command, and the placeholder static page. How that app shares the
   process with the orchestrator is still open. See the
   [web setup guide](../setup/pi-web.md).
-- `PendingOperationWeb-04` implements the versioned HTTP API.
+- `PendingOperationWeb-04` implemented the versioned HTTP API. The status
+  map is the
+  [pending-operation web API](../interfaces/pending-operation-web-api.md).
 - `PendingOperationWeb-05` consumes that API from vanilla JavaScript.
 - `PendingOperationWeb-06` documents the resulting architecture and the HTTP
   contract.

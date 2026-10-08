@@ -47,8 +47,11 @@ Flow should compose `PendingOperationGateway` and pass its slot and the
 executor in. It should not reimplement confirm and cancel in the HTTP layer,
 and it should not keep a second copy of the resolution rules.
 
-`pi.web` already accepts the two ports and stores them. No route calls them
-yet. The current page is a placeholder. The API is `PendingOperationWeb-04`.
+`pi.web` stores the two ports and, when they are present, the versioned
+routes call them. The HTTP status map is the
+[pending-operation web API](../interfaces/pending-operation-web-api.md).
+The current page is still a placeholder. Without ports the API returns
+`application_not_ready` and `/health` stays a liveness check.
 
 The code lives in `pi.pending_operation`, because both the future UI and the
 orchestrator run on the Raspberry Pi. It is not in `shared`: the PC does not

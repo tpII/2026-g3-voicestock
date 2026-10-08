@@ -293,8 +293,9 @@ directly would violate this decision even if it lives in the same process.
   production process. How the app and the orchestrator share one process is
   still open. The
   [web setup guide](../setup/pi-web.md) is the run procedure.
-- **PendingOperationWeb-04** implements a versioned HTTP API on that
-  application. Schemas belong to the API, not to the FSM.
+- **PendingOperationWeb-04** implements the versioned HTTP API. Schemas
+  belong to `pi.web`, not to the FSM. The contract is the
+  [pending-operation web API](../interfaces/pending-operation-web-api.md).
 - **PendingOperationWeb-05** implements the page in vanilla JavaScript that
   calls that API. It does not import Python and it does not embed domain
   transitions.

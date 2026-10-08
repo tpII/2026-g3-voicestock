@@ -123,6 +123,36 @@ Cancel does not produce `execution_failed` in the current application path.
 The HTTP map is shared with confirm, so a port that did return that status
 would still get `503`.
 
+## Scenarios
+
+The application rule for each row is the
+[flow contract](../research/pending-operation-web-flow-contract.md). This
+table is only the HTTP result.
+
+| Situation | HTTP |
+| --- | --- |
+| `confirm(AAA)` succeeds, the response is lost, `confirm(AAA)` is sent again | `200` `already_resolved`. The executor is not run again. |
+| The page shows AAA, the current operation is already BBB, the page sends `confirm(AAA)` | `409` `stale_operation`. BBB is unchanged. |
+| AAA was confirmed, then `cancel(AAA)` arrives | `409` `conflict`. `resolved_action` is the action that already won. |
+| The executor fails | `503` `execution_failed`. The operation stays pending. |
+| `cancel(id)` | `200` `success` when that id is still current. Inventory is not executed. |
+
+There is no route that confirms whatever happens to be current. The path
+always names `operation_id`.
+
+`already_resolved` is not durable idempotency. The gateway remembers only
+`last_resolution` in memory. A process restart drops it.
+
+Clearing the pending operation before `execute` is not this contract. A
+failed execution stays pending so the client can retry.
+
+`ProvisionalOperationExecutor` is what confirm calls in this increment. It
+reports success and does not change inventory. A `200` `success` from confirm
+does not mean stock was updated. `OperationConfirmationExecution` replaces
+that executor later. If a future real execution succeeds and the slot or FSM
+resolution then fails, a retry could run the effect again. That risk is
+recorded in the flow contract. This API does not solve it.
+
 A blank or whitespace `operation_id` is `422`:
 
 ```json

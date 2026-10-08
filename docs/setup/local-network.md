@@ -10,10 +10,12 @@ the procedure. It covers the cable, the static addresses, local inspection,
 the order to bring the link up, and troubleshooting.
 
 Application traffic is a separate feature, `RaspberryPiPCCommunication`.
-Endpoints, payloads, speech-to-text, language models, and the web application
-are not part of this guide. Once the addresses below are in place, that
-feature is documented in the
+Endpoints, payloads, speech-to-text, and language models are not part of this
+guide. Once the addresses below are in place, that feature is documented in
+the
 [Raspberry Pi–PC communication interface](../interfaces/pc-communication.md).
+The operator page that the PC browser opens on the Pi is the
+[web setup guide](pi-web.md).
 
 The setup scripts check the machine they run on. They do not ping the other
 host, and they do not test Internet access. That physical check belongs to

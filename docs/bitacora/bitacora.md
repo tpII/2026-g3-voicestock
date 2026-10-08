@@ -749,3 +749,18 @@ está disponible y sigue reintentando.
 
 El comportamiento está en
 [página de la operación pendiente](../interfaces/pending-operation-web-ui.md).
+
+### Documentación del servidor y de la página (`PendingOperationWeb-06`)
+
+Se consolidó la documentación de la feature sin agregar comportamiento. Cada
+tema quedó en un documento: la decisión en ADR-0004, el hand-off con
+`PendingOperationFlow` en el contrato de flujo, el arranque en la guía del
+servidor web, el HTTP en el contrato del API y la página en su interfaz.
+
+La guía deja explícito que `GET /health` solo indica que el servidor HTTP
+está vivo. El contrato de flujo registra que el executor de octubre no
+modifica inventario, que `last_resolution` no es idempotencia durable, y que
+un éxito de ejecución seguido de un fallo al resolver el slot queda para el
+executor real. Flow sigue siendo el dueño de la FSM y del slot.
+
+No se creó un ADR: no hay una decisión de arquitectura nueva.

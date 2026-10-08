@@ -11,9 +11,9 @@ or the page.
 
 | Area | Status |
 | --- | --- |
-| HTTP server | Decided: FastAPI served by Uvicorn. Not implemented in this task. |
-| Frontend | Decided: vanilla HTML, CSS, and JavaScript, served as static files by the same application. Not implemented in this task. |
-| Process topology | Decided: one Python process owns the orchestrator, the FSM, and `PendingOperation`. HTTP is an input adapter in that process. |
+| HTTP server | Decided: FastAPI served by Uvicorn. Implemented later in `pi.web`. This note is the comparison. |
+| Frontend | Decided: vanilla HTML, CSS, and JavaScript, served as static files by the same application. The page now exists. Its behavior is the [pending operation page](../interfaces/pending-operation-web-ui.md). |
+| Process topology | Decided: one Python process owns the orchestrator, the FSM, and `PendingOperation`. HTTP is an input adapter in that process. The standalone command is still only for development. |
 
 ## Problem
 
@@ -300,17 +300,20 @@ directly would violate this decision even if it lives in the same process.
   calls that API. It does not import Python and it does not embed domain
   transitions. The page behavior is the
   [pending operation page](../interfaces/pending-operation-web-ui.md).
-- **PendingOperationWeb-06** documents the resulting architecture and the
-  HTTP contract, including how the browser on `192.168.50.2` reaches the Pi
-  on `192.168.50.1`. The contract's source of truth will be that interface
-  document, not this research note.
+- **PendingOperationWeb-06** points each topic at one document. This research
+  note stays the comparison. It is not the HTTP contract, the page behavior,
+  or the Flow hand-off. The browser on `192.168.50.2` opens the Pi at
+  `http://192.168.50.1:8000/`, as the
+  [web setup guide](../setup/pi-web.md) describes.
 
 ## Out of scope
 
-This task does not add a FastAPI app, routes, static files, a query port, a
-resolution port, confirmation, cancellation, FSM changes, or inventory
-updates. It does not change `pyproject.toml`: FastAPI and Uvicorn are
-already declared.
+PendingOperationWeb-01 did not add a FastAPI app, routes, static files, a
+query port, a resolution port, confirmation, cancellation, FSM changes, or
+inventory updates. It did not change `pyproject.toml`: FastAPI and Uvicorn
+were already declared. Later tasks implemented the server, the API, and the
+page. Those live in the documents linked from the status table and from
+[ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md).
 
 ## References
 

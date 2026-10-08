@@ -6,8 +6,10 @@ pending-operation page. What it does with each HTTP result is the
 
 Why this stack exists is
 [ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md).
-The application ports the later API will call are in the
-[flow contract](../research/pending-operation-web-flow-contract.md).
+The boundary with `PendingOperationFlow` is the
+[flow contract](../research/pending-operation-web-flow-contract.md). The HTTP
+map is the
+[pending-operation web API](../interfaces/pending-operation-web-api.md).
 
 ## What this command is
 
@@ -17,8 +19,9 @@ point.
 
 The production shape is still one Python process. This command does not
 create a second service, a systemd unit, or a channel to the orchestrator.
-How the web app and the future runtime share that process is not decided
-here.
+How the web app and the future runtime share that process is still open.
+That list is [Still open](../research/pending-operation-web-flow-contract.md#still-open)
+in the flow contract.
 
 ## Network
 
@@ -43,8 +46,10 @@ overrides it. The PC interpretation server also defaults to port `8000`, on
 the PC. They do not share a machine. On one computer, run only one of them
 on `8000`, or set `VOICESTOCK_WEB_PORT` / `VOICESTOCK_PC_PORT`.
 
-There is no HTTPS, no login, and no CORS. The page, its files, and the later
-API are the same origin: `http://192.168.50.1:8000`.
+The page, its files, and the API are the same origin:
+`http://192.168.50.1:8000`. This increment has no HTTPS, no login, and no
+CORS. Those limits are
+[ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md).
 
 ## Install
 
@@ -74,14 +79,23 @@ http://192.168.50.1:8000/
 http://192.168.50.1:8000/health
 ```
 
-`/` is the operator page. `/health` returns:
+`/` is the operator page. `GET /health` returns:
 
 ```json
 {"status": "ok"}
 ```
 
-That only means the HTTP server answered. It does not check the microphone,
-the button, the PC, the inventory, or the FSM.
+That only means the HTTP server is alive and can respond. It does not mean
+that:
+
+- `PendingOperationFlow` is ready;
+- a pending operation exists;
+- the microphone works;
+- GPIO works;
+- the PC is reachable;
+- inventory works.
+
+`/health` is not a readiness check. Do not extend it into one.
 
 `/static/styles.css` and `/static/app.js` are served by the same process.
 
@@ -120,5 +134,7 @@ Then open `http://127.0.0.1:8123/` and `http://127.0.0.1:8123/health`.
 
 ## What is not here yet
 
-- Wiring this app into the orchestrator process, which is what supplies the ports.
-- TLS, authentication, and a reverse proxy.
+`voicestock-pi-web` does not start `PendingOperationFlow`, and confirm does
+not update inventory. The open list, including the single-process lifecycle,
+the real executor, and durable idempotency, is
+[Still open](../research/pending-operation-web-flow-contract.md#still-open).

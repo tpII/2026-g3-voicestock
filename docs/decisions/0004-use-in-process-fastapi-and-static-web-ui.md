@@ -117,14 +117,16 @@ and Docker as the way to publish this UI.
 - `PendingOperationWeb-02` defined the query and resolution ports. The
   integration contract for `PendingOperationFlow` is the
   [flow contract](../research/pending-operation-web-flow-contract.md).
-- `PendingOperationWeb-03` added the FastAPI application, the temporary
-  Uvicorn command, and the placeholder static page. How that app shares the
-  process with the orchestrator is still open. See the
+- `PendingOperationWeb-03` added the FastAPI application and the temporary
+  Uvicorn command. `PendingOperationWeb-05` replaced the first static page
+  with the operator UI. How that app shares the process with the orchestrator
+  is still open. See the
   [web setup guide](../setup/pi-web.md).
 - `PendingOperationWeb-04` implemented the versioned HTTP API. The status
   map is the
   [pending-operation web API](../interfaces/pending-operation-web-api.md).
 - `PendingOperationWeb-05` consumes that API from vanilla JavaScript. See the
   [pending operation page](../interfaces/pending-operation-web-ui.md).
-- `PendingOperationWeb-06` documents the resulting architecture and the HTTP
-  contract.
+- `PendingOperationWeb-06` records which document is the source of truth.
+  Open work with `PendingOperationFlow` stays in the
+  [flow contract](../research/pending-operation-web-flow-contract.md).

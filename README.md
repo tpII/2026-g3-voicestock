@@ -5,10 +5,12 @@ Sistema de gestión de inventario asistido por voz, pensado para ejecutarse en u
 La Raspberry Pi capturará audio, hará Speech-to-Text, se comunicará con un modelo de lenguaje a través de una interfaz independiente del proveedor, validará respuestas estructuradas, administrará el inventario, persistirá datos en SQLite y expondrá una interfaz web.
 
 El proyecto está en una etapa inicial. Ya incluye la captura push-to-talk en la
-Raspberry Pi y el servidor de comunicación de la PC, conectado a un servicio de
-interpretación con proveedor intercambiable (por ahora un stub). STT, el modelo
-de lenguaje, inventario e interfaz web continúan en desarrollo. La prueba física
-del pulsador y del micrófono USB todavía no se hizo.
+Raspberry Pi, el servidor de comunicación de la PC (conectado a un servicio de
+interpretación con proveedor intercambiable, por ahora un stub) y la página
+web para confirmar o cancelar la operación pendiente. STT, el modelo de
+lenguaje e inventario continúan en desarrollo. Confirmar en la página todavía
+no modifica el inventario. La prueba física del pulsador y del micrófono USB
+todavía no se hizo.
 
 ## Requisitos
 
@@ -106,17 +108,22 @@ el contrato de audio y la prueba en la placa están separados:
 
 ### Web en la Raspberry Pi
 
-`voicestock-pi-web` levanta la página de marcador de posición y `GET /health`.
-En la Raspberry Pi escucha en `192.168.50.1:8000`. En una máquina de desarrollo:
+`voicestock-pi-web` sirve la página de la operación pendiente. En la
+Raspberry Pi escucha en `192.168.50.1:8000`. Desde la PC:
+`http://192.168.50.1:8000/`. En una máquina de desarrollo:
 
 ```bash
-VOICESTOCK_WEB_HOST=127.0.0.1 voicestock-pi-web
+VOICESTOCK_WEB_HOST=127.0.0.1 VOICESTOCK_WEB_PORT=8123 voicestock-pi-web
 ```
 
 El comando es temporal, para desarrollo y validación, hasta que el orquestador
-exista. Sin ese runtime el API responde que la aplicación no está lista. La
-guía está en [servidor web de la Raspberry Pi](docs/setup/pi-web.md) y el
-contrato en [API de la operación pendiente](docs/interfaces/pending-operation-web-api.md).
+exista. Sin ese runtime `GET /health` sigue respondiendo y el API dice que la
+aplicación no está lista. `GET /health` solo indica que el servidor HTTP está
+vivo.
+
+- [Cómo instalarlo, arrancarlo y abrirlo](docs/setup/pi-web.md)
+- [Contrato HTTP](docs/interfaces/pending-operation-web-api.md)
+- [Qué muestra la página](docs/interfaces/pending-operation-web-ui.md)
 
 ## Documentación
 

@@ -1,0 +1,16 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #f4f1ea;
+  color: #1d1a16;
+}
+
+.status-panel {
+  max-width: 36rem;
+  margin: 4rem auto;
+  padding: 2rem;
+}
+
+.status-note {
+  color: #5c564e;
+}

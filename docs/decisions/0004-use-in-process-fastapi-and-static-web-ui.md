@@ -98,9 +98,10 @@ and Docker as the way to publish this UI.
 
 ### Negative
 
-- `test_only_one_http_server_exists` currently reserves FastAPI and Uvicorn
-  imports for the PC server. The Pi adapter has to be allowed explicitly,
-  still without importing `pc`.
+- FastAPI and Uvicorn may be imported from the PC server and from `pi/web`.
+  The rest of `pi`, including pending operations, still must not import them.
+  `voicestock-pi-web` only starts that app for development and validation
+  until the orchestrator exists. It is not a second production process.
 - Handlers share a process with the FSM. They must call ports and must not
   mutate orchestrator state, including under concurrent requests.
   `PendingOperationWeb-02` serializes resolution with one lock on the
@@ -116,8 +117,10 @@ and Docker as the way to publish this UI.
 - `PendingOperationWeb-02` defined the query and resolution ports. The
   integration contract for `PendingOperationFlow` is the
   [flow contract](../research/pending-operation-web-flow-contract.md).
-- `PendingOperationWeb-03` adds the FastAPI application, Uvicorn startup, and
-  static files in the Pi process.
+- `PendingOperationWeb-03` added the FastAPI application, the temporary
+  Uvicorn command, and the placeholder static page. How that app shares the
+  process with the orchestrator is still open. See the
+  [web setup guide](../setup/pi-web.md).
 - `PendingOperationWeb-04` implements the versioned HTTP API.
 - `PendingOperationWeb-05` consumes that API from vanilla JavaScript.
 - `PendingOperationWeb-06` documents the resulting architecture and the HTTP

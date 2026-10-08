@@ -24,9 +24,15 @@ dependencies = [
 voicestock-pc-server = "pc.main:main"
 voicestock-pi-client = "pi.main:main"
 voicestock-pi-ptt = "pi.push_to_talk.manual:main"
+voicestock-pi-web = "pi.web.server:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pc", "src/pi", "src/shared"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/pi/web/static/index.html" = "pi/web/static/index.html"
+"src/pi/web/static/styles.css" = "pi/web/static/styles.css"
+"src/pi/web/static/app.js" = "pi/web/static/app.js"
 
 [project.optional-dependencies]
 dev = [

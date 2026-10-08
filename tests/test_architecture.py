@@ -62,12 +62,24 @@ def test_pc_communication_does_not_know_interpretation() -> None:
     assert offending == set()
 
 
-def test_only_one_http_server_exists() -> None:
+def test_http_frameworks_stay_in_http_adapters() -> None:
+    """FastAPI and Uvicorn stay in the PC server and in pi/web.
+
+    The Pi application layer, including pending operations, must not import
+    an HTTP framework. Allowing every module under pi would hide that leak.
+    """
     http_modules = {"fastapi", "starlette", "uvicorn", "aiohttp", "flask", "socket"}
     users = {
         name
         for name, modules in _imports_by_file().items()
         if any(module.split(".")[0] in http_modules for module in modules)
     }
+    pc_adapters = {"pc/communication/server.py", "pc/main.py"}
+    pi_web = {name for name in users if name.startswith("pi/web/")}
 
-    assert users == {"pc/communication/server.py", "pc/main.py"}
+    assert users == pc_adapters | pi_web
+    assert pi_web
+    assert not any(name.startswith("pi/pending_operation/") for name in users)
+    assert not any(name.startswith("pi/communication/") for name in users)
+    assert not any(name.startswith("pi/audio/") for name in users)
+    assert not any(name.startswith("shared/") for name in users)

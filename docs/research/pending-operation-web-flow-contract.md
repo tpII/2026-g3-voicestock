@@ -25,7 +25,7 @@ The web adapter, when it exists, calls application ports. It does not own the
 pending operation, does not clear it, and does not modify the FSM.
 
 ```text
-HTTP / Web                         later, PendingOperationWeb-03/04
+pi.web                             HTTP adapter
     |
     v
 PendingOperationQueryPort
@@ -46,6 +46,9 @@ FSM / PendingOperation             future owner
 Flow should compose `PendingOperationGateway` and pass its slot and the
 executor in. It should not reimplement confirm and cancel in the HTTP layer,
 and it should not keep a second copy of the resolution rules.
+
+`pi.web` already accepts the two ports and stores them. No route calls them
+yet. The current page is a placeholder. The API is `PendingOperationWeb-04`.
 
 The code lives in `pi.pending_operation`, because both the future UI and the
 orchestrator run on the Raspberry Pi. It is not in `shared`: the PC does not

@@ -23,7 +23,7 @@ El código está dividido según la máquina donde corre
 ```text
 src/
 ├── pc/       lo que corre en la PC: servidor HTTP e interpretación
-├── pi/       lo que corre en la Raspberry Pi: push-to-talk y cliente de la PC
+├── pi/       lo que corre en la Raspberry Pi: push-to-talk, cliente y web
 └── shared/   contratos que intercambian ambas (TransportEnvelope)
 ```
 
@@ -104,6 +104,18 @@ el contrato de audio y la prueba en la placa están separados:
 - [Interfaz de captura](docs/interfaces/push-to-talk-capture.md)
 - [Conexión, configuración y prueba manual](docs/setup/push-to-talk.md)
 
+### Web en la Raspberry Pi
+
+`voicestock-pi-web` levanta la página de marcador de posición y `GET /health`.
+En la Raspberry Pi escucha en `192.168.50.1:8000`. En una máquina de desarrollo:
+
+```bash
+VOICESTOCK_WEB_HOST=127.0.0.1 voicestock-pi-web
+```
+
+El comando es temporal, para desarrollo y validación, hasta que el orquestador
+exista. La guía está en [servidor web de la Raspberry Pi](docs/setup/pi-web.md).
+
 ## Documentación
 
 - [Guía de contribución](CONTRIBUTING.md)
@@ -114,6 +126,7 @@ el contrato de audio y la prueba en la placa están separados:
 - [Captura push-to-talk](docs/interfaces/push-to-talk-capture.md)
 - [Prueba manual de push-to-talk](docs/setup/push-to-talk.md)
 - [Red Ethernet local](docs/setup/local-network.md)
+- [Servidor web de la Raspberry Pi](docs/setup/pi-web.md)
 - [Bitácora](docs/bitacora/bitacora.md)
 
 ## Licencia

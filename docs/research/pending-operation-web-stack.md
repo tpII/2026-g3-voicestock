@@ -287,11 +287,12 @@ directly would violate this decision even if it lives in the same process.
   hand-off to `PendingOperationFlow` are in the
   [flow contract](pending-operation-web-flow-contract.md).
 - **PendingOperationWeb-03** creates the FastAPI application, runs it with
-  Uvicorn in the Pi process, and mounts the static files. It also updates
-  `tests/test_architecture.py`: `test_only_one_http_server_exists` currently
-  allows `fastapi`, `starlette`, `uvicorn`, and `flask` only in the PC
-  server modules. The Pi adapter needs the same libraries without importing
-  `pc`. The PC interpretation server stays a separate HTTP surface.
+  Uvicorn, and mounts the static files. HTTP frameworks stay in `pi/web` and
+  in the PC server. The command `voicestock-pi-web` is a temporary way to
+  start that app before the orchestrator exists. It is not a second
+  production process. How the app and the orchestrator share one process is
+  still open. The
+  [web setup guide](../setup/pi-web.md) is the run procedure.
 - **PendingOperationWeb-04** implements a versioned HTTP API on that
   application. Schemas belong to the API, not to the FSM.
 - **PendingOperationWeb-05** implements the page in vanilla JavaScript that

@@ -692,3 +692,25 @@ El registro para integrar Flow está en
 [pending operation web flow contract](../research/pending-operation-web-flow-contract.md).
 No se agregó un ADR nuevo: la topología y el rol de HTTP ya están en ADR-0004,
 y este contrato es el hand-off hasta que Flow exista.
+
+---
+
+## 08/10/2026
+
+### Servidor web inicial (`PendingOperationWeb-03`)
+
+Se agregó la capa `pi.web`: FastAPI en `create_app`, Uvicorn en `run_server`,
+y la página estática de marcador de posición. `GET /health` solo indica que
+el servidor HTTP responde. `GET /` sirve el HTML local, y `/static/*` los
+archivos CSS y JavaScript. No hay API de operación pendiente, CORS, HTTPS ni
+login.
+
+El comando `voicestock-pi-web` arranca ese servidor para desarrollo y
+validación. En la Raspberry Pi el default es `192.168.50.1:8000`. En otra
+máquina se puede usar `VOICESTOCK_WEB_HOST=127.0.0.1`. No es un segundo
+proceso productivo: ADR-0004 sigue pidiendo un único proceso cuando exista el
+orquestador. Cómo se componen ambos queda pendiente.
+
+La guía está en [servidor web de la Raspberry Pi](../setup/pi-web.md).
+Los frameworks HTTP siguen permitidos solo en el servidor de la PC y en
+`pi/web`.

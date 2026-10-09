@@ -1,0 +1,93 @@
+provider,model,case_id,status,error,latency_ms,prompt_tokens,output_tokens,tokens_per_second,valid_json,schema_valid,correct_operation,correct_product,correct_quantity,exact_match,expected_json,raw_response
+ollama,qwen3:4b-instruct,solo_agregar,ok,,56939.16,1014,78,14.767,True,True,True,True,True,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Coca Cola 2L"", ""cantidad"": 3}, {""operacion"": ""agregar_stock"", ""producto"": ""Sprite 1.5L"", ""cantidad"": 4}]}","{
+  ""operaciones"": [
+    {
+      ""operacion"": ""agregar_stock"",
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 3
+    },
+    {
+      ""operacion"": ""agregar_stock"",
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 4
+    }
+  ]
+}"
+ollama,qwen3:4b-instruct,solo_restar,ok,,3810.6,1003,45,14.826,True,True,True,True,True,True,"{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Arroz Gallo 1kg"", ""cantidad"": 2}]}","{
+  ""operaciones"": [
+    {
+      ""operacion"": ""restar_stock"",
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 2
+    }
+  ]
+}"
+ollama,qwen3:4b-instruct,negar_agregacion,ok,,1967.06,1022,9,16.42,True,True,True,True,True,True,"{""operaciones"": []}","{
+  ""operaciones"": []
+}"
+ollama,qwen3:4b-instruct,negar_restacion,ok,,1920.69,1020,9,17.031,True,True,True,True,True,True,"{""operaciones"": []}","{
+  ""operaciones"": []
+}"
+ollama,qwen3:4b-instruct,restar_ambos,ok,,6796.46,1017,85,15.17,True,True,True,True,True,True,"{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Coca Cola Zero 2L"", ""cantidad"": 2}, {""operacion"": ""restar_stock"", ""producto"": ""Detergente Magistral 750ml"", ""cantidad"": 4}]}","{
+  ""operaciones"": [
+    {
+      ""operacion"": ""restar_stock"",
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 2
+    },
+    {
+      ""operacion"": ""restar_stock"",
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 4
+    }
+  ]
+}"
+ollama,qwen3:4b-instruct,corregir_cantidad,ok,,4027.84,1010,45,14.953,True,True,True,True,True,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Coca Cola 2L"", ""cantidad"": 2}]}","{
+  ""operaciones"": [
+    {
+      ""operacion"": ""agregar_stock"",
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 2
+    }
+  ]
+}"
+ollama,qwen3:4b-instruct,negar_agregacion_y_restacion,ok,,2665.08,1045,9,16.789,True,True,True,True,True,True,"{""operaciones"": []}","{
+  ""operaciones"": []
+}"
+ollama,qwen3:4b-instruct,negar_varias_agregaciones,ok,,5261.9,1058,45,13.009,True,True,True,True,True,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Arroz Gallo 1kg"", ""cantidad"": 5}]}","{
+  ""operaciones"": [
+    {
+      ""operacion"": ""agregar_stock"",
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 5
+    }
+  ]
+}"
+ollama,qwen3:4b-instruct,negar_varias_restaciones,ok,,5254.14,1048,50,14.862,True,True,True,True,True,True,"{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Detergente Magistral 750ml"", ""cantidad"": 4}]}","{
+  ""operaciones"": [
+    {
+      ""operacion"": ""restar_stock"",
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 4
+    }
+  ]
+}"
+ollama,qwen3:4b-instruct,caso_integral,ok,,13509.77,1211,116,13.575,True,True,True,True,True,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Coca Cola 2L"", ""cantidad"": 2}, {""operacion"": ""restar_stock"", ""producto"": ""Arroz Gallo 1kg"", ""cantidad"": 2}, {""operacion"": ""restar_stock"", ""producto"": ""Fideos Matarazzo 500g"", ""cantidad"": 3}]}","{
+  ""operaciones"": [
+    {
+      ""operacion"": ""agregar_stock"",
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 2
+    },
+    {
+      ""operacion"": ""restar_stock"",
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 2
+    },
+    {
+      ""operacion"": ""restar_stock"",
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 3
+    }
+  ]
+}"

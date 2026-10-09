@@ -622,3 +622,44 @@ punto de acceso Wi-Fi que se había considerado antes.
   Raspberry Pi y el cable Ethernet reales. Todavía no se comprobó en hardware
   la conectividad de punta a punta, el aislamiento de Internet ni que la
   configuración sobreviva a un reinicio.
+
+
+---
+
+## 07/10/2026
+
+### Interpretación estructurada: experimentos y organización documental
+
+Se organizaron los scripts y resultados de los experimentos realizados en
+septiembre con Ollama, Groq y Gemini. El benchmark original evalúa extracción
+de productos y cantidades; el de precisión incorpora diez casos de operaciones,
+correcciones y cancelaciones. Los reportes preservan respuestas originales,
+exactitud y errores de solicitud.
+
+La [investigación de estrategias](../research/stock-interpretation-strategy-and-evaluation.md)
+registra resultados y limitaciones. Qwen 3 4B Instruct y GPT-OSS 20B completaron
+cada uno una corrida de precisión con 10/10. Gemini contestó nueve casos
+correctamente y tuvo un error de API; el caso restante se evaluó después con
+`contract.txt` en vez de `contract-copy.txt`. Se verificó que ambos archivos
+tienen contenido idéntico en el repositorio actual. Sus nombres distintos no
+implican instrucciones diferentes. Los resultados no garantizan precisión
+sobre frases nuevas. Los umbrales operativos se registran en la entrada del 09/10.
+
+Después de incorporar develop, se reservó
+[ADR-0004](../decisions/0004-use-api-provider-for-stock-interpretation.md)
+para la estrategia de interpretación, conservando los ADR existentes 0001–0003.
+El proveedor de producción todavía no está implementado.
+
+---
+
+## 09/10/2026
+
+### Estrategia inicial y límites operativos
+
+Se definió una API externa como primera opción (Groq o Gemini, configurable)
+y el modelo local como segunda opción. Se aceptan hasta 8 segundos por solicitud
+para API, y hasta 40 segundos y 3 GB RAM para local. No se exige fallback
+automático. Los límites se definieron después de los experimentos de septiembre.
+Las medias registradas están por debajo de los límites de latencia; falta
+comprobar el límite por solicitud y la RAM local, cuyo pico histórico fue
+aproximadamente 3,132 MB. La decisión sigue propuesta para revisión del equipo.

@@ -108,9 +108,8 @@ el contrato de audio y la prueba en la placa están separados:
 
 - [Guía de contribución](CONTRIBUTING.md)
 - [Guía de documentación](docs/guides/documentation-guide.md)
-- [ADR-0002: propuesta de interpretación con LLM local y proveedor sustituible](docs/decisions/0002-use-local-llm-for-stock-interpretation.md)
-- [ADR-0003: catálogo de prueba canónico para interpretación y validación](docs/decisions/0003-use-canonical-test-catalog-for-interpretation.md)
-- [ADR-0004: estrategia y evaluación de interpretación](docs/decisions/0004-stock-interpretation-strategy-and-evaluation.md)
+- [ADR-0004: API inicial y alternativa local sustituible](docs/decisions/0004-use-api-provider-for-stock-interpretation.md)
+- [Investigación: estrategia y evaluación de interpretación](docs/research/stock-interpretation-strategy-and-evaluation.md)
 - [Flujo de trabajo de desarrollo](docs/guides/development-workflow.md)
 - [Comunicación Raspberry Pi–PC](docs/interfaces/pc-communication.md)
 - [Servicio de interpretación](docs/interfaces/interpretation-service.md)

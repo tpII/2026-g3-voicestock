@@ -3,10 +3,11 @@
 Uso: python scripts/benchmarks/analyze_llm_benchmark.py
 Genera: reports/llm-benchmark/benchmark_report.md
 """
+
 from __future__ import annotations
 
-import csv
 import argparse
+import csv
 import statistics
 from pathlib import Path
 
@@ -45,34 +46,48 @@ def model_analysis(rows: list[dict[str, str]]) -> list[dict[str, object]]:
     analysis = []
     for model in models:
         measured = [
-            row for row in rows
-            if row.get("model") == model
-            and row.get("warmup", "").lower() == "false"
+            row
+            for row in rows
+            if row.get("model") == model and row.get("warmup", "").lower() == "false"
         ]
         successful = [row for row in measured if row.get("status") == "ok"]
         exact = sum(row.get("exact_match", "").lower() == "true" for row in successful)
-        valid_json = sum(row.get("valid_json", "").lower() == "true" for row in successful)
-        schema_valid = sum(row.get("schema_valid", "").lower() == "true" for row in successful)
+        valid_json = sum(
+            row.get("valid_json", "").lower() == "true" for row in successful
+        )
+        schema_valid = sum(
+            row.get("schema_valid", "").lower() == "true" for row in successful
+        )
         total_values = [number(row, "total_latency_ms") for row in successful]
         total_values = [value for value in total_values if value is not None]
         speed_values = [number(row, "tokens_per_second") for row in successful]
         speed_values = [value for value in speed_values if value is not None]
-        analysis.append({
-            "model": model,
-            "params": next((row.get("params", "") for row in measured), ""),
-            "runs": len(measured),
-            "successful": len(successful),
-            "exact_pct": 100 * exact / len(successful) if successful else None,
-            "json_pct": 100 * valid_json / len(successful) if successful else None,
-            "schema_pct": 100 * schema_valid / len(successful) if successful else None,
-            "avg_total": statistics.mean(total_values) if total_values else None,
-            "median_total": statistics.median(total_values) if total_values else None,
-            "avg_speed": statistics.mean(speed_values) if speed_values else None,
-            "ram_peak": max(
-                (value for value in (number(row, "ram_peak_mb") for row in successful) if value is not None),
-                default=None,
-            ),
-        })
+        analysis.append(
+            {
+                "model": model,
+                "params": next((row.get("params", "") for row in measured), ""),
+                "runs": len(measured),
+                "successful": len(successful),
+                "exact_pct": 100 * exact / len(successful) if successful else None,
+                "json_pct": 100 * valid_json / len(successful) if successful else None,
+                "schema_pct": 100 * schema_valid / len(successful)
+                if successful
+                else None,
+                "avg_total": statistics.mean(total_values) if total_values else None,
+                "median_total": statistics.median(total_values)
+                if total_values
+                else None,
+                "avg_speed": statistics.mean(speed_values) if speed_values else None,
+                "ram_peak": max(
+                    (
+                        value
+                        for value in (number(row, "ram_peak_mb") for row in successful)
+                        if value is not None
+                    ),
+                    default=None,
+                ),
+            }
+        )
     return analysis
 
 
@@ -82,21 +97,24 @@ def table(rows: list[list[str]], headers: list[str]) -> str:
         for index, value in enumerate(row):
             widths[index] = max(widths[index], len(value))
     render = [
-        "| " + " | ".join(header.ljust(widths[index]) for index, header in enumerate(headers)) + " |",
+        "| "
+        + " | ".join(
+            header.ljust(widths[index]) for index, header in enumerate(headers)
+        )
+        + " |",
         "| " + " | ".join("-" * width for width in widths) + " |",
     ]
     render.extend(
-        "| " + " | ".join(value.ljust(widths[index]) for index, value in enumerate(row)) + " |"
+        "| "
+        + " | ".join(value.ljust(widths[index]) for index, value in enumerate(row))
+        + " |"
         for row in rows
     )
     return "\n".join(render)
 
 
 def build_report(rows: list[dict[str, str]], models: list[dict[str, object]]) -> str:
-    measured = [
-        row for row in rows
-        if row.get("warmup", "").lower() == "false"
-    ]
+    measured = [row for row in rows if row.get("warmup", "").lower() == "false"]
     errors = [row for row in measured if row.get("status") != "ok"]
     fastest = sorted(
         (model for model in models if model["avg_total"] is not None),
@@ -108,17 +126,21 @@ def build_report(rows: list[dict[str, str]], models: list[dict[str, object]]) ->
     )
     rows_for_table = []
     for model in models:
-        rows_for_table.append([
-            str(model["model"]),
-            str(model["params"]),
-            str(model["runs"]),
-            percent(model["json_pct"]),
-            percent(model["schema_pct"]),
-            percent(model["exact_pct"]),
-            ms(model["avg_total"]),
-            f"{model['avg_speed']:.2f}" if model["avg_speed"] is not None else "N/D",
-            f"{model['ram_peak']:.0f}" if model["ram_peak"] is not None else "N/D",
-        ])
+        rows_for_table.append(
+            [
+                str(model["model"]),
+                str(model["params"]),
+                str(model["runs"]),
+                percent(model["json_pct"]),
+                percent(model["schema_pct"]),
+                percent(model["exact_pct"]),
+                ms(model["avg_total"]),
+                f"{model['avg_speed']:.2f}"
+                if model["avg_speed"] is not None
+                else "N/D",
+                f"{model['ram_peak']:.0f}" if model["ram_peak"] is not None else "N/D",
+            ]
+        )
     report = [
         "# Análisis del benchmark",
         "",
@@ -133,43 +155,95 @@ def build_report(rows: list[dict[str, str]], models: list[dict[str, object]]) ->
         f"- Ejecuciones medidas analizadas: **{len(measured)}**",
         f"- Ejecuciones con error HTTP/cliente: **{len(errors)}**",
         "- Los warm-up fueron excluidos.",
-        "- `Total medio` es el promedio de `total_latency_ms`: desde que el cliente envía la solicitud hasta que recibe la respuesta completa.",
-        "- En Groq incluye red y tiempo de respuesta extremo a extremo; en Ollama corresponde al tiempo observado desde el cliente local.",
+        (
+            "- `Total medio` es el promedio de `total_latency_m"
+            "s`: desde que el cliente envía la solicitud hasta "
+            "que recibe la respuesta completa."
+        ),
+        (
+            "- En Groq incluye red y tiempo de respuesta extrem"
+            "o a extremo; en Ollama corresponde al tiempo obser"
+            "vado desde el cliente local."
+        ),
         "- La velocidad y la latencia no se interpretan como calidad semántica.",
         "",
         "## Comparación por modelo",
         "",
-        table(rows_for_table, ["Modelo", "Params", "Runs", "JSON", "Schema", "Exact", "Total medio", "Tok/s", "RAM pico MB"]),
+        table(
+            rows_for_table,
+            [
+                "Modelo",
+                "Params",
+                "Runs",
+                "JSON",
+                "Schema",
+                "Exact",
+                "Total medio",
+                "Tok/s",
+                "RAM pico MB",
+            ],
+        ),
         "",
         "## Lectura rápida",
         "",
     ]
     if fastest:
-        report.append(f"- Menor latencia media: **{fastest[0]['model']}** ({ms(fastest[0]['avg_total'])}).")
+        report.append(
+            (
+                "- Menor latencia media: **"
+                f"{fastest[0]['model']}"
+                "** ("
+                f"{ms(fastest[0]['avg_total'])}"
+                ")."
+            )
+        )
     if most_accurate:
-        report.append(f"- Mayor exact match: **{most_accurate[0]['model']}** ({percent(most_accurate[0]['exact_pct'])}).")
-    report.extend([
-        "- La elección final debe priorizar `exact_match` y luego contrastar latencia, velocidad y RAM.",
-        "",
-        "## Alertas",
-        "",
-    ])
+        report.append(
+            (
+                "- Mayor exact match: **"
+                f"{most_accurate[0]['model']}"
+                "** ("
+                f"{percent(most_accurate[0]['exact_pct'])}"
+                ")."
+            )
+        )
+    report.extend(
+        [
+            (
+                "- La elección final debe priorizar `exact_match` y"
+                " luego contrastar latencia, velocidad y RAM."
+            ),
+            "",
+            "## Alertas",
+            "",
+        ]
+    )
     alerts = []
     for model in models:
         if model["exact_pct"] == 0:
             alerts.append(f"- **{model['model']}** no obtuvo ningún `exact_match`.")
         if model["json_pct"] is not None and model["json_pct"] < 100:
-            alerts.append(f"- **{model['model']}** tuvo respuestas que no fueron JSON válido.")
+            alerts.append(
+                f"- **{model['model']}** tuvo respuestas que no fueron JSON válido."
+            )
         if model["schema_pct"] is not None and model["schema_pct"] < 100:
-            alerts.append(f"- **{model['model']}** tuvo respuestas con esquema inválido.")
+            alerts.append(
+                f"- **{model['model']}** tuvo respuestas con esquema inválido."
+            )
     if errors:
-        alerts.append("- Hay ejecuciones con error que deben revisarse en `benchmark_runs.csv`.")
-    report.extend(alerts or ["- No se detectaron alertas con las métricas disponibles."])
+        alerts.append(
+            "- Hay ejecuciones con error que deben revisarse en `benchmark_runs.csv`."
+        )
+    report.extend(
+        alerts or ["- No se detectaron alertas con las métricas disponibles."]
+    )
     return "\n".join(report) + "\n"
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Analiza los resultados de una corrida del benchmark.")
+    parser = argparse.ArgumentParser(
+        description="Analiza los resultados de una corrida del benchmark."
+    )
     parser.add_argument("--results-directory", type=Path, default=RESULTS_DIRECTORY)
     parser.add_argument("--report-file", type=Path)
     args = parser.parse_args(argv)
@@ -184,7 +258,14 @@ def main(argv: list[str] | None = None) -> int:
     models = model_analysis(rows)
     report_file.write_text(build_report(rows, models), encoding="utf-8")
     print(f"Informe generado: {report_file.resolve()}")
-    print(f"Modelos analizados: {len(models)} | Ejecuciones medidas: {sum(model['runs'] for model in models)}")
+    print(
+        (
+            "Modelos analizados: "
+            f"{len(models)}"
+            " | Ejecuciones medidas: "
+            f"{sum((model['runs'] for model in models))}"
+        )
+    )
     return 0
 
 

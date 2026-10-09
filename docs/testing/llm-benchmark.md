@@ -22,12 +22,88 @@ python scripts/benchmarks/analyze_llm_benchmark.py --results-directory reports/l
 
 Para incluir la comparación con Groq se requiere definir `GROQ_API_KEY` en el entorno; esa clave nunca debe incluirse en el repositorio.
 
+## Evaluación de precisión de operaciones
+
+El script [precision_benchmark.py](../../scripts/benchmarks/precision_benchmark.py)
+evalúa diez casos de agregación, resta, negación y corrección de cantidades.
+Los textos se encuentran en
+[la carpeta de prompts](../../scripts/benchmarks/prompts/precision/), y los
+resultados esperados, catálogo experimental y esquema están definidos en el
+script.
+
+### Precondiciones
+
+Ejecutar desde la raíz con Python 3.11 o superior. Para Ollama, iniciar el
+servicio local y descargar el modelo seleccionado. Para Gemini, instalar
+`pip install ".[gemini]"` y definir `GEMINI_API_KEY`. Para Groq, definir
+`GROQ_API_KEY`. Las claves se suministran por el entorno y nunca se versionan.
+Los modelos de los comandos siguientes son los identificadores históricos
+registrados; su disponibilidad actual depende del proveedor.
+
+### Procedimiento
+
+Estos comandos describen cómo solicitar nuevas ejecuciones. No reproducen
+exactamente el entorno histórico, cuya configuración completa no fue guardada.
+
+```bash
+python scripts/benchmarks/precision_benchmark.py --provider ollama --ollama-model qwen3:4b-instruct --ollama-format schema --contract contract.txt
+python scripts/benchmarks/precision_benchmark.py --provider groq --groq-model openai/gpt-oss-20b --contract contract.txt
+python scripts/benchmarks/precision_benchmark.py --provider gemini --gemini-models gemini-3.6-flash --contract contract.txt
+```
+
+`--run-name` permite identificar la carpeta de salida. `--cases` limita la
+selección: una ejecución parcial sirve para diagnóstico, no para aceptación
+del corpus completo. `--contract` selecciona el archivo de instrucciones;
+el nombre por defecto es `contract.txt`. Ollama permite `schema`, `json`,
+`none` y `all`; `all` requiere `--provider ollama`.
+
+### Resultados esperados y evidencia
+
+Cada respuesta se compara con su JSON esperado sin reparar la salida.
+`exact_match` exige JSON válido, esquema válido e igualdad del resultado,
+incluido el orden de operaciones. El esquema experimental contiene
+`operaciones`, con `operacion`, `producto` y `cantidad`; no es el contrato
+oficial de producción.
+
+El script guarda `benchmark_runs.csv`, `benchmark_summary.csv`,
+`raw_responses.json` y `benchmark_report.md` en una carpeta
+`precision_<fecha_hora>` dentro de `reports/llm-benchmark/`, salvo que se
+indique un nombre. Revisar errores de solicitud y casos omitidos además del
+porcentaje de exactitud. Nueve respuestas correctas y un error de API no
+son diez casos completados correctamente.
+
+La [investigación](../research/stock-interpretation-strategy-and-evaluation.md)
+resume la evidencia versionada. El
+[ADR-0004](../decisions/0004-use-api-provider-for-stock-interpretation.md)
+propone criterios para evaluaciones futuras. Antes de una nueva comparación
+se aplican los límites acordados: 40 s por solicitud y 3 GB RAM para local,
+y 8 s por solicitud para API. Las medias no comprueban límites por solicitud.
+El benchmark de precisión no mide RAM. Se debe conservar corpus, esquema y
+prompt. `contract.txt` y `contract-copy.txt` se verificaron idénticos el 07/10/2026; el nombre distinto no implica instrucciones distintas. Los
+reportes históricos solo guardan el nombre del archivo, no su contenido efectivo
+ni toda la configuración.
+
+### Comparación Gemini del mensaje original
+
+[gemini_benchmark.py](../../scripts/benchmarks/gemini_benchmark.py) utiliza
+el experimento original de productos y cantidades, no el corpus de operaciones.
+Requiere la dependencia opcional `gemini` y `GEMINI_API_KEY`.
+
+```bash
+python scripts/benchmarks/gemini_benchmark.py --help
+```
+
+Permite seleccionar modelos mediante `--models`, repeticiones con `--runs`
+y nombre de salida con `--run-name`. Los resultados de las dos suites no
+son directamente equivalentes.
+
 ---
 
 ## 1. Objetivo
 
-Crear un programa de benchmark que compare distintos LLMs locales
-ejecutados mediante Ollama en la misma computadora.
+El script implementado compara distintos LLMs locales ejecutados mediante
+Ollama en la misma computadora. Las secciones siguientes conservan el diseño
+del experimento original; los resultados observados están en los reportes.
 
 El objetivo principal es determinar qué modelo ofrece la mejor relación
 entre:
@@ -55,11 +131,9 @@ LLM local
    ↓
 JSON estructurado
    ↓
-Validación
+Validación y confirmación
    ↓
-API
-   ↓
-Base de datos remota
+Persistencia de inventario
 ```
 
 En este benchmark NO se evalúa el STT, la API ni la base de datos. Se

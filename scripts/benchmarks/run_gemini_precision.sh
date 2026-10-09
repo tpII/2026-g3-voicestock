@@ -15,4 +15,4 @@ export GEMINI_API_KEY
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 exec "$PYTHON_BIN" scripts/benchmarks/precision_benchmark.py \
     --provider gemini \
-    --contract contract-copy.txt
+    --contract contract.txt

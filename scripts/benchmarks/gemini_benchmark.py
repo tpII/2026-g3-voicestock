@@ -1,4 +1,5 @@
 """Benchmark de modelos Gemini para extracción de inventario en JSON."""
+
 from __future__ import annotations
 
 import argparse
@@ -34,19 +35,41 @@ GEMINI_SCHEMA = {
 }
 
 
-def error_result(model: str, run: int, warmup: bool, message: str) -> benchmark.RunResult:
+def error_result(
+    model: str, run: int, warmup: bool, message: str
+) -> benchmark.RunResult:
     return benchmark.RunResult(
-        model=f"gemini:{model}", params="cloud", run=run, warmup=warmup,
-        status="error", error=message, time_to_first_token_ms=None,
-        total_latency_ms=None, tokens_per_second=None,
-        ollama_total_duration_ms=None, load_duration_ms=None,
-        prompt_eval_duration_ms=None, eval_duration_ms=None,
-        inference_duration_ms=None, prompt_tokens=None, output_tokens=None,
-        ram_before_mb=None, ram_mid_mb=None, ram_peak_mb=None, ram_after_mb=None,
-        valid_json=False, schema_valid=False, expected_products=len(benchmark.EXPECTED),
-        correct_products=0, missing_products=len(benchmark.EXPECTED), extra_products=0,
-        correct_quantities=0, incorrect_quantities=len(benchmark.EXPECTED),
-        excluded_water_correctly=True, exact_match=False, raw_response="",
+        model=f"gemini:{model}",
+        params="cloud",
+        run=run,
+        warmup=warmup,
+        status="error",
+        error=message,
+        time_to_first_token_ms=None,
+        total_latency_ms=None,
+        tokens_per_second=None,
+        ollama_total_duration_ms=None,
+        load_duration_ms=None,
+        prompt_eval_duration_ms=None,
+        eval_duration_ms=None,
+        inference_duration_ms=None,
+        prompt_tokens=None,
+        output_tokens=None,
+        ram_before_mb=None,
+        ram_mid_mb=None,
+        ram_peak_mb=None,
+        ram_after_mb=None,
+        valid_json=False,
+        schema_valid=False,
+        expected_products=len(benchmark.EXPECTED),
+        correct_products=0,
+        missing_products=len(benchmark.EXPECTED),
+        extra_products=0,
+        correct_quantities=0,
+        incorrect_quantities=len(benchmark.EXPECTED),
+        excluded_water_correctly=True,
+        exact_match=False,
+        raw_response="",
     )
 
 
@@ -85,17 +108,29 @@ def run_once(client: object, model: str, run: int, warmup: bool) -> benchmark.Ru
             else None
         )
         return benchmark.RunResult(
-            model=f"gemini:{model}", params="cloud", run=run, warmup=warmup,
-            status="ok", error=None,
+            model=f"gemini:{model}",
+            params="cloud",
+            run=run,
+            warmup=warmup,
+            status="ok",
+            error=None,
             time_to_first_token_ms=round(((first_at or ended) - started) * 1000, 2),
             total_latency_ms=round((ended - started) * 1000, 2),
             tokens_per_second=tokens_per_second,
-            ollama_total_duration_ms=None, load_duration_ms=None,
-            prompt_eval_duration_ms=None, eval_duration_ms=None,
-            inference_duration_ms=None, prompt_tokens=prompt_tokens,
-            output_tokens=output_tokens, ram_before_mb=None, ram_mid_mb=None,
-            ram_peak_mb=None, ram_after_mb=None, raw_response=raw,
-            expected_products=len(benchmark.EXPECTED), **metrics,
+            ollama_total_duration_ms=None,
+            load_duration_ms=None,
+            prompt_eval_duration_ms=None,
+            eval_duration_ms=None,
+            inference_duration_ms=None,
+            prompt_tokens=prompt_tokens,
+            output_tokens=output_tokens,
+            ram_before_mb=None,
+            ram_mid_mb=None,
+            ram_peak_mb=None,
+            ram_after_mb=None,
+            raw_response=raw,
+            expected_products=len(benchmark.EXPECTED),
+            **metrics,
         )
     except Exception as exc:
         return error_result(model, run, warmup, str(exc))
@@ -103,7 +138,9 @@ def run_once(client: object, model: str, run: int, warmup: bool) -> benchmark.Ru
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Benchmark de modelos Gemini.")
-    parser.add_argument("--models", nargs="+", choices=GEMINI_MODELS, default=GEMINI_MODELS)
+    parser.add_argument(
+        "--models", nargs="+", choices=GEMINI_MODELS, default=GEMINI_MODELS
+    )
     parser.add_argument("--runs", type=int, default=benchmark.RUNS_PER_MODEL)
     parser.add_argument("--run-name", default=None)
     args = parser.parse_args()
@@ -137,10 +174,15 @@ def main() -> int:
     benchmark.write_outputs(results)
     try:
         from analyze_llm_benchmark import main as analyze_results_main
-        analyze_results_main([
-            "--results-directory", str(output_directory),
-            "--report-file", str(output_directory / "benchmark_report.md"),
-        ])
+
+        analyze_results_main(
+            [
+                "--results-directory",
+                str(output_directory),
+                "--report-file",
+                str(output_directory / "benchmark_report.md"),
+            ]
+        )
     except Exception as exc:
         print(f"No se pudo generar el informe Markdown: {exc}")
     print(f"\nResultados guardados en: {output_directory.resolve()}")

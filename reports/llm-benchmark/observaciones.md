@@ -14,12 +14,26 @@ Gemini 3.6 Flash no logró 10/10 en una misma corrida completa: obtuvo **9/10 de
 
 ## Comparación con modelos más grandes
 
-`openai/gpt-oss-120b`, más grande que GPT-OSS 20B, hizo [8/10 con `contract.txt`](precision_20260929_213303/benchmark_report.md): omitió una resta válida en `negar_varias_restaciones` y una agregación válida en `caso_integral`. GPT-OSS 20B resolvió ambos casos en su corrida de 10/10. Ambos usaron los mismos casos, esquema JSON estricto y `reasoning_effort: low`; el tamaño no garantizó mejores resultados en este test.
-
-Estos tres modelos son el **foco de este resumen, no una lista exhaustiva** de corridas perfectas: [Qwen 3.8 27B también obtuvo 10/10](precision_20260929_212812/benchmark_report.md) en una corrida con otro contrato (`contract-copy-copy.txt`). Omitir ese dato llevaría a una conclusión falsa sobre qué modelos pudieron completar los casos.
+Las notas históricas mencionan corridas adicionales de GPT-OSS 120B y
+Qwen 3.8 27B, pero `precision_20260929_213303` y
+`precision_20260929_212812` no están versionadas en este repositorio. Sus
+resultados no se usan como evidencia verificable de una comparación o ranking.
+Los resultados no permiten atribuir la precisión solamente al tamaño del modelo.
 
 ## Cómo interpretar estos resultados
 
 El esquema estricto obliga a producir un JSON con la forma pedida, pero no garantiza interpretar correctamente correcciones y cancelaciones. Un error de API tampoco demuestra un fallo de interpretación. Por eso conviene mirar **exactitud total**, **solicitudes exitosas** y **contrato usado** por separado.
 
-Diez ejemplos son una muestra pequeña, y varios contratos se ajustaron durante las pruebas. Para elegir un modelo de Voice Stock hace falta evaluar frases nuevas, no usadas para ajustar el prompt, y repetir corridas con el mismo contrato y configuración. El reporte actual guarda el **nombre** del contrato, no una copia de su contenido en el momento de ejecutar; esto limita la reproducibilidad exacta si el archivo cambia después.
+`contract.txt` y `contract-copy.txt` se verificaron idénticos byte por byte el 07/10/2026; sus nombres distintos no implican instrucciones distintas para Qwen, GPT-OSS 20B y Gemini. Ambos tienen SHA-256 `6da3c4cdadc485dcb6d39b6eac3c825f2bd7edf11c2b839b1d4cca5ca4c087f5`. No corresponde exigir repetir esas corridas por la diferencia de nombres.
+
+Diez ejemplos son una muestra pequeña. La evaluación de frases nuevas, no usadas para ajustar el prompt, sigue siendo una ampliación posible de la cobertura. El reporte actual guarda el **nombre** del contrato, no una copia de su contenido en el momento de ejecutar; esto limita la reproducibilidad exacta si el archivo cambia después.
+
+
+## Estrategia para este PR
+
+Se prioriza una API externa (Groq o Gemini según configuración), con local
+como segunda opción. Los límites definidos el 09/10/2026 son 8 s por solicitud
+para API y 40 s y 3 GB RAM para local. Las medias informadas están por debajo
+de los límites de latencia, pero no prueban el límite en cada solicitud.
+El pico local histórico de aproximadamente 3,132 MB no demuestra cumplimiento
+de 3 GB; el benchmark de precisión no mide RAM.

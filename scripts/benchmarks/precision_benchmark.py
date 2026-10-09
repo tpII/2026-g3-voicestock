@@ -1,4 +1,5 @@
 """Benchmark de precisión para interpretar operaciones de inventario."""
+
 from __future__ import annotations
 
 import argparse
@@ -14,7 +15,6 @@ from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 REPORTS_DIRECTORY = PROJECT_ROOT / "reports" / "llm-benchmark"
@@ -110,7 +110,7 @@ def load_prompt_file(filename: str) -> str:
     return (PROMPTS_DIRECTORY / filename).read_text(encoding="utf-8").strip()
 
 
-PROMPT_CONTRACT = load_prompt_file("contract-copy.txt")
+PROMPT_CONTRACT = load_prompt_file("contract.txt")
 
 
 @dataclass(frozen=True)
@@ -124,17 +124,33 @@ CASES = [
     PrecisionCase(
         "solo_agregar",
         load_prompt_file("solo_agregar.txt"),
-        {"operaciones": [
-            {"operacion": "agregar_stock", "producto": "Coca Cola 2L", "cantidad": 3},
-            {"operacion": "agregar_stock", "producto": "Sprite 1.5L", "cantidad": 4},
-        ]},
+        {
+            "operaciones": [
+                {
+                    "operacion": "agregar_stock",
+                    "producto": "Coca Cola 2L",
+                    "cantidad": 3,
+                },
+                {
+                    "operacion": "agregar_stock",
+                    "producto": "Sprite 1.5L",
+                    "cantidad": 4,
+                },
+            ]
+        },
     ),
     PrecisionCase(
         "solo_restar",
         load_prompt_file("solo_restar.txt"),
-        {"operaciones": [
-            {"operacion": "restar_stock", "producto": "Arroz Gallo 1kg", "cantidad": 2},
-        ]},
+        {
+            "operaciones": [
+                {
+                    "operacion": "restar_stock",
+                    "producto": "Arroz Gallo 1kg",
+                    "cantidad": 2,
+                },
+            ]
+        },
     ),
     PrecisionCase(
         "negar_agregacion",
@@ -149,17 +165,33 @@ CASES = [
     PrecisionCase(
         "restar_ambos",
         load_prompt_file("restar_ambos.txt"),
-        {"operaciones": [
-            {"operacion": "restar_stock", "producto": "Coca Cola Zero 2L", "cantidad": 2},
-            {"operacion": "restar_stock", "producto": "Detergente Magistral 750ml", "cantidad": 4},
-        ]},
+        {
+            "operaciones": [
+                {
+                    "operacion": "restar_stock",
+                    "producto": "Coca Cola Zero 2L",
+                    "cantidad": 2,
+                },
+                {
+                    "operacion": "restar_stock",
+                    "producto": "Detergente Magistral 750ml",
+                    "cantidad": 4,
+                },
+            ]
+        },
     ),
     PrecisionCase(
         "corregir_cantidad",
         load_prompt_file("corregir_cantidad.txt"),
-        {"operaciones": [
-            {"operacion": "agregar_stock", "producto": "Coca Cola 2L", "cantidad": 2},
-        ]},
+        {
+            "operaciones": [
+                {
+                    "operacion": "agregar_stock",
+                    "producto": "Coca Cola 2L",
+                    "cantidad": 2,
+                },
+            ]
+        },
     ),
     PrecisionCase(
         "negar_agregacion_y_restacion",
@@ -169,25 +201,51 @@ CASES = [
     PrecisionCase(
         "negar_varias_agregaciones",
         load_prompt_file("negar_varias_agregaciones.txt"),
-        {"operaciones": [
-            {"operacion": "agregar_stock", "producto": "Arroz Gallo 1kg", "cantidad": 5},
-        ]},
+        {
+            "operaciones": [
+                {
+                    "operacion": "agregar_stock",
+                    "producto": "Arroz Gallo 1kg",
+                    "cantidad": 5,
+                },
+            ]
+        },
     ),
     PrecisionCase(
         "negar_varias_restaciones",
         load_prompt_file("negar_varias_restaciones.txt"),
-        {"operaciones": [
-            {"operacion": "restar_stock", "producto": "Detergente Magistral 750ml", "cantidad": 4},
-        ]},
+        {
+            "operaciones": [
+                {
+                    "operacion": "restar_stock",
+                    "producto": "Detergente Magistral 750ml",
+                    "cantidad": 4,
+                },
+            ]
+        },
     ),
     PrecisionCase(
         "caso_integral",
         load_prompt_file("caso_integral.txt"),
-        {"operaciones": [
-            {"operacion": "agregar_stock", "producto": "Coca Cola 2L", "cantidad": 2},
-            {"operacion": "restar_stock", "producto": "Arroz Gallo 1kg", "cantidad": 2},
-            {"operacion": "restar_stock", "producto": "Fideos Matarazzo 500g", "cantidad": 3},
-        ]},
+        {
+            "operaciones": [
+                {
+                    "operacion": "agregar_stock",
+                    "producto": "Coca Cola 2L",
+                    "cantidad": 2,
+                },
+                {
+                    "operacion": "restar_stock",
+                    "producto": "Arroz Gallo 1kg",
+                    "cantidad": 2,
+                },
+                {
+                    "operacion": "restar_stock",
+                    "producto": "Fideos Matarazzo 500g",
+                    "cantidad": 3,
+                },
+            ]
+        },
     ),
 ]
 
@@ -272,7 +330,9 @@ def evaluate(
     }
 
 
-def error_result(provider: str, model: str, case: PrecisionCase, error: str) -> PrecisionResult:
+def error_result(
+    provider: str, model: str, case: PrecisionCase, error: str
+) -> PrecisionResult:
     return PrecisionResult(
         provider=provider,
         model=model,
@@ -294,9 +354,7 @@ def error_result(provider: str, model: str, case: PrecisionCase, error: str) -> 
     )
 
 
-def run_ollama(
-    model: str, case: PrecisionCase, output_format: str
-) -> PrecisionResult:
+def run_ollama(model: str, case: PrecisionCase, output_format: str) -> PrecisionResult:
     started = time.perf_counter()
     try:
         payload: dict[str, Any] = {
@@ -432,9 +490,7 @@ def run_gemini(client: Any, model: str, case: PrecisionCase) -> PrecisionResult:
                     temperature=TEMPERATURE,
                     response_mime_type="application/json",
                     response_schema=JSON_SCHEMA,
-                    thinking_config=types.ThinkingConfig(
-                        thinking_level=thinking_level
-                    ),
+                    thinking_config=types.ThinkingConfig(thinking_level=thinking_level),
                 ),
             )
             ended = time.perf_counter()
@@ -470,11 +526,20 @@ def run_gemini(client: Any, model: str, case: PrecisionCase) -> PrecisionResult:
                     delay = gemini_retry_delay(error)
                     reason = "cuota agotada"
                 else:
-                    delay = GEMINI_UNAVAILABLE_RETRY_SECONDS * (2 ** attempt)
+                    delay = GEMINI_UNAVAILABLE_RETRY_SECONDS * (2**attempt)
                     reason = "servicio no disponible (503)"
                 print(
-                    f"  {reason}; reintento {attempt + 1}/"
-                    f"{GEMINI_MAX_RETRIES} en {delay:.1f} s"
+                    (
+                        "  "
+                        f"{reason}"
+                        "; reintento "
+                        f"{attempt + 1}"
+                        "/"
+                        f"{GEMINI_MAX_RETRIES}"
+                        " en "
+                        f"{delay:.1f}"
+                        " s"
+                    )
                 )
                 time.sleep(delay)
                 continue
@@ -502,42 +567,40 @@ def build_summary(
         ]
         successful = [result for result in model_results if result.status == "ok"]
         latencies = [
-            result.latency_ms
-            for result in successful
-            if result.latency_ms is not None
+            result.latency_ms for result in successful if result.latency_ms is not None
         ]
         speeds = [
             result.tokens_per_second
             for result in successful
             if result.tokens_per_second is not None
         ]
-        summary.append({
-            "provider": provider,
-            "model": model,
-            "cases": len(model_results),
-            "successful": len(successful),
-            "request_success_pct": round(
-                100 * len(successful) / len(model_results), 1
-            ),
-            "valid_json_pct": percentage(successful, "valid_json"),
-            "schema_valid_pct": percentage(successful, "schema_valid"),
-            "correct_operation_pct": percentage(
-                successful, "correct_operation"
-            ),
-            "correct_product_pct": percentage(successful, "correct_product"),
-            "correct_quantity_pct": percentage(successful, "correct_quantity"),
-            "exact_match_pct": percentage(successful, "exact_match"),
-            "end_to_end_exact_pct": percentage(model_results, "exact_match"),
-            "avg_latency_ms": (
-                round(statistics.mean(latencies), 2) if latencies else None
-            ),
-            "median_latency_ms": (
-                round(statistics.median(latencies), 2) if latencies else None
-            ),
-            "avg_tokens_per_second": (
-                round(statistics.mean(speeds), 3) if speeds else None
-            ),
-        })
+        summary.append(
+            {
+                "provider": provider,
+                "model": model,
+                "cases": len(model_results),
+                "successful": len(successful),
+                "request_success_pct": round(
+                    100 * len(successful) / len(model_results), 1
+                ),
+                "valid_json_pct": percentage(successful, "valid_json"),
+                "schema_valid_pct": percentage(successful, "schema_valid"),
+                "correct_operation_pct": percentage(successful, "correct_operation"),
+                "correct_product_pct": percentage(successful, "correct_product"),
+                "correct_quantity_pct": percentage(successful, "correct_quantity"),
+                "exact_match_pct": percentage(successful, "exact_match"),
+                "end_to_end_exact_pct": percentage(model_results, "exact_match"),
+                "avg_latency_ms": (
+                    round(statistics.mean(latencies), 2) if latencies else None
+                ),
+                "median_latency_ms": (
+                    round(statistics.median(latencies), 2) if latencies else None
+                ),
+                "avg_tokens_per_second": (
+                    round(statistics.mean(speeds), 3) if speeds else None
+                ),
+            }
+        )
     return summary
 
 
@@ -571,33 +634,43 @@ def write_report(
             str(row["model"]),
             str(row["cases"]),
             str(row["successful"]),
-            f'{row["request_success_pct"]:.1f}%',
-            f'{row["valid_json_pct"]:.1f}%',
-            f'{row["schema_valid_pct"]:.1f}%',
-            f'{row["correct_operation_pct"]:.1f}%',
-            f'{row["correct_product_pct"]:.1f}%',
-            f'{row["correct_quantity_pct"]:.1f}%',
-            f'{row["exact_match_pct"]:.1f}%',
-            f'{row["end_to_end_exact_pct"]:.1f}%',
+            f"{row['request_success_pct']:.1f}%",
+            f"{row['valid_json_pct']:.1f}%",
+            f"{row['schema_valid_pct']:.1f}%",
+            f"{row['correct_operation_pct']:.1f}%",
+            f"{row['correct_product_pct']:.1f}%",
+            f"{row['correct_quantity_pct']:.1f}%",
+            f"{row['exact_match_pct']:.1f}%",
+            f"{row['end_to_end_exact_pct']:.1f}%",
             str(row["avg_latency_ms"] or "N/D"),
             str(row["avg_tokens_per_second"] or "N/D"),
         ]
         for row in summary
     ]
     case_results = {
-        (result.provider, result.model, result.case_id): result
-        for result in results
+        (result.provider, result.model, result.case_id): result for result in results
     }
     case_headers = ["Proveedor", "Modelo"] + [case.case_id for case in cases]
     case_rows = []
-    for provider, model in sorted({(result.provider, result.model) for result in results}):
+    for provider, model in sorted(
+        {(result.provider, result.model) for result in results}
+    ):
         row = [provider, model]
         for case in cases:
             result = case_results.get((provider, model, case.case_id))
-            row.append("Sí" if result and result.status == "ok" and result.exact_match else "No")
+            row.append(
+                "Sí"
+                if result and result.status == "ok" and result.exact_match
+                else "No"
+            )
         case_rows.append(row)
     failed_rows = [
-        [result.provider, result.model, result.case_id, result.error or "respuesta incorrecta"]
+        [
+            result.provider,
+            result.model,
+            result.case_id,
+            result.error or "respuesta incorrecta",
+        ]
         for result in results
         if result.status != "ok" or not result.exact_match
     ]
@@ -607,7 +680,11 @@ def write_report(
         "## Contrato JSON",
         "",
         "```json",
-        '{"operaciones":[{"operacion":"agregar_stock|restar_stock","producto":"nombre canónico","cantidad":1}]}',
+        (
+            '{"operaciones":[{"operacion":"agregar_stock|restar'
+            '_stock","producto":"nombre canónico","cantidad":1}'
+            "]}"
+        ),
         "```",
         "",
         f"- Contrato utilizado: `{contract_filename}`.",
@@ -615,10 +692,19 @@ def write_report(
         "- Gemini 3.7 Flash y 3.8 Flash se ejecutan con `thinking_level: low`.",
         "- Los demás modelos Gemini se ejecutan con `thinking_level: minimal`.",
         "- Todos los proveedores usan temperatura 0.",
-        "- Gemini y Groq restringen la salida con schema; Ollama usa el modo indicado arriba.",
-        "- Groq usa `reasoning_effort: low` para GPT-OSS y `none` para Qwen; schema estricto.",
+        (
+            "- Gemini y Groq restringen la salida con schema; O"
+            "llama usa el modo indicado arriba."
+        ),
+        (
+            "- Groq usa `reasoning_effort: low` para GPT-OSS y "
+            "`none` para Qwen; schema estricto."
+        ),
         "- Las métricas marcadas con `*` se calculan solo sobre solicitudes exitosas.",
-        "- `Exact total` incluye los errores de API y representa el resultado de punta a punta.",
+        (
+            "- `Exact total` incluye los errores de API y repre"
+            "senta el resultado de punta a punta."
+        ),
         "",
         "## Resultados por modelo",
         "",
@@ -644,7 +730,11 @@ def write_report(
         "",
         "## Resultado por caso",
         "",
-        "`Sí` significa que la respuesta coincidió exactamente con la salida esperada; `No` indica que el caso falló o que la solicitud no se completó.",
+        (
+            "`Sí` significa que la respuesta coincidió exactame"
+            "nte con la salida esperada; `No` indica que el cas"
+            "o falló o que la solicitud no se completó."
+        ),
         "",
         markdown_table(case_headers, case_rows),
         "",
@@ -652,22 +742,28 @@ def write_report(
         "",
     ]
     for case in cases:
-        report.extend([
-            f"### {case.case_id}",
-            "",
-            case.message,
-            "",
-            "```json",
-            json.dumps(case.expected, ensure_ascii=False, indent=2),
-            "```",
-            "",
-        ])
+        report.extend(
+            [
+                f"### {case.case_id}",
+                "",
+                case.message,
+                "",
+                "```json",
+                json.dumps(case.expected, ensure_ascii=False, indent=2),
+                "```",
+                "",
+            ]
+        )
     report.extend(["## Errores y respuestas no exactas", ""])
     if failed_rows:
-        report.append(markdown_table(["Proveedor", "Modelo", "Caso", "Detalle"], failed_rows))
+        report.append(
+            markdown_table(["Proveedor", "Modelo", "Caso", "Detalle"], failed_rows)
+        )
     else:
         report.append("Todos los modelos obtuvieron exact match en todos los casos.")
-    (output_directory / "benchmark_report.md").write_text("\n".join(report) + "\n", encoding="utf-8")
+    (output_directory / "benchmark_report.md").write_text(
+        "\n".join(report) + "\n", encoding="utf-8"
+    )
 
 
 def write_outputs(
@@ -696,8 +792,12 @@ def write_outputs(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Benchmark de precisión de interpretación.")
-    parser.add_argument("--provider", choices=["all", "ollama", "gemini", "groq"], default="all")
+    parser = argparse.ArgumentParser(
+        description="Benchmark de precisión de interpretación."
+    )
+    parser.add_argument(
+        "--provider", choices=["all", "ollama", "gemini", "groq"], default="all"
+    )
     parser.add_argument("--ollama-model", default=OLLAMA_MODEL)
     parser.add_argument("--groq-model", default=GROQ_MODEL)
     parser.add_argument(
@@ -706,7 +806,9 @@ def main() -> int:
         default="schema",
         help="Control de salida enviado a Ollama: schema, json, ninguno o todos.",
     )
-    parser.add_argument("--gemini-models", nargs="+", choices=GEMINI_MODELS, default=GEMINI_MODELS)
+    parser.add_argument(
+        "--gemini-models", nargs="+", choices=GEMINI_MODELS, default=GEMINI_MODELS
+    )
     parser.add_argument(
         "--cases",
         nargs="+",
@@ -715,9 +817,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--contract",
-        choices=sorted(
-            path.name for path in PROMPTS_DIRECTORY.glob("contract*.txt")
-        ),
+        choices=sorted(path.name for path in PROMPTS_DIRECTORY.glob("contract*.txt")),
         default="contract.txt",
         help="Archivo de contrato ubicado en la carpeta de prompts.",
     )
@@ -744,7 +844,7 @@ def main() -> int:
         try:
             from google import genai
         except ImportError:
-            print("Falta google-genai. Instalá con: python -m pip install \".[gemini]\"")
+            print('Falta google-genai. Instalá con: python -m pip install ".[gemini]"')
             return 1
         gemini_client = genai.Client(api_key=api_key)
 
@@ -768,10 +868,7 @@ def main() -> int:
         for ollama_format in ollama_formats:
             format_results: list[PrecisionResult] = []
             for case in selected_cases:
-                print(
-                    f"ollama/{args.ollama_model} [{ollama_format}]: "
-                    f"{case.case_id}"
-                )
+                print(f"ollama/{args.ollama_model} [{ollama_format}]: {case.case_id}")
                 format_results.append(
                     run_ollama(args.ollama_model, case, ollama_format)
                 )
@@ -797,8 +894,11 @@ def main() -> int:
                 results.append(run_gemini(gemini_client, model, case))
             if model_index < len(args.gemini_models) - 1:
                 print(
-                    "Pausa de "
-                    f"{GEMINI_MODEL_DELAY_SECONDS} s antes del siguiente modelo."
+                    (
+                        "Pausa de "
+                        f"{GEMINI_MODEL_DELAY_SECONDS}"
+                        " s antes del siguiente modelo."
+                    )
                 )
                 time.sleep(GEMINI_MODEL_DELAY_SECONDS)
 

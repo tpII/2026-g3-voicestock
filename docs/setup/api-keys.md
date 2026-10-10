@@ -24,6 +24,7 @@ Estos scripts llaman a `load_api_keys()` al arrancar:
 - `scripts/benchmarks/audio_stt_llm_benchmark.py`
 - `scripts/benchmarks/audio_stt_gemini_benchmark.py`
 - `scripts/benchmarks/audio_stt_groq_benchmark.py`
+- `scripts/integration/audio_stt_llm_ssh.py` (coordinador en PC)
 
 El cargador compartido es [api_keys.py](../../scripts/benchmarks/api_keys.py).
 Busca `config/api-keys.env` respecto de la ubicación del repositorio, no respecto

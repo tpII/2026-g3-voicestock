@@ -138,3 +138,14 @@ This setup reproduces PC exploration; the actual Pi OS/architecture build,
 installation walkthrough, offline check and usability verdict are still pending.
 The production public interface and adapter under `src/pi/speech_to_text/`
 are not implemented by these scripts.
+
+## Raspberry SSH integration preparation
+
+A separate `WhisperAdapter` and `SpeechToText` port now exist in
+`src/pi/speech_to_text/`. See [the public contract](../interfaces/speech-to-text.md)
+and [the target build/SSH procedure](../testing/raspberry-stt-ssh.md).
+On the Pi, `bash scripts/setup.sh` creates/reuses `.venv` when Conda is not active;
+install `.[stt-integration]` for resource instrumentation. Conda is not required
+on the Pi. The existing `--stt` setup option adds Vosk, not this Whisper build.
+Hardware execution is still pending; the old PC exploration results are not
+validation of the new adapter.

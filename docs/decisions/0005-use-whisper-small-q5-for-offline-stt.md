@@ -3,8 +3,9 @@
 ## Status
 
 Proposed — 10 October 2026. Selected for the next hardware validation; acceptance
-on Raspberry Pi 3 and team review remain pending. No production STT adapter is
-implemented by the exploration scripts.
+on Raspberry Pi 3 and team review remain pending. A separate STT interface
+and adapter are now implemented; the exploration scripts themselves do not
+constitute hardware acceptance.
 
 ## Context
 
@@ -53,7 +54,8 @@ Freeze hardware-specific acceptance thresholds before that run.
   and cancellations can still produce incorrect transcription.
 - Capture/orchestration remain independent of the chosen engine.
 - Revisit this ADR if hardware quality, memory, latency or offline installation
-  fails. Interface, adapter, physical validation and formal acceptance are pending.
+  fails. The interface and adapter now exist; their automated contract tests,
+  physical validation and formal acceptance remain pending.
 
 ## Related work
 
@@ -63,3 +65,16 @@ Freeze hardware-specific acceptance thresholds before that run.
 - [SpeechToText-04: Production adapter](https://app.clickup.com/t/86e3euwhw)
 - [SpeechToText-05: Operation documentation](https://app.clickup.com/t/86e3eux74)
 - [SpeechToText-06: Raspberry Pi validation](https://app.clickup.com/t/86e3euxwb)
+
+## Implementation follow-up
+
+The next increment introduces `SpeechToText`, `TranscriptionError` and
+`WhisperAdapter` in `src/pi/speech_to_text/`, plus a new SSH fixture coordinator.
+The public input is a WAV path; engine configuration stays in adapter construction.
+Existing benchmark tests are unchanged. The implementation has not yet run on
+the Pi or been covered by new automated contract tests. This ADR remains Proposed
+until the hardware and acceptance work is completed. See
+[SSH fixture procedure](../testing/raspberry-stt-ssh.md).
+
+[The public module interface](../interfaces/speech-to-text.md) records inputs,
+outputs, lifecycle, errors and replaceability.

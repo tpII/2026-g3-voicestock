@@ -8,7 +8,7 @@ GPIO, the Pi HTTP client/server path or production operation validation.
 
 ```mermaid
 flowchart LR
-    A[Pi PushToTalk WAV] --> B[Pi STT adapter: pending]
+    A[Pi PushToTalk WAV] --> B[Pi STT adapter: hardware validation pending]
     B --> C[HttpInterpretationClient]
     C --> D[PC HTTP server]
     D --> E[InterpretationService]
@@ -55,8 +55,9 @@ separate responsibilities; the benchmark schema does not implement them.
 [SpeechToText-03](https://app.clickup.com/t/86e3euw78) and
 [SpeechToText-04](https://app.clickup.com/t/86e3euwhw) own the STT interface and
 adapter; [StructuredCommandInterpretation-04](https://app.clickup.com/t/86e3ev4cx)
-owns the real interpreter. This PR contributes exploration and documentation,
-not those implementations.
+owns the real interpreter. The initial evaluation PR contributes exploration and documentation. The SSH
+follow-up below introduces the STT port/adapter; production LLM and physical
+application orchestration remain pending.
 
 ## Tooling and operation
 
@@ -78,3 +79,12 @@ See [pipeline operation](../testing/audio-stt-llm-benchmark.md),
 The credential helper currently serves benchmark scripts; production configuration
 must be introduced with the real provider rather than importing benchmark code
 into `src/`.
+
+## SSH fixture integration increment
+
+A sequential engine-independent `SpeechToText` port and `WhisperAdapter` now
+exist under `src/pi/speech_to_text/`. The new SSH coordinator transfers recorded
+WAVs and exercises that adapter remotely, then calls Groq from the PC. See
+[the preparation and execution guide](../testing/raspberry-stt-ssh.md). Hardware
+execution is pending. The earlier diagram describes the planned HTTP application
+flow: connecting physical capture and a production LLM provider remains pending.

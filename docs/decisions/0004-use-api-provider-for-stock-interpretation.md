@@ -5,6 +5,7 @@
 Proposed
 
 The working strategy and operational limits were defined on 9 October 2026.
+The initial API/model preference was narrowed on 10 October 2026.
 Team review remains pending. The benchmarks do not implement the production adapter.
 
 ## Context
@@ -16,9 +17,11 @@ The evaluation is recorded in
 
 ## Decision
 
-Use an external API as the initial strategy. Either evaluated API provider,
-Groq or Gemini, may be selected through configuration according to availability
-and credentials; this PR does not choose an exclusive API vendor.
+Use **Groq with `openai/gpt-oss-20b`** as the principal initial interpreter on
+the PC. The six-case basic/habitual audio → Whisper Small Q5_1 → GPT pipeline
+returned 6/6 expected experimental JSON outputs. This supports starting the
+provider implementation, not declaring production integration complete.
+Other API providers remain replaceable alternatives through configuration.
 Keep Qwen 3 4B Instruct through Ollama on the PC as the second option.
 This priority does not require automatic fallback or implementing both adapters
 in the same increment.
@@ -52,7 +55,11 @@ two runs, with an API error in the first; this is not a single 10/10 run.
 
 - Local inference first: avoids Internet and external quotas, but is retained
   as the second option under the chosen strategy.
-- A fixed API vendor: deferred; the provider interface allows either evaluated API.
+- Gemini as the initial provider: retains successful examples but the latest
+  six-case audio pipeline had two API failures. Keep as an evaluated alternative
+  rather than the principal provider.
+- A provider permanently coupled to the service: rejected; Groq is the initial
+  selection behind the existing replaceable interface.
 - Automatic fallback: not required for this PR.
 
 ## Consequences
@@ -63,3 +70,19 @@ two runs, with an API error in the first; this is not a single 10/10 run.
 - Historical reports lack complete per-run configuration snapshots.
 - Adapter implementation and team approval remain pending; experimental results
   are not guarantees for unseen commands or the full audio workflow.
+
+## Audio pipeline follow-up — 10 October 2026
+
+[The STT research](../research/speech-to-text-engine-evaluation.md) records
+the audio pipeline: GPT OSS 20B 6/6, local Qwen 5/6, Gemini 3.8 Flash 4/6
+with two request failures. GPT interprets the STT spelling «Coca-Cola 0» as
+Zero, which Qwen selected incorrectly in that run. The experiments used the
+benchmark catalog/schema, not InterpretationDraft or the official contract.
+
+[Whisper Small Q5_1 is proposed for hardware validation](0005-use-whisper-small-q5-for-offline-stt.md).
+STT runs on the Pi offline; the PC needs Internet to call Groq. Credentials
+remain on the PC. The local Qwen alternative does not establish compliance
+with the 3-GB limit: the latest observed Ollama RSS was approximately 3158 MiB
+and missed the first loading peak. Remote LLM RAM cannot be measured from the
+API client. Hardware STT, production adapters, units/attributes extraction,
+latency acceptance and team review remain pending.

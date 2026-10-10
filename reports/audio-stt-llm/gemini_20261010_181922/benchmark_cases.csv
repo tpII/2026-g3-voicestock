@@ -1,0 +1,7 @@
+case_id,level,status,whisper_peak_mib,api_client_peak_mib,remote_model_ram_mib
+solo_agregar,basico,error,344.67578125,,
+solo_restar,basico,error,346.234375,,
+restar_ambos,habitual,error,346.94921875,,
+corregir_cantidad,habitual,error,346.94921875,,
+negar_agregacion,habitual,error,346.94921875,,
+negar_restacion,habitual,error,349.39453125,,

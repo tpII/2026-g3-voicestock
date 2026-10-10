@@ -109,9 +109,11 @@ with 10/10 correct cases. Gemini 3.6 Flash answered nine cases correctly with
 one API error; a later run answered the remaining case using `contract.txt`
 instead of `contract-copy.txt`, whose contents were verified identical on 7 October 2026. This does not establish 10/10 in one complete Gemini run.
 
-The initial strategy is an external API, either Groq or Gemini selected through
-configuration. Local Qwen through Ollama is the second option. No automatic
-fallback is required by this PR.
+The initial strategy was an external API without an exclusive vendor on
+9 October. On 10 October the working recommendation was narrowed to
+**Groq GPT OSS 20B as principal**, following the six-case audio pipeline.
+Local Qwen through Ollama remains the second option. Provider replacement
+is preserved and automatic fallback is not required.
 
 ## Operational limits agreed on 9 October 2026
 
@@ -131,3 +133,13 @@ that limit. These thresholds were defined after the experiments.
 The [ADR](../decisions/0004-use-api-provider-for-stock-interpretation.md)
 records the strategy and remains Proposed pending team review. Preserve the
 historical reports and effective configuration evidence for subsequent validation.
+
+## Audio pipeline follow-up — 10 October 2026
+
+The [STT and audio-pipeline research](speech-to-text-engine-evaluation.md)
+records six basic/habitual recordings through Whisper Small Q5_1 and each
+interpreter. GPT OSS 20B produced 6/6 exact experimental JSON outputs; local
+Qwen produced 5/6; Gemini 3.8 Flash produced four exact outputs and two API
+failures. The follow-up supports the principal GPT selection in ADR-0004.
+It does not extend the September text-only experiments to unseen commands,
+units/attributes extraction or the official production contract.

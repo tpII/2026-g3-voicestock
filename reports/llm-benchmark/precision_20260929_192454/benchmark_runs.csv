@@ -1,0 +1,35 @@
+provider,model,case_id,status,error,latency_ms,prompt_tokens,output_tokens,tokens_per_second,valid_json,schema_valid,correct_operation,correct_product,correct_quantity,exact_match,expected_json,raw_response
+ollama,qwen3:4b-instruct,solo_agregar,ok,,15760.39,923,74,13.469,True,True,True,True,True,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Coca Cola 2L"", ""cantidad"": 3}, {""operacion"": ""agregar_stock"", ""producto"": ""Sprite 1.5L"", ""cantidad"": 4}]}","{""operaciones"": [
+  {
+    ""operacion"": ""agregar_stock"",
+    ""producto"": ""Coca Cola 2L"",
+    ""cantidad"": 3
+  },
+  {
+    ""operacion"": ""agregar_stock"",
+    ""producto"": ""Sprite 1.5L"",
+    ""cantidad"": 4
+  }
+]}"
+ollama,qwen3:4b-instruct,solo_restar,ok,,3546.45,912,33,13.547,True,True,True,True,True,True,"{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Arroz Gallo 1kg"", ""cantidad"": 2}]}","{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Arroz Gallo 1kg"", ""cantidad"": 2}]}"
+ollama,qwen3:4b-instruct,negar_agregacion,ok,,5924.58,931,7,15.507,True,True,True,True,True,True,"{""operaciones"": []}","{""operaciones"": []}"
+ollama,qwen3:4b-instruct,negar_restacion,ok,,5980.75,929,7,13.738,True,True,True,True,True,True,"{""operaciones"": []}","{""operaciones"": []}"
+ollama,qwen3:4b-instruct,restar_ambos,ok,,11038.71,926,66,12.031,True,True,True,True,True,True,"{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Coca Cola Zero 2L"", ""cantidad"": 2}, {""operacion"": ""restar_stock"", ""producto"": ""Detergente Magistral 750ml"", ""cantidad"": 4}]}","{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Coca Cola Zero 2L"", ""cantidad"": 2}, {""operacion"": ""restar_stock"", ""producto"": ""Detergente Magistral 750ml"", ""cantidad"": 4}]}"
+ollama,qwen3:4b-instruct,corregir_cantidad,ok,,3957.75,919,33,12.943,True,True,True,True,True,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Coca Cola 2L"", ""cantidad"": 2}]}","{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Coca Cola 2L"", ""cantidad"": 2}]}"
+ollama,qwen3:4b-instruct,negar_agregacion_y_restacion,ok,,6110.33,954,7,15.455,True,True,True,True,True,True,"{""operaciones"": []}","{""operaciones"": []}"
+ollama,qwen3:4b-instruct,negar_varias_agregaciones,ok,,9674.67,967,45,14.124,True,True,True,True,True,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Arroz Gallo 1kg"", ""cantidad"": 5}]}","{
+  ""operaciones"": [
+    {
+      ""operacion"": ""agregar_stock"",
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 5
+    }
+  ]
+}"
+ollama,qwen3:4b-instruct,negar_varias_restaciones,ok,,9702.67,957,46,14.022,True,True,True,True,True,True,"{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Detergente Magistral 750ml"", ""cantidad"": 4}]}","{""operaciones"": [
+  {
+    ""operacion"": ""restar_stock"",
+    ""producto"": ""Detergente Magistral 750ml"",
+    ""cantidad"": 4
+  }
+]}"

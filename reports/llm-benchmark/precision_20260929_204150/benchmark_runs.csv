@@ -1,0 +1,10 @@
+provider,model,case_id,status,error,latency_ms,prompt_tokens,output_tokens,tokens_per_second,valid_json,schema_valid,correct_operation,correct_product,correct_quantity,exact_match,expected_json,raw_response
+gemini,gemini-3.6-flash,negar_varias_agregaciones,ok,,2084.48,966,50,23.987,True,True,True,True,True,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Arroz Gallo 1kg"", ""cantidad"": 5}]}","{
+  ""operaciones"": [
+    {
+      ""operacion"": ""agregar_stock"",
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 5
+    }
+  ]
+}"

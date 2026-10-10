@@ -37,6 +37,10 @@ Docker no forma parte de este arranque. Más adelante se puede agregar para serv
 
 ---
 
+Para configurar claves locales sin versionarlas, seguí la
+[guía de claves de API](../setup/api-keys.md). Los benchmarks que integran el
+cargador leen `config/api-keys.env` automáticamente.
+
 ## A. Preparación inicial
 
 Cloná el repositorio y entrá a la carpeta del proyecto:
@@ -74,12 +78,12 @@ chmod +x scripts/setup.sh
 El script se puede volver a ejecutar sin problema. En cada corrida:
 
 1. Comprueba que exista Python 3.11 o superior.
-2. Crea `.venv` si todavía no existe. No instala paquetes de Python de forma global.
+2. Si hay un entorno Conda activo (`CONDA_PREFIX`), usa su Python e instala ahí. Si no, crea o reutiliza `.venv`. No instala paquetes de Python de forma global.
 3. Actualiza `pip` dentro de ese entorno.
 4. Instala el proyecto en modo editable junto con las dependencias de desarrollo (`ruff`, `pytest`, `pytest-cov`, `pre-commit`).
 5. Instala los hooks de pre-commit. Esto hay que hacerlo **una vez** después de clonar; a partir de ahí, cada `git commit` los usa automáticamente.
 
-Cuando termine, activá el entorno virtual:
+Si usás Conda, activá el entorno deseado antes de ejecutar setup (`conda activate voicestock`, por ejemplo). Para incluir Vosk, usá `./scripts/setup.sh --stt` o `.\scripts\setup.ps1 -Stt`. Sin Conda activo, cuando termine activá el entorno virtual:
 
 Windows:
 

@@ -29,6 +29,21 @@ voicestock-pi-ptt = "pi.push_to_talk.manual:main"
 packages = ["src/pc", "src/pi", "src/shared"]
 
 [project.optional-dependencies]
+stt-benchmark = [
+    "vosk==0.3.45",
+    "psutil>=5.9",
+    "av==19.0.1",
+]
+stt-sherpa = [
+    "sherpa-onnx==1.13.8",
+    "numpy>=2",
+]
+stt-moonshine = [
+    "moonshine-voice==0.1.5",
+]
+stt-vosk = [
+    "vosk==0.3.45",
+]
 dev = [
     "ruff>=0.16",
     "pytest>=8.0",

@@ -1,0 +1,2 @@
+configuration,load_s,load_ram_peak_mib,measured_runs,successful_runs,failed_runs,expected_measured_runs,wer_pct,cer_pct,exact_match_pct,mean_inference_s,median_inference_s,max_inference_s,mean_rtf,ram_peak_mib,mean_cpu_pct
+kroko_es,5.588701815999229,294.5703125,30,30,0,30,30.42168674698795,20.987654320987655,0.0,0.7502592006666722,0.4919610594997721,2.639834711999356,0.04858011693367864,323.43359375,706.5868847161939

@@ -107,7 +107,12 @@ GROQ_JSON_SCHEMA = {
 
 
 def load_prompt_file(filename: str) -> str:
-    return (PROMPTS_DIRECTORY / filename).read_text(encoding="utf-8").strip()
+    path = PROMPTS_DIRECTORY / filename
+    if not path.exists():
+        from prompt_levels import prompt_path
+
+        path = prompt_path(PROMPTS_DIRECTORY, Path(filename).stem)
+    return path.read_text(encoding="utf-8").strip()
 
 
 PROMPT_CONTRACT = load_prompt_file("contract.txt")

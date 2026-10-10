@@ -36,7 +36,7 @@ script.
 Ejecutar desde la raíz con Python 3.11 o superior. Para Ollama, iniciar el
 servicio local y descargar el modelo seleccionado. Para Gemini, instalar
 `pip install ".[gemini]"` y definir `GEMINI_API_KEY`. Para Groq, definir
-`GROQ_API_KEY`. Las claves se suministran por el entorno y nunca se versionan.
+`GROQ_API_KEY`. Las claves se suministran por el entorno o por `config/api-keys.env`, que el benchmark de precisión carga automáticamente. Ver [configuración de claves](../setup/api-keys.md). Las claves reales nunca se versionan.
 Los modelos de los comandos siguientes son los identificadores históricos
 registrados; su disponibilidad actual depende del proveedor.
 

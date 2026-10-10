@@ -22,11 +22,21 @@ class WhisperAdapter:
         threads: int = 4,
         timeout: float = 600,
         log_path: Path | None = None,
+        prompt_path: Path | None = None,
     ):
         if threads < 1 or timeout <= 0:
             raise ValueError("threads and timeout must be positive")
         if not worker_path.is_file() or not model_path.is_file():
             raise TranscriptionError("Whisper worker or model not installed")
+        if prompt_path is not None:
+            if (
+                not prompt_path.is_file()
+                or not prompt_path.read_text(encoding="utf-8").strip()
+            ):
+                raise TranscriptionError("STT prompt must be a nonempty UTF-8 file")
+        command = [str(worker_path.resolve()), str(model_path.resolve()), str(threads)]
+        if prompt_path is not None:
+            command.append(str(prompt_path.resolve()))
         self._timeout = timeout
         self._log = (
             log_path.open("w") if log_path else tempfile.TemporaryFile(mode="w+")
@@ -35,7 +45,7 @@ class WhisperAdapter:
         self._worker = None
         try:
             self._worker = subprocess.Popen(
-                [str(worker_path.resolve()), str(model_path.resolve()), str(threads)],
+                command,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=self._log,

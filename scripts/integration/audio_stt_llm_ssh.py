@@ -66,7 +66,7 @@ def save(out, rows, metadata):
     lines = [
         "# Raspberry STT → SSH → PC Groq integration",
         "",
-        f"Whisper Small Q5_1 on remote host → {MODEL} from PC.",
+        f"Whisper {metadata['stt_model']} on remote host → {MODEL} from PC.",
         f"Exact JSON: {exact}/{len(rows)} processed; six expected cases.",
         "One transcription and one API request per case; no warm-up or retries.",
         (
@@ -131,7 +131,14 @@ def main():
         "--remote-repo", required=True, help="Absolute repository path on Pi"
     )
     parser.add_argument("--remote-python", default="python3")
+    parser.add_argument("--stt-model", default="ggml-small-q5_1.bin")
+    parser.add_argument("--stt-prompt", type=Path, help="Local UTF-8 STT context file")
     parser.add_argument("--port", type=int, default=22)
+    parser.add_argument(
+        "--ssh-password",
+        action="store_true",
+        help="Allow SSH to prompt for a password in the local terminal",
+    )
     parser.add_argument("--threads", type=int, default=4)
     parser.add_argument("--timeout", type=float, default=600)
     args = parser.parse_args()
@@ -143,6 +150,18 @@ def main():
         parser.error("remote-repo must be an absolute path")
     if args.threads < 1 or args.timeout <= 0 or not 1 <= args.port <= 65535:
         parser.error("Invalid threads, timeout or port")
+    if Path(args.stt_model).name != args.stt_model or not args.stt_model.endswith(
+        ".bin"
+    ):
+        parser.error("stt-model must be a model filename ending in .bin")
+    prompt_bytes = None
+    if args.stt_prompt is not None:
+        try:
+            prompt_bytes = args.stt_prompt.read_bytes()
+            if not prompt_bytes.decode("utf-8").strip():
+                parser.error("STT prompt is empty")
+        except (OSError, UnicodeError):
+            parser.error("STT prompt must be a readable UTF-8 file")
     load_api_keys()
     key = os.environ.get("GROQ_API_KEY")
     if not key:
@@ -162,7 +181,7 @@ def main():
         "ssh",
         "-T",
         "-o",
-        "BatchMode=yes",
+        "BatchMode=no" if args.ssh_password else "BatchMode=yes",
         "-o",
         "ConnectTimeout=10",
         "-p",
@@ -174,12 +193,18 @@ def main():
         "remote_repo": args.remote_repo,
         "remote_inputs": remote_dir,
         "llm_model": MODEL,
+        "stt_model": args.stt_model,
+        "stt_prompt_path": str(args.stt_prompt) if args.stt_prompt else None,
+        "stt_prompt_text": prompt_bytes.decode("utf-8")
+        if prompt_bytes is not None
+        else None,
+        "stt_prompt_sha256": sha256(args.stt_prompt) if args.stt_prompt else None,
         "runs_per_case": 1,
         "warmups": 0,
         "retries": 0,
         "manifest_sha256": sha256(fixtures / "manifest.json"),
-        "local_model_sha256": sha256(ROOT / "models/stt/whisper/ggml-small-q5_1.bin")
-        if (ROOT / "models/stt/whisper/ggml-small-q5_1.bin").exists()
+        "local_model_sha256": sha256(ROOT / "models/stt/whisper" / args.stt_model)
+        if (ROOT / "models/stt/whisper" / args.stt_model).exists()
         else None,
         "contract_sha256": sha256(
             ROOT / "scripts/benchmarks/prompts/precision/contract.txt"
@@ -199,6 +224,10 @@ def main():
             with tarfile.open(fileobj=archive, mode="w") as tar:
                 for case in cases:
                     tar.add(fixtures / case["wav"], arcname=case["id"] + ".wav")
+                if prompt_bytes is not None:
+                    prompt_copy = out / "stt_prompt.txt"
+                    prompt_copy.write_bytes(prompt_bytes)
+                    tar.add(prompt_copy, arcname="stt_prompt.txt")
             archive.seek(0)
             command = (
                 "mkdir -p "
@@ -219,6 +248,13 @@ def main():
                     "scripts/integration/stt_remote_worker.py",
                     "--input-dir",
                     remote_dir,
+                    "--stt-model",
+                    args.stt_model,
+                    *(
+                        ["--stt-prompt", remote_dir + "/stt_prompt.txt"]
+                        if args.stt_prompt
+                        else []
+                    ),
                     "--threads",
                     str(args.threads),
                     "--timeout",
@@ -238,6 +274,8 @@ def main():
             if ready.get("event") != "ready":
                 raise RuntimeError("Missing remote ready event")
             metadata["remote_environment"] = ready
+            if ready.get("stt_prompt_sha256") != metadata["stt_prompt_sha256"]:
+                raise RuntimeError("Pi and PC STT prompt hashes differ")
             if (
                 metadata["local_model_sha256"]
                 and ready["model_sha256"] != metadata["local_model_sha256"]

@@ -32,15 +32,23 @@ def main():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-dir", type=Path, required=True)
+    parser.add_argument("--stt-model", default="ggml-small-q5_1.bin")
+    parser.add_argument("--stt-prompt", type=Path)
     parser.add_argument("--threads", type=int, default=4)
     parser.add_argument("--timeout", type=float, default=600)
     args = parser.parse_args()
     directory = args.input_dir.resolve()
-    model = ROOT / "models/stt/whisper/ggml-small-q5_1.bin"
+    if Path(args.stt_model).name != args.stt_model or not args.stt_model.endswith(
+        ".bin"
+    ):
+        parser.error("stt-model must be a model filename ending in .bin")
+    model = ROOT / "models/stt/whisper" / args.stt_model
     worker = ROOT / ".tools/stt/whisper-benchmark-worker"
     log = directory / "whisper.log"
     try:
-        with WhisperAdapter(worker, model, args.threads, args.timeout, log) as stt:
+        with WhisperAdapter(
+            worker, model, args.threads, args.timeout, log, prompt_path=args.stt_prompt
+        ) as stt:
             with Monitor(stt.worker_pid) as monitor:
                 load = stt.wait_until_loaded()
             emit(
@@ -54,6 +62,10 @@ def main():
                     "logical_cpus": psutil.cpu_count(),
                     "system_ram_mib": psutil.virtual_memory().total / 1024**2,
                     "model_sha256": digest(model),
+                    "stt_model": args.stt_model,
+                    "stt_prompt_sha256": digest(args.stt_prompt)
+                    if args.stt_prompt
+                    else None,
                     "worker_sha256": digest(worker),
                     "threads": args.threads,
                     "remote_repo": str(ROOT),

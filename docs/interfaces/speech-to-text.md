@@ -49,6 +49,10 @@ with WhisperAdapter(
 Construction starts a persistent native worker. `wait_until_loaded()` optionally
 reads its startup event for instrumentation; `transcribe()` does this itself
 before the first request. No context from previous recordings is retained.
+An optional `prompt_path=Path(...)` constructor argument supplies a nonempty
+UTF-8 vocabulary file to the integration worker. It uses Whisper initial
+prompt conditioning for every request and window, independently of previous
+recordings. Rebuild the integration worker before enabling this option.
 The model remains loaded for sequential requests. Context exit or `close()`
 terminates the worker and releases temporary files and logs.
 

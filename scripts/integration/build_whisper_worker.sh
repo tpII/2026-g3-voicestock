@@ -17,7 +17,7 @@ cmake -S "$TASK_WHISPER_ROOT" -B "$TASK_WHISPER_ROOT/build" \
   -DCMAKE_BUILD_TYPE=Release -DGGML_CUDA=OFF -DGGML_VULKAN=OFF \
   -DGGML_METAL=OFF -DWHISPER_BUILD_TESTS=OFF
 cmake --build "$TASK_WHISPER_ROOT/build" --target whisper-cli -j "${STT_BUILD_JOBS:-1}"
-g++ -O2 -std=c++17 "$TASK_REPO_ROOT/scripts/benchmarks/native/whisper_worker.cpp" \
+g++ -O2 -std=c++17 "$TASK_REPO_ROOT/scripts/integration/whisper_worker.cpp" \
   -I "$TASK_WHISPER_ROOT/include" -I "$TASK_WHISPER_ROOT/ggml/include" \
   -L "$TASK_WHISPER_ROOT/build/bin" \
   -Wl,-rpath,'$ORIGIN/whisper.cpp/build/bin' -lwhisper \

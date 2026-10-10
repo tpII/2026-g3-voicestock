@@ -76,9 +76,13 @@ La PC necesita Internet para Groq. La Raspberry sólo necesita acceso SSH desde
 la PC y sus archivos locales.
 
 Configurá un alias en `~/.ssh/config` o usá `usuario@direccion`. SSH debe estar
-habilitado y la autenticación por clave debe funcionar sin pedir contraseña.
+habilitado. Por defecto se usa autenticación por clave sin pedir contraseña.
+Para usar contraseña, agregá `--ssh-password` y ejecutá desde una terminal
+interactiva en la PC. OpenSSH pide la contraseña directamente en esa terminal;
+el script no la recibe ni la guarda. Puede pedirla dos veces: para transferir
+los audios y para iniciar el worker. El servidor debe permitir este método.
 Verificá manualmente `ssh raspberry` una vez para registrar la identidad del
-host. El ejecutor usa BatchMode y no omite la comprobación del host.
+host. Ambos modos mantienen la comprobación de identidad del host.
 
 ## 3. Ejecutar desde la PC
 
@@ -152,3 +156,32 @@ puede reutilizar `WhisperAdapter` después, conectándolo a `AudioCaptureResult`
 Las implementaciones del proveedor LLM de producción y la orquestación física
 siguen pendientes. El adaptador es secuencial; no comparte una instancia entre
 transcripciones concurrentes.
+
+## Elegir modelo y contexto STT
+
+`--stt-model` acepta el nombre del archivo instalado en
+`models/stt/whisper/` de la Raspberry; por defecto `ggml-small-q5_1.bin`.
+`--stt-prompt` acepta la ruta local en la PC de un TXT UTF-8 no vacío.
+El coordinador copia ese texto a la Pi y registra contenido y SHA-256 en el
+informe. Sin este parámetro no se usa contexto. El catálogo contiene sólo
+vocabulario de productos, sin cantidades ni respuestas esperadas.
+
+Ejemplo con Base y catálogo:
+
+```bash
+python scripts/integration/audio_stt_llm_ssh.py \
+  --host usuario@IP_RASPBERRY \
+  --remote-repo /ruta/al/repositorio \
+  --remote-python /ruta/al/repositorio/.venv/bin/python \
+  --ssh-password \
+  --stt-model ggml-base.bin \
+  --stt-prompt scripts/benchmarks/prompts/catalogo-stt.txt
+```
+
+Descargá previamente `ggml-base.bin` en la carpeta de modelos de la Pi.
+Después de actualizar el código, recompilá allí con
+`bash scripts/integration/build_whisper_worker.sh`. El worker de integración
+usa `initial_prompt` de whisper.cpp en cada solicitud y lo mantiene en cada
+ventana del mismo audio; no conserva contexto entre audios. El contexto puede
+sesgar la transcripción y no garantiza reconocimiento correcto.
+Los workers y ejecutores de benchmarks anteriores permanecen sin cambios.

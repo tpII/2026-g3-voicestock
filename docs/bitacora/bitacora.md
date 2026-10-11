@@ -623,11 +623,147 @@ punto de acceso Wi-Fi que se había considerado antes.
   la conectividad de punta a punta, el aislamiento de Internet ni que la
   configuración sobreviva a un reinicio.
 
+---
+
+## 06/10/2026
+
+### Interfaz web de la operación pendiente (`PendingOperationWeb-01`)
+
+Se eligió el stack y la topología del servidor que va a mostrar la operación
+pendiente en el navegador de la PC. La PC llega a la Raspberry Pi por el
+enlace Ethernet ya definido (`192.168.50.1` y `192.168.50.2`). No se vuelve a
+usar un punto de acceso Wi-Fi.
+
+La decisión quedó así:
+
+- FastAPI como framework HTTP y Uvicorn como servidor ASGI;
+- HTML, CSS y JavaScript vanilla, servidos como archivos estáticos por la
+  misma aplicación;
+- un solo proceso Python en la Raspberry Pi, dueño del orquestador, de la
+  máquina de estados y de `PendingOperation`;
+- HTTP solo como adaptador: consulta y resolución pasan por puertos de
+  aplicación, sin modificar la FSM desde las rutas.
+
+FastAPI se eligió por el contrato HTTP explícito (modelos, validación y un
+API que las tareas siguientes pueden implementar), no por rendimiento. El
+proceso único se eligió para no introducir IPC ni un segundo dueño del
+estado.
+
+Quedaron fuera de este incremento React, Vue, Angular, un frontend
+separado, Node.js, un segundo proceso HTTP, Redis, SQLite como canal entre
+HTTP y el orquestador, WebSockets, nginx y Docker para publicar esta
+interfaz.
+
+La comparación está en
+[pending operation web stack](../research/pending-operation-web-stack.md)
+y la decisión en
+[ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md).
+Esta tarea no implementa el servidor, el API ni la página.
 
 ---
 
 ## 07/10/2026
 
+### Puertos de la operación pendiente (`PendingOperationWeb-02`)
+
+Se definió la frontera que va a usar la web para consultar y resolver la
+operación pendiente, sin implementar `PendingOperationFlow`. Esa feature sigue
+siendo la dueña futura de la operación y de la máquina de estados. Acá no se
+creó un segundo modelo de dominio ni una FSM paralela.
+
+El código quedó en `pi.pending_operation`:
+
+- `PendingOperationQueryPort.get_current()` devuelve un
+  `PendingOperationView` o nada;
+- `PendingOperationResolutionPort` expone `confirm(operation_id)` y
+  `cancel(operation_id)`, con `ResolutionResult` en lugar de un booleano;
+- `PendingOperationGateway` aplica esa política con un único lock;
+- `ProvisionalOperationExecutor` responde éxito y no toca inventario;
+- el estado real entra por `PendingOperationSlot`, que Flow tiene que
+  implementar.
+
+Confirmar solo cierra la pendiente después de una ejecución exitosa. Cancelar
+no ejecuta inventario. Un reintento de la misma acción devuelve
+`already_resolved` y no vuelve a ejecutar; la acción contraria devuelve
+`conflict`. Esa memoria es solo la resolución anterior en el proceso y se
+pierde al reiniciar.
+
+El registro para integrar Flow está en
+[pending operation web flow contract](../research/pending-operation-web-flow-contract.md).
+No se agregó un ADR nuevo: la topología y el rol de HTTP ya están en ADR-0004,
+y este contrato es el hand-off hasta que Flow exista.
+
+---
+
+## 08/10/2026
+
+### Servidor web inicial (`PendingOperationWeb-03`)
+
+Se agregó la capa `pi.web`: FastAPI en `create_app`, Uvicorn en `run_server`,
+y la página estática de marcador de posición. `GET /health` solo indica que
+el servidor HTTP responde. `GET /` sirve el HTML local, y `/static/*` los
+archivos CSS y JavaScript. No hay API de operación pendiente, CORS, HTTPS ni
+login.
+
+El comando `voicestock-pi-web` arranca ese servidor para desarrollo y
+validación. En la Raspberry Pi el default es `192.168.50.1:8000`. En otra
+máquina se puede usar `VOICESTOCK_WEB_HOST=127.0.0.1`. No es un segundo
+proceso productivo: ADR-0004 sigue pidiendo un único proceso cuando exista el
+orquestador. Cómo se componen ambos queda pendiente.
+
+La guía está en [servidor web de la Raspberry Pi](../setup/pi-web.md).
+Los frameworks HTTP siguen permitidos solo en el servidor de la PC y en
+`pi/web`.
+
+### API de la operación pendiente (`PendingOperationWeb-04`)
+
+Se agregó el API versionado en `pi.web`: `GET /api/v1/pending-operation`,
+`POST .../confirm` y `POST .../cancel`. Las rutas llaman a los puertos de
+aplicación y traducen `ResolutionResult` a HTTP. No hay body en confirm ni
+cancel. Un GET sin pendiente responde `204`. Un reintento de la misma acción
+responde `200` con `already_resolved`. Conflicto y id viejo responden `409`.
+Un fallo de ejecución responde `503` sin texto de excepción.
+
+Si `voicestock-pi-web` arranca sin puertos, `/health` sigue en `200` y el
+API responde `503` con `application_not_ready`. Un `operation_id` en blanco
+responde `422`.
+
+El contrato está en
+[API de la operación pendiente](../interfaces/pending-operation-web-api.md).
+No se creó un ADR: el mapeo es el contrato HTTP, y la decisión de que HTTP
+es un adaptador ya está en ADR-0004.
+
+### Interfaz de la operación pendiente (`PendingOperationWeb-05`)
+
+La página dejó de ser un marcador de posición. Muestra la frase de
+confirmación, los datos estructurados y el texto reconocido. Si no hay
+operación, pide usar el botón físico. Confirmar y cancelar llaman al API
+con el `operation_id` visible.
+
+La consulta se repite cerca de una vez por segundo, esperando a que termine
+la anterior. Un reintento exitoso se muestra como confirmación o
+cancelación, no como error. Si la operación cambió, la página se actualiza.
+Si la ejecución falla, la tarjeta sigue y se pueden reintentar los botones.
+Si la aplicación no está lista o se corta la red, el encabezado dice que no
+está disponible y sigue reintentando.
+
+El comportamiento está en
+[página de la operación pendiente](../interfaces/pending-operation-web-ui.md).
+
+### Documentación del servidor y de la página (`PendingOperationWeb-06`)
+
+Se consolidó la documentación de la feature sin agregar comportamiento. Cada
+tema quedó en un documento: la decisión en ADR-0004, el hand-off con
+`PendingOperationFlow` en el contrato de flujo, el arranque en la guía del
+servidor web, el HTTP en el contrato del API y la página en su interfaz.
+
+La guía deja explícito que `GET /health` solo indica que el servidor HTTP
+está vivo. El contrato de flujo registra que el executor de octubre no
+modifica inventario, que `last_resolution` no es idempotencia durable, y que
+un éxito de ejecución seguido de un fallo al resolver el slot queda para el
+executor real. Flow sigue siendo el dueño de la FSM y del slot.
+
+No se creó un ADR: no hay una decisión de arquitectura nueva.
 ### Interpretación estructurada: experimentos y organización documental
 
 Se organizaron los scripts y resultados de los experimentos realizados en

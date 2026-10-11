@@ -95,9 +95,6 @@ def save(out, rows, metadata):
         f"({100 * exact / expected_count:.1f}%).",
         f"Processed: {len(rows)}/{expected_count}; execution errors: "
         f"{sum(r.get('status') != 'ok' for r in rows)}.",
-        "",
-        "| Case | Exact JSON | Pi STT (s) | LLM API (s) | Whisper peak RAM (MiB) |",
-        "|---|---|---:|---:|---:|",
     ]
     for level in ("basico", "habitual"):
         expected_level = sum(
@@ -114,6 +111,11 @@ def save(out, rows, metadata):
                 f"{level}: {correct}/{expected_level} exact "
                 f"({100 * correct / expected_level:.1f}%).",
             ]
+    lines += [
+        "",
+        "| Case | Exact JSON | Pi STT (s) | LLM API (s) | Whisper peak RAM (MiB) |",
+        "|---|---|---:|---:|---:|",
+    ]
     stt_times, api_times, peaks = [], [], []
 
     def number(value):
@@ -133,6 +135,58 @@ def save(out, rows, metadata):
             f"| {row['case_id']} | {row.get('exact_match', False)} | "
             f"{number(stt)} | {number(api)} | {number(peak)} |"
         )
+    audio_durations = {
+        c["id"]: c.get("duration_s") for c in metadata.get("audio_cases", [])
+    }
+    lines += [
+        "",
+        "### Resources and audio duration",
+        "",
+        "| Case | Audio (s) | Pi CPU (%) | PC client RAM (MiB) | STT + API (s) |",
+        "|---|---:|---:|---:|---:|",
+    ]
+    for row in flat:
+        combined = (
+            row["pi_stt_s"] + row["llm_api_s"]
+            if row["pi_stt_s"] is not None and row["llm_api_s"] is not None
+            else None
+        )
+        lines.append(
+            f"| {row['case_id']} | {number(audio_durations.get(row['case_id']))} | "
+            f"{number(row['pi_cpu_pct'])} | "
+            f"{number(row['pc_api_client_peak_mib'])} | {number(combined)} |"
+        )
+    lines += [
+        "",
+        "CPU: 100% represents one logical core. "
+        "PC RAM is the API client, not the model hosted by Groq.",
+    ]
+    load = metadata.get("remote_environment", {}).get("load", {}).get("load_s")
+    lines += [
+        "",
+        "### Overall metrics",
+        "",
+        "| Metric | Value |",
+        "|---|---:|",
+        f"| Exact JSON success | {exact}/{expected_count} "
+        f"({100 * exact / expected_count:.1f}%) |",
+        f"| Initial model load (s) | {number(load)} |",
+    ]
+    for label, values in [("Pi STT", stt_times), ("LLM API", api_times)]:
+        if values:
+            lines.append(f"| {label} mean (s) | {number(sum(values) / len(values))} |")
+            lines.append(
+                f"| {label} min–max (s) | {number(min(values))}–{number(max(values))} |"
+            )
+    if peaks:
+        lines.append(f"| Whisper peak RAM (MiB) | {number(max(peaks))} |")
+    client_peaks = [
+        r["pc_api_client_peak_mib"]
+        for r in flat
+        if r["pc_api_client_peak_mib"] is not None
+    ]
+    if client_peaks:
+        lines.append(f"| PC client peak RAM (MiB) | {number(max(client_peaks))} |")
     for label, values in [("Pi STT", stt_times), ("LLM API", api_times)]:
         if values:
             lines += [
@@ -150,6 +204,95 @@ def save(out, rows, metadata):
         "Pi STT includes WAV reading/conversion and inference. "
         "LLM API includes network and response handling. Stage sums exclude "
         "SSH transfers, model load and orchestration; they are not total run duration.",
+    ]
+
+    def cell(value):
+        return (
+            str(value)
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("|", "&#124;")
+            .replace("\r", "")
+            .replace("\n", "<br>")
+        )
+
+    lines += [
+        "",
+        "### Reference, transcription and JSON comparison",
+        "",
+        "| Case | Reference | STT output | Expected JSON | Actual JSON |",
+        "|---|---|---|---|---|",
+    ]
+    for r in rows:
+        expected_json = json.dumps(r["expected_json"], ensure_ascii=False)
+        lines.append(
+            f"| {cell(r['case_id'])} | {cell(r['reference_text'])} | "
+            f"{cell(r.get('transcription', 'N/A'))} | {cell(expected_json)} | "
+            f"{cell(r.get('raw_response', 'N/A'))} |"
+        )
+    fields = [
+        "valid_json",
+        "schema_valid",
+        "correct_operation",
+        "correct_product",
+        "correct_quantity",
+        "exact_match",
+    ]
+    lines += [
+        "",
+        "### Validation by case",
+        "",
+        "| Case | Level | Status | Valid JSON | Schema | Operation | "
+        "Product | Quantity | Exact JSON | Error |",
+        "|---|---|---|---|---|---|---|---|---|---|",
+    ]
+    for r in rows:
+        values = [r["case_id"], r["level"], r["status"]]
+        values += [r.get("evaluation", {}).get(field, "N/A") for field in fields]
+        values.append(r.get("error") or "None")
+        lines.append("| " + " | ".join(cell(v) for v in values) + " |")
+    lines += [
+        "",
+        "### Component resources by case",
+        "",
+        "| Case | Component | Wall time (s) | Base RAM (MiB) | "
+        "Peak RAM (MiB) | CPU time (s) | CPU (%) |",
+        "|---|---|---:|---:|---:|---:|---:|---:|",
+    ]
+    resource_fields = [
+        "request_wall_s",
+        "ram_base_mib",
+        "ram_peak_mib",
+        "cpu_s",
+        "cpu_pct",
+    ]
+    for r in rows:
+        components = [
+            ("Pi Whisper", r.get("remote_stt", {}).get("resources", {})),
+            ("PC API client", r.get("api_resources", {})),
+        ]
+        for label, resources in components:
+            values = [number(resources.get(field)) for field in resource_fields]
+            lines.append(
+                f"| {cell(r['case_id'])} | {label} | " + " | ".join(values) + " |"
+            )
+    load_resources = metadata.get("remote_environment", {}).get("load_resources", {})
+    if load_resources:
+        lines += [
+            "",
+            "### Initial load resources",
+            "",
+            "| Metric | Value |",
+            "|---|---:|",
+        ]
+        for field in resource_fields:
+            lines.append(f"| {field} | {number(load_resources.get(field))} |")
+    lines += [
+        "",
+        "Exact JSON evaluates the complete pipeline; it does not "
+        "measure STT semantic accuracy or prove that quantities were present "
+        "in the transcription. Missing measurements are shown as N/A.",
     ]
     for r in rows:
         lines += [

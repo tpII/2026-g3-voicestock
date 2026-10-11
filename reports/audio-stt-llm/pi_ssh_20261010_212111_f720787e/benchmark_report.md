@@ -13,6 +13,10 @@ No microphone capture or inventory updates occur in this fixture experiment.
 Exact JSON success: 5/6 (83.3%).
 Processed: 6/6; execution errors: 0.
 
+basico: 2/2 exact (100.0%).
+
+habitual: 3/4 exact (75.0%).
+
 | Case | Exact JSON | Pi STT (s) | LLM API (s) | Whisper peak RAM (MiB) |
 |---|---|---:|---:|---:|
 | solo_agregar | True | 42.947 | 0.701 | 254.660 |
@@ -21,6 +25,32 @@ Processed: 6/6; execution errors: 0.
 | corregir_cantidad | True | 42.369 | 0.541 | 257.027 |
 | negar_agregacion | True | 44.158 | 0.447 | 259.402 |
 | negar_restacion | True | 43.817 | 1.023 | 258.289 |
+
+### Resources and audio duration
+
+| Case | Audio (s) | Pi CPU (%) | PC client RAM (MiB) | STT + API (s) |
+|---|---:|---:|---:|---:|
+| solo_agregar | 8.576 | 375.787 | 30.793 | 43.648 |
+| solo_restar | 4.992 | 373.088 | 30.812 | 42.153 |
+| restar_ambos | 8.448 | 375.042 | 30.820 | 43.495 |
+| corregir_cantidad | 8.064 | 371.875 | 30.840 | 42.910 |
+| negar_agregacion | 9.664 | 370.941 | 30.871 | 44.605 |
+| negar_restacion | 11.072 | 370.997 | 30.906 | 44.840 |
+
+CPU: 100% represents one logical core. PC RAM is the API client, not the model hosted by Groq.
+
+### Overall metrics
+
+| Metric | Value |
+|---|---:|
+| Exact JSON success | 5/6 (83.3%) |
+| Initial model load (s) | 0.898 |
+| Pi STT mean (s) | 42.968 |
+| Pi STT min–max (s) | 41.711–44.158 |
+| LLM API mean (s) | 0.640 |
+| LLM API min–max (s) | 0.442–1.023 |
+| Whisper peak RAM (MiB) | 259.402 |
+| PC client peak RAM (MiB) | 30.906 |
 
 Pi STT: mean 42.968 s; range 41.711–44.158 s; sum 257.808 s (6 measurements).
 

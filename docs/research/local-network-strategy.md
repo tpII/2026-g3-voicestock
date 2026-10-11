@@ -1,341 +1,304 @@
 # Local network strategy
 
-Research record for task **LocalNetworkInfra-01**: evaluate the local network
-strategy between the Raspberry Pi 3 and the PC.
+Research record for the local network between the Raspberry Pi 3 and the PC.
+It keeps the evidence and the evolution of the choice. The decision now in
+force is [ADR-0004](../decisions/0004-use-isolated-raspberry-pi-wifi-access-point.md).
 
-**Status:** research closed. The topology and the addressing plan are decided.
-Applying those addresses on the devices belongs to the next LocalNetworkInfra
-task. This document is not an Architecture Decision Record. It keeps the
-evidence of the investigation. A later ADR is not required for this choice
-unless a future task changes it.
+The operational procedure is the
+[local network setup guide](../setup/local-network.md). Application features
+use the resulting addresses. They do not choose the network.
 
 | Area | Status |
 | --- | --- |
-| Topology | Decided: direct Ethernet between the PC and the Raspberry Pi 3. Not configured in this task. |
-| Addressing | Decided: static `192.168.50.0/24`. Not applied on the devices in this task. |
-| Raspberry Pi as Wi-Fi access point | Considered and rejected for VoiceStock's current constraints. |
+| Topology | Revised on 2026-10-11: isolated Wi-Fi access point on the Raspberry Pi 3, with two Wi-Fi interfaces on the PC. |
+| Addressing | Kept: static `192.168.50.0/24`. Raspberry Pi `192.168.50.1/24`. PC `192.168.50.2/24`. |
+| Physical validation | Pending. LocalNetworkInfra-04 has not been run on the project hardware. |
 
 ## Purpose
 
 VoiceStock needs the Raspberry Pi 3 and the PC to reach each other on a
-private IPv4 network. This document records which physical network provides
-that connectivity, which addresses each host uses, and what "isolated" means
-for this feature.
+private IPv4 network while the PC still reaches the Internet and the
+Raspberry Pi does not.
 
-`LocalNetworkInfra` is responsible only for that underlying IP connectivity.
-It does not define what the two hosts say to each other once the packets can
-flow.
+`LocalNetworkInfra` provides that IP connectivity. It does not define what
+the two hosts say to each other once the packets can flow. That belongs to
+`RaspberryPiPCCommunication`.
 
-## Context
+## How the decision evolved
 
-During normal operation the Raspberry Pi and the PC stay next to each other.
-The PC already uses its Wi-Fi interface for Internet access. The Raspberry Pi
-does not need Internet access while the system is running.
+The current architecture is a revision. The earlier choice is part of the
+record, not a discarded draft that can be ignored.
 
-The Raspberry Pi 3 and a typical PC each have an Ethernet interface that can
-be dedicated to VoiceStock. That physical arrangement is the constraint this
-decision is built on. The choice is about how two nearby machines are linked,
-not about a general-purpose wireless network.
+### 1. A Wi-Fi access point was considered first
 
-The addressing plan below is the source for the VoiceStock local network.
-The procedure that applies it is the
-[Ethernet setup guide](../setup/local-network.md). Application features keep
-using the network; they do not choose it.
+The first concrete wireless option was to make the Raspberry Pi advertise a
+Wi-Fi cell and have the PC join it. That would have carried VoiceStock
+traffic without a cable. It was set aside because, with the assumptions used
+at the time, it looked more expensive to operate than a cable.
 
-## Evaluation criteria
+### 2. Direct Ethernet was selected
 
-The alternatives are judged against the current physical setup and against
-the October system, not against a general networking design.
+On 2026-10-04 the project selected a direct Ethernet link. The machines were
+expected to stay next to each other. A normal cable, with automatic
+MDI/MDI-X, was enough. The PC's single assumed Wi-Fi interface stayed on the
+Internet. The Ethernet interfaces were reserved for VoiceStock.
 
-1. The Raspberry Pi and the PC can exchange IPv4 traffic with each other.
-2. The PC keeps its existing Wi-Fi path to the Internet.
-3. The Raspberry Pi does not need Internet access during normal operation.
-4. The link does not require an access point, an SSID, WPA, or a Wi-Fi DHCP
-   service.
-5. Addressing stays simple for two known hosts.
-6. The Internet-facing interface on the PC stays separate from the VoiceStock
-   interface.
-7. The Raspberry Pi is not asked to route, translate, or forward traffic for
-   the PC.
-8. The result is stable enough to demonstrate and straightforward to diagnose.
+That choice avoided an SSID, WPA, and any access-point service. Static
+addresses were enough for two known hosts. The Raspberry Pi was only an
+endpoint: it did not create a wireless cell and it did not route for the PC.
+A failure to reach `192.168.50.2` would have been on the cable segment.
 
-No throughput or latency measurement was required. Both a direct cable and a
-small Wi-Fi cell can carry the later application messages. The difference is
-operational cost on this hardware layout.
-
-## Decision
-
-VoiceStock does **not** use the Raspberry Pi as a Wi-Fi access point.
-
-The selected architecture is a **direct Ethernet point-to-point local
-network** between the Raspberry Pi 3 and the PC. Both Ethernet interfaces use
-**static IPv4 addresses** on a dedicated private subnet. No DHCP server is
-part of the design.
-
-A normal Ethernet cable is sufficient. Modern Ethernet interfaces, including
-the Raspberry Pi 3 Ethernet port and typical PC Ethernet ports, negotiate
-MDI/MDI-X automatically. A crossover cable is not part of the design.
-
-## Physical topology
-
-The PC has two relevant interfaces:
-
-- Wi-Fi reaches the Internet.
-- Ethernet is reserved for the VoiceStock local network.
-
-The Raspberry Pi 3 uses its Ethernet interface for that same local network. It
-does not use this link as a path to the Internet.
-
-```text
-                    Internet
-                       |
-                     Wi-Fi
-                       |
-                      PC
-                       |
-                    Ethernet
-                       |
-                Raspberry Pi 3
-```
-
-## Addressing
-
-Dedicated private subnet:
+The addressing plan fixed then is still the plan:
 
 | Role | Address |
 | --- | --- |
 | Network | `192.168.50.0/24` |
 | Netmask | `255.255.255.0` |
-| Raspberry Pi 3 | `192.168.50.1` |
-| PC | `192.168.50.2` |
+| Raspberry Pi 3 | `192.168.50.1/24` |
+| PC | `192.168.50.2/24` |
 
-`192.168.50.0/24` is inside the private `192.168.0.0/16` block. These two host
-addresses are fixed for VoiceStock. They are not allocated by DHCP and they
-are not reused from the network that provides Internet access to the PC.
+`192.168.50.0/24` is inside the private `192.168.0.0/16` block. The VoiceStock
+network had no gateway, no DNS, no DHCP, no NAT, and no IP forwarding. The PC
+default route stayed on Wi-Fi.
 
-The dedicated Ethernet network has:
+### 3. The wired link is not available
 
-- no default gateway;
-- no DNS server.
+The Ethernet decision assumed a dedicated wired path between the PC and the
+Raspberry Pi 3. The target hardware setup does not provide that path. Keeping
+the Ethernet scripts would document a network the project cannot build.
 
-Hosts on this link address each other by the fixed IPv4 addresses above. Name
-resolution is not a requirement of `LocalNetworkInfra`.
+### 4. The architecture returns to an isolated access point
 
-## Routing
+The Wi-Fi access point is the selected architecture again, with the
+constraints that made the earlier rejection incomplete now stated explicitly.
+The Raspberry Pi 3 creates the cell and does nothing else with its radio. The
+PC does not give up Internet access, because Internet and VoiceStock are no
+longer asked to share one Wi-Fi interface.
 
-Assigning `192.168.50.1/24` and `192.168.50.2/24` makes `192.168.50.0/24`
-directly reachable on each Ethernet interface. That connected route is the
-whole VoiceStock route. It is not a route via a gateway.
+### 5. The PC uses two Wi-Fi interfaces
+
+One PC Wi-Fi interface remains associated to the normal Internet network and
+keeps DHCP, its gateway, its DNS, and the default route. A second Wi-Fi
+interface associates only to the VoiceStock cell and uses the static address
+`192.168.50.2/24`. There is no route between those networks.
+
+## Decision
+
+The Raspberry Pi 3 is an isolated Wi-Fi access point. The PC has two Wi-Fi
+interfaces: one for Internet and one for VoiceStock. Addressing is static.
+There is no routing between the Internet network and the VoiceStock network.
+
+The Raspberry Pi does not associate as a Wi-Fi client to any other network.
+Its Wi-Fi interface is used only in access-point mode. It has no Internet
+access through this feature.
+
+```text
+                         Internet
+                            |
+                      external router
+                            |
+                       PC Wi-Fi #1
+                            |
+                           PC
+                            |
+                       PC Wi-Fi #2
+                            |
+                     VoiceStock Wi-Fi
+                            |
+                    Raspberry Pi 3
+                         AP mode
+```
+
+The VoiceStock cell exists so the PC and the Raspberry Pi can exchange IPv4
+packets. It is not an upstream network and it is not a path to the Internet.
+
+## Fixed configuration
+
+| Item | Value |
+| --- | --- |
+| SSID | `VoiceStock` |
+| Security | WPA2-PSK |
+| Band | 2.4 GHz |
+| Subnet | `192.168.50.0/24` |
+| Raspberry Pi | `192.168.50.1/24` |
+| PC VoiceStock interface | `192.168.50.2/24` |
+| Addressing | Static IPv4 only |
+| DHCP, DNS, gateway | None on the VoiceStock network |
+| Regulatory domain | Argentina (`AR`) on the Raspberry Pi |
+
+The prototype passphrase lives in one file,
+[`scripts/voicestock-network.conf`](../../scripts/voicestock-network.conf).
+The setup scripts source that file. It is not copied into other scripts.
+
+Committing that passphrase is intentional for the current academic prototype.
+It is not a production secret and it does not change the project rule for API
+keys and other credentials. Before any production or final deployment, this
+passphrase has to leave the repository. This task does not add environment
+variables, a vault, or an interactive prompt.
+
+## Routing and isolation
+
+Each host gets a connected route to `192.168.50.0/24` from its own static
+address. That route is not a route via a gateway.
 
 On the PC the two paths stay distinct:
 
 ```text
-192.168.50.0/24 -> Ethernet interface
-default route   -> Wi-Fi interface
+default route    -> Internet Wi-Fi
+192.168.50.0/24  -> VoiceStock Wi-Fi
 ```
 
-The PC Ethernet interface therefore has no gateway of its own. Traffic for
-the Raspberry Pi uses Ethernet. Traffic for every other network, including
-the Internet, keeps using the default route on Wi-Fi.
+The VoiceStock interface has `ipv4.never-default` set, no gateway, and no
+DNS. Traffic for the Raspberry Pi uses that interface. Traffic for every
+other network, including the Internet, keeps the default route on the
+Internet Wi-Fi interface. The setup for VoiceStock does not change that
+interface.
 
-On the Raspberry Pi the Ethernet interface has the static address
-`192.168.50.1/24` and no default gateway through that interface. The Pi can
-reach the PC at `192.168.50.2`. It is not given a route to the Internet by
-this feature, and it does not need one during normal operation.
+On the Raspberry Pi the access-point interface has `192.168.50.1/24`, no
+gateway, and no DNS. The Pi can reach the PC at `192.168.50.2`. It is not
+given a default route.
 
-## Isolation
+Isolation means:
 
-"Isolated local network" means the VoiceStock Ethernet segment is a private
-link between these two hosts, separate from the PC's Internet connection.
+- the PC and the Raspberry Pi can communicate on `192.168.50.0/24`;
+- the Raspberry Pi does not connect to the Internet;
+- the Raspberry Pi is not a Wi-Fi client;
+- the Raspberry Pi does not route, translate, or forward for the PC;
+- NAT, IP forwarding, bridging, and Internet Connection Sharing are not part
+  of this feature;
+- the PC's Internet connection does not depend on the VoiceStock cell, and
+  the VoiceStock cell does not depend on the PC having Internet access.
 
-Concretely:
+Isolation does not mean the two hosts are forbidden to talk to each other.
+Reachability between `192.168.50.1` and `192.168.50.2` is the purpose of the
+cell.
 
-- the PC and the Raspberry Pi can communicate with each other over Ethernet;
-- the Raspberry Pi does not require Internet access;
-- the Raspberry Pi must not act as a router for the PC;
-- NAT is not part of this feature;
-- IP forwarding between the local Ethernet network and the PC's Internet
-  connection is not part of this feature;
-- Internet connectivity on the PC does not depend on the VoiceStock network,
-  and the VoiceStock network does not depend on the PC having Internet access.
+## Why this revision
 
-Isolation does not mean that the PC and the Raspberry Pi are prevented from
-communicating. Reachability between `192.168.50.1` and `192.168.50.2` is the
-purpose of the link.
+The cable plan could not be built on the target setup. A second Wi-Fi
+interface on the PC removes the objection that made the access point a poor
+fit: the Internet association and the VoiceStock association are different
+radios, so joining `VoiceStock` does not disconnect the PC from the Internet.
 
-## Rationale
+The Raspberry Pi 3 radio is used in one role only. It advertises `VoiceStock`
+on 2.4 GHz. The Pi 3 does not provide a 5 GHz radio, and the architecture
+does not ask it to join another network at the same time.
 
-Ethernet was selected instead of a Raspberry Pi Wi-Fi access point for the
-following reasons.
+Static addresses stay simpler than DHCP for two known hosts. NetworkManager
+on the Pi and on the reference PC (Arch Linux) can hold a persistent profile
+without `hostapd` or `dnsmasq`. Those extra services would have been a DHCP
+or access-point stack the design does not need.
 
-The two machines are expected to remain physically close while VoiceStock is
-operating, so a short Ethernet cable matches the real layout. The PC's Wi-Fi
-interface remains available for Internet access and is not consumed by the
-VoiceStock link.
+The same address pair is kept so `RaspberryPiPCCommunication` does not change
+because the medium changed. The application still talks to `192.168.50.2`
+and `192.168.50.1`.
 
-The project then does not have to configure or maintain an access point. There
-is no SSID, no WPA configuration, no Wi-Fi DHCP service, no `hostapd`, and no
-other Wi-Fi access-point infrastructure.
+## Alternatives rejected for the current setup
 
-Static point-to-point addressing is simpler than DHCP when the only hosts are
-two known devices with fixed roles. A wired link is also predictable: it does
-not depend on radio association, signal quality, or which wireless network the
-PC joined.
+### Direct Ethernet
 
-The architecture separates the Internet-facing interface (PC Wi-Fi) from the
-VoiceStock interface (Ethernet on both machines). That split reduces the
-networking work assigned to the Raspberry Pi. The Pi is an endpoint on the
-local segment, not the device that creates the wireless cell or the device
-that routes for the PC. Fewer roles on the Pi make failures easier to locate
-during troubleshooting and during a demonstration: if the Pi cannot reach
-`192.168.50.2`, the problem is on the Ethernet segment, not in Wi-Fi
-association or in the PC's Internet connection.
+Appropriate when a dedicated cable exists. It does not exist on the target
+setup, so it is no longer the architecture. The scripts that configured it
+are not part of the active procedure. Git history keeps them.
 
-## Alternatives considered
+### Raspberry Pi as a client of the upstream Wi-Fi
 
-### Raspberry Pi Wi-Fi access point
+The Pi would associate to the same network that provides Internet access, or
+to some other infrastructure network. That puts the radio in client mode,
+which this feature forbids, and it can give the Pi a gateway. The Pi would
+also depend on that upstream network being present. VoiceStock needs the
+opposite: a cell that exists only between these two machines.
 
-An access point on the Raspberry Pi was the other concrete option. The PC
-would have associated to a wireless network created by the Pi, and that
-wireless cell would have carried VoiceStock traffic.
+### One Wi-Fi interface on the PC
 
-That approach is a valid way to connect two machines in general. It is a
-weaker fit for VoiceStock's current physical and operational constraints:
+A single radio can be associated to the Internet router or to `VoiceStock`,
+not to both. Using it for VoiceStock would drop the PC's Internet path. The
+reference PC therefore has a dedicated second interface, and the setup script
+receives that interface as an explicit argument.
 
-- it consumes the Raspberry Pi Wi-Fi interface for infrastructure;
-- it requires additional access-point configuration;
-- simultaneous Internet access on the PC is less straightforward when the PC
-  has only one Wi-Fi adapter, because that adapter would be associated to the
-  Pi instead of to the upstream network;
-- it adds SSID, WPA, and wireless DHCP (or an equivalent static Wi-Fi plan)
-  that the project does not need while both devices sit next to each other.
+### DHCP, NAT, forwarding, or a bridge
 
-The access point was therefore rejected for this system. It can be
-reconsidered only if a later requirement removes the nearby Ethernet layout,
-for example if the PC and the Pi must operate without a cable. This research
-does not design that variant.
+DHCP would add a service in order to hand out two addresses that are already
+known. NAT, forwarding, bridging, and Internet Connection Sharing would turn
+the VoiceStock cell into a path beyond the two hosts. None of those belong
+in this feature. The access point is configured with NetworkManager's manual
+IPv4 method, not with the shared method that starts DHCP and masquerading.
 
-DHCP on the Ethernet segment was not selected either. With exactly two known
-hosts, a DHCP service would add a component to install and diagnose without
-changing the addresses the applications must use. Static addresses keep the
-plan visible and stable.
+## Requirements now in force
 
-## Scope
+- The Raspberry Pi Wi-Fi interface runs only as the `VoiceStock` access
+  point, using NetworkManager profile `voicestock-ap`.
+- The PC VoiceStock interface is chosen explicitly and is configured only by
+  NetworkManager profile `voicestock-client` on Arch Linux.
+- Subnet `192.168.50.0/24`, Raspberry Pi `192.168.50.1/24`, PC
+  `192.168.50.2/24`.
+- WPA2-PSK, 2.4 GHz, IPv4 only, static addresses, autoconnect enabled.
+- No gateway, no DNS, and no default route on the VoiceStock network.
+- No DHCP, NAT, IP forwarding, bridge, or Internet Connection Sharing.
+- The PC Internet interface keeps its own DHCP, gateway, DNS, and default
+  route.
+- The Raspberry Pi regulatory domain for this deployment is Argentina (`AR`).
+  The access-point script checks it and does not change it.
 
-`LocalNetworkInfra` provides IP connectivity between the Raspberry Pi 3 and
-the PC. After the next configuration task, each host can send IPv4 packets to
-the other host's fixed address on `192.168.50.0/24`.
+Adapter names, the NetworkManager commands, and the prototype passphrase file
+are implementation details of the setup guide. Firewall policy beyond the ban
+on NAT and forwarding is outside this research. Ports and URLs belong to
+`RaspberryPiPCCommunication`.
 
-This feature does **not** define:
-
-- the application protocol between the Raspberry Pi and the PC;
-- HTTP endpoints;
-- request or response payloads;
-- speech-to-text communication;
-- LLM communication;
-- pending-operation synchronization;
-- web application behaviour.
-
-Those responsibilities belong to their own VoiceStock features. The protocol
-between the two machines belongs to `RaspberryPiPCCommunication`, which
-consumes this network and does not configure it.
-
-## Architectural requirements and implementation boundary
-
-The following points are architectural requirements. They are in force for
-later LocalNetworkInfra work and for any feature that assumes this network
-exists.
-
-- Topology: one Ethernet cable between the PC and the Raspberry Pi 3. The
-  cable is a normal straight-through cable. Auto MDI/MDI-X is assumed.
-  Crossover cabling is out of scope.
-- The Raspberry Pi is not a Wi-Fi access point for VoiceStock.
-- Subnet `192.168.50.0/24`, Raspberry Pi `192.168.50.1`, PC `192.168.50.2`,
-  netmask `255.255.255.0`.
-- Static configuration on both Ethernet interfaces.
-- No default gateway and no DNS server on the VoiceStock Ethernet network.
-- The PC default route stays on Wi-Fi.
-- No NAT and no IP forwarding between that Ethernet network and the PC's
-  Internet connection.
-- The Raspberry Pi does not route on behalf of the PC.
-
-The following points are implementation details. This research does not decide
-them.
-
-- Which operating-system tool writes the static address on each device.
-- The kernel or adapter name of either Ethernet interface.
-- Firewall rules, except the architectural ban on NAT and on forwarding onto
-  this feature.
-- Any port, URL, timeout, or message format used after the packets can flow.
-
-## Expected implementation
-
-The next LocalNetworkInfra task configures static Ethernet addressing on both
-devices. This research does not perform that configuration.
-
-Expected final state:
+## Expected state
 
 ```text
 PC
-├── Wi-Fi
-│   └── Internet
+├── Wi-Fi #1
+│   └── Internet (DHCP, gateway, DNS, default route)
 │
-└── Ethernet
+└── Wi-Fi #2
     └── 192.168.50.2/24
           |
-          | dedicated VoiceStock network
+          | VoiceStock Wi-Fi, SSID VoiceStock
           |
         192.168.50.1/24
-            Raspberry Pi 3
+            Raspberry Pi 3 access point
 ```
 
-The Raspberry Pi Ethernet interface must have:
+The Raspberry Pi profile `voicestock-ap` has static IPv4 `192.168.50.1/24`,
+no gateway, no DNS, IPv6 disabled, and `ipv4.never-default`. The PC profile
+`voicestock-client` has static IPv4 `192.168.50.2/24` on the interface the
+operator named, with the same restrictions. Checking that the two addresses
+can reach each other, and that the PC still has Internet, is
+LocalNetworkInfra-04. This research does not claim that check was done.
 
-- static IP `192.168.50.1/24`;
-- no default gateway through this interface;
-- no DNS requirement through this interface.
+## Limitations
 
-The PC Ethernet interface must have:
-
-- static IP `192.168.50.2/24`;
-- no gateway on this interface;
-- no DNS server associated with the VoiceStock network.
-
-When that configuration is in place, each host has a connected route to
-`192.168.50.0/24` through its Ethernet interface, and the PC still uses Wi-Fi
-for its default route. Checking that those two addresses answer each other is
-a connectivity check for that later task. It does not require Internet access
-on the Raspberry Pi.
-
-## Limitations of this research
-
-- No cable, switch, or radio measurement was made. The decision follows from
-  the physical layout and from the cost of running an access point, not from
-  a bandwidth benchmark.
-- Automatic MDI/MDI-X is a property of the Ethernet interfaces in this design.
-  This task did not read the link status of the project boards.
-- Operating-system names for the Ethernet adapters, and the commands that set
-  a static address, are deliberately left to the next task.
-- This document does not assign an application port or a base URL. Those
-  belong to `RaspberryPiPCCommunication`.
-- Software installation on the Raspberry Pi may still happen before this
-  network exists. That provisioning path is outside `LocalNetworkInfra`.
-  Normal operation of the system does not require the Pi to reach the
-  Internet.
+- No radio measurement was made. The revision follows from the missing cable
+  and from the two-interface PC, not from a bandwidth benchmark.
+- LocalNetworkInfra-04 is still open. Association, reboot persistence, and
+  real packet delivery are not demonstrated by this document.
+- The reference PC operating system is Arch Linux with NetworkManager. Other
+  PC operating systems are not the setup this feature implements.
+- The Raspberry Pi must already be running Raspberry Pi OS with
+  NetworkManager. Installing that image, and any earlier software setup that
+  needs Internet, happens before this network exists.
+- The prototype passphrase is in the repository on purpose. It must be
+  reconsidered before a production or final deployment.
+- A wrong regulatory domain can hide the cell or reject the channel. The
+  expected domain is `AR`. The setup script reports a mismatch. It does not
+  rewrite the system domain by itself.
+- The second PC radio has to be identified by the operator. The setup refuses
+  to guess, because guessing could select the Internet interface.
 
 ## Conclusion
 
-Use a dedicated Ethernet link between the PC and the Raspberry Pi 3, with
-static addresses `192.168.50.2/24` on the PC and `192.168.50.1/24` on the Pi.
-Leave the PC's default route on Wi-Fi. Do not put a gateway or a DNS server
-on the VoiceStock segment, and do not turn the Raspberry Pi into an access
-point, a router, or a NAT device.
-
-That gives `RaspberryPiPCCommunication` and the other application features a
-stable pair of addresses, without mixing their protocols into the network
-design.
+Use the Raspberry Pi 3 as an isolated 2.4 GHz access point for SSID
+`VoiceStock`, and use a second Wi-Fi interface on the PC to join that cell.
+Keep `192.168.50.1/24` on the Pi and `192.168.50.2/24` on the PC. Leave the
+PC default route on the Internet Wi-Fi interface. Do not give the VoiceStock
+network a gateway, DNS, DHCP, NAT, forwarding, or a bridge, and do not give
+the Raspberry Pi an Internet path.
 
 ## References
 
 - [RFC 1918: Address Allocation for Private Internets](https://www.rfc-editor.org/rfc/rfc1918.html).
   `192.168.50.0/24` sits inside the private `192.168.0.0/16` block defined there.
+- [ADR-0004](../decisions/0004-use-isolated-raspberry-pi-wifi-access-point.md),
+  the decision record for this revision.

@@ -153,7 +153,7 @@ y validación del flujo físico. Ver [evaluación y pendientes](docs/research/sp
 - [Servicio de interpretación](docs/interfaces/interpretation-service.md)
 - [Captura push-to-talk](docs/interfaces/push-to-talk-capture.md)
 - [Prueba manual de push-to-talk](docs/setup/push-to-talk.md)
-- [Red Ethernet local](docs/setup/local-network.md)
+- [Red local VoiceStock](docs/setup/local-network.md)
 - [Servidor web de la Raspberry Pi](docs/setup/pi-web.md)
 - [API de la operación pendiente](docs/interfaces/pending-operation-web-api.md)
 - [Página de la operación pendiente](docs/interfaces/pending-operation-web-ui.md)

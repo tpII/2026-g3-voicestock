@@ -623,42 +623,7 @@ punto de acceso Wi-Fi que se había considerado antes.
   la conectividad de punta a punta, el aislamiento de Internet ni que la
   configuración sobreviva a un reinicio.
 
----
 
-## 06/10/2026
-
-### Interfaz web de la operación pendiente (`PendingOperationWeb-01`)
-
-Se eligió el stack y la topología del servidor que va a mostrar la operación
-pendiente en el navegador de la PC. La PC llega a la Raspberry Pi por el
-enlace Ethernet ya definido (`192.168.50.1` y `192.168.50.2`). No se vuelve a
-usar un punto de acceso Wi-Fi.
-
-La decisión quedó así:
-
-- FastAPI como framework HTTP y Uvicorn como servidor ASGI;
-- HTML, CSS y JavaScript vanilla, servidos como archivos estáticos por la
-  misma aplicación;
-- un solo proceso Python en la Raspberry Pi, dueño del orquestador, de la
-  máquina de estados y de `PendingOperation`;
-- HTTP solo como adaptador: consulta y resolución pasan por puertos de
-  aplicación, sin modificar la FSM desde las rutas.
-
-FastAPI se eligió por el contrato HTTP explícito (modelos, validación y un
-API que las tareas siguientes pueden implementar), no por rendimiento. El
-proceso único se eligió para no introducir IPC ni un segundo dueño del
-estado.
-
-Quedaron fuera de este incremento React, Vue, Angular, un frontend
-separado, Node.js, un segundo proceso HTTP, Redis, SQLite como canal entre
-HTTP y el orquestador, WebSockets, nginx y Docker para publicar esta
-interfaz.
-
-La comparación está en
-[pending operation web stack](../research/pending-operation-web-stack.md)
-y la decisión en
-[ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md).
-Esta tarea no implementa el servidor, el API ni la página.
 
 ---
 
@@ -829,3 +794,42 @@ paralelismo distinto entre motores, hueco de RAM de la primera carga de Qwen
 y falta de aceptación de latencia/recursos. Quedan pendientes hardware real,
 interfaz/adaptador STT, proveedor de producción y flujo físico. No se modificó
 el estado de las tareas de ClickUp ni se considera cerrada la feature STT.
+
+---
+
+## 11/10/2026
+
+### Red local: del Ethernet al punto de acceso aislado
+
+Se revisó la arquitectura Ethernet de `LocalNetworkInfra` porque el montaje
+previsto no tiene el enlace cableado que esa decisión daba por existente. El
+trabajo Ethernet anterior queda en la bitácora y en el historial de Git. No
+se lo reescribe.
+
+La red pasa a un punto de acceso Wi-Fi aislado creado por la Raspberry Pi 3.
+La placa no se conecta a Internet ni entra como cliente de otra red: su
+interfaz Wi-Fi queda solo en modo access point, con el SSID `VoiceStock`.
+
+La PC de referencia es Arch Linux con NetworkManager. Usa dos interfaces
+Wi-Fi. Una sigue en la red de Internet, con su DHCP, su puerta de enlace, su
+DNS y la ruta por defecto. La otra se dedica a VoiceStock, con la dirección
+estática `192.168.50.2/24`. La Raspberry Pi queda en `192.168.50.1/24`. No hay
+DHCP, NAT, reenvío ni puente entre las dos redes.
+
+Se reemplazaron los scripts de Ethernet por
+`scripts/setup_pi_access_point.sh` y
+`scripts/setup_pc_voicestock_wifi.sh`. El de la PC exige el nombre de la
+interfaz VoiceStock y no elige ni modifica la interfaz de Internet. La
+contraseña de prototipo quedó en un solo archivo,
+`scripts/voicestock-network.conf`, a propósito para esta etapa académica.
+
+También se actualizaron la investigación, el ADR-0004, la guía de setup y la
+interfaz de comunicación Raspberry Pi–PC. Las direcciones que usa la
+aplicación no cambian.
+
+`LocalNetworkInfra-04` sigue pendiente. No se validó en hardware que la PC y
+la Raspberry se alcancen, que la PC conserve Internet, que VoiceStock no se
+vuelva la ruta por defecto, que la Raspberry no tenga Internet, que la
+configuración sobreviva a un reinicio, que el punto de acceso vuelva a
+levantarse, ni que la comunicación de la aplicación funcione sobre el enlace
+real.

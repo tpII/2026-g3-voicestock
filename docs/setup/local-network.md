@@ -1,13 +1,13 @@
-# VoiceStock Ethernet setup
+# VoiceStock local network setup
 
-How to prepare the direct Ethernet link between the Raspberry Pi 3 and the PC,
-check that each machine has the right local configuration, and recover from
-the usual setup mistakes.
+How to bring up the isolated VoiceStock Wi-Fi cell between the Raspberry Pi 3
+and the PC, check the local configuration, and recover from the usual setup
+mistakes.
 
-Why this topology was chosen is the
-[local network strategy](../research/local-network-strategy.md). This page is
-the procedure. It covers the cable, the static addresses, local inspection,
-the order to bring the link up, and troubleshooting.
+Why this topology was chosen, including the earlier Ethernet plan, is the
+[local network strategy](../research/local-network-strategy.md). The decision
+record is [ADR-0004](../decisions/0004-use-isolated-raspberry-pi-wifi-access-point.md).
+This page is the procedure.
 
 Application traffic is a separate feature, `RaspberryPiPCCommunication`.
 Endpoints, payloads, speech-to-text, and language models are not part of this
@@ -19,406 +19,431 @@ The operator page that the PC browser opens on the Pi is the
 
 The setup scripts check the machine they run on. They do not ping the other
 host, and they do not test Internet access. That physical check belongs to
-LocalNetworkInfra-04.
+LocalNetworkInfra-04 and has not been done.
 
 ## Expected topology
 
 ```text
-                    Internet
-                       |
-                     Wi-Fi
-                       |
-                      PC
-                       |
-                    Ethernet
-                       |
-                Raspberry Pi 3
+                         Internet
+                            |
+                      external router
+                            |
+                       PC Wi-Fi #1
+                            |
+                           PC
+                            |
+                       PC Wi-Fi #2
+                            |
+                     VoiceStock Wi-Fi
+                            |
+                    Raspberry Pi 3
+                         AP mode
 ```
 
-| Role | Address |
+| Role | Value |
 | --- | --- |
+| SSID | `VoiceStock` |
+| Security | WPA2-PSK |
+| Band | 2.4 GHz |
 | Network | `192.168.50.0/24` |
-| Netmask | `255.255.255.0` |
 | Raspberry Pi 3 | `192.168.50.1/24` |
-| PC | `192.168.50.2/24` |
+| PC VoiceStock Wi-Fi | `192.168.50.2/24` |
 
-The PC uses Wi-Fi for Internet and Ethernet only for VoiceStock. The
-Raspberry Pi uses Ethernet for VoiceStock and does not need Internet during
-normal operation. The VoiceStock Ethernet interfaces have no gateway and no
-DNS server.
-
-```text
-                    Internet
-                       |
-                     Wi-Fi
-                       |
-                      PC
-                 default route
-                       |
-        +--------------+--------------+
-        |                             |
-      Wi-Fi                         Ethernet
-                                   192.168.50.2/24
-                                        |
-                                        |
-                                  direct cable
-                                        |
-                                        |
-                                   192.168.50.1/24
-                                  Raspberry Pi 3
-```
-
-On the PC the routes should be:
+The PC Internet Wi-Fi interface keeps its own DHCP, gateway, DNS, and default
+route. The VoiceStock Wi-Fi interface has none of those. The Raspberry Pi is
+only the access point. It does not join another Wi-Fi network and it has no
+Internet path.
 
 ```text
-192.168.50.0/24 -> Ethernet
-default route   -> Wi-Fi
+PC
+├── Wi-Fi #1
+│   └── Internet
+│         default route, gateway, DNS
+│
+└── Wi-Fi #2
+    └── 192.168.50.2/24
+          |
+          | SSID VoiceStock
+          |
+        192.168.50.1/24
+            Raspberry Pi 3 access point
 ```
 
-A normal Ethernet cable is enough. The design does not use a crossover cable.
+```text
+default route    -> Internet Wi-Fi
+192.168.50.0/24  -> VoiceStock Wi-Fi
+```
 
-## Hardware preparation
+## Fixed settings and the prototype passphrase
 
-Minimum for a development session or a demo:
+SSID, addresses, and the WPA2 passphrase are defined once, in
+[`scripts/voicestock-network.conf`](../../scripts/voicestock-network.conf).
+Both setup scripts source that file. Do not copy the passphrase into another
+script or into this guide.
 
-- a Raspberry Pi 3, powered on;
-- a PC;
-- an Ethernet port on the PC, or a USB Ethernet adapter plugged into the PC;
-- a normal Ethernet cable between that port and the Pi;
-- the PC's Wi-Fi available when the session needs Internet.
+That passphrase is committed on purpose for the current academic prototype.
+It is not a production secret. API keys and other credentials stay out of the
+repository. Before any production or final deployment, remove this passphrase
+from the repository. This setup does not use environment variables, a vault,
+or an interactive password prompt.
 
-During operation the Ethernet port used for VoiceStock is dedicated to that
-direct cable. Do not share it with a dock network, a campus LAN, or a virtual
-switch. If the PC has several wired adapters, decide which physical port faces
-the Pi before applying an address.
+## What you need
 
-## Raspberry Pi setup
+- Raspberry Pi 3 running Raspberry Pi OS, with NetworkManager (`nmcli`) and
+  `iw`.
+- A PC running Arch Linux, with NetworkManager (`nmcli`) and two Wi-Fi
+  interfaces. One of them must already be the Internet connection. The other
+  is dedicated to VoiceStock.
+- The VoiceStock repository on both machines, so the scripts can read
+  `scripts/voicestock-network.conf`.
 
-Prerequisites:
+A previous Ethernet profile named `voicestock-ethernet`, if it is still stored
+on a machine from the earlier architecture, is not used. Remove it manually
+when you no longer need it:
 
-- Raspberry Pi OS with NetworkManager;
-- `nmcli` and `ip` on the Pi;
-- root, because the script writes a system connection profile;
-- the VoiceStock repository checked out on the Pi.
+```bash
+nmcli connection delete voicestock-ethernet
+```
+
+The scripts do not delete it.
+
+## Regulatory domain
+
+The Raspberry Pi Wi-Fi regulatory domain must match the country where the
+access point operates. For this project that country is Argentina, `AR`.
+The access-point script checks the domain and stops if it is not `AR`. It
+does not change the domain.
+
+Check:
+
+```bash
+iw reg get
+```
+
+The first `country` line must be `AR`. On Raspberry Pi OS, set it and reboot:
+
+```bash
+sudo raspi-config nonint do_wifi_country AR
+sudo reboot
+```
+
+Run `iw reg get` again after reboot. Continue with the access-point script
+only when the country is `AR`.
+
+## Raspberry Pi: access point
+
+The Pi script creates or updates one persistent profile, `voicestock-ap`, on
+the Pi's Wi-Fi interface:
+
+- mode access point, 2.4 GHz, SSID `VoiceStock`, WPA2-PSK;
+- static address `192.168.50.1/24`;
+- no gateway, no DNS, IPv6 disabled, `ipv4.never-default`;
+- autoconnect enabled, so the profile survives reboot.
+
+If the Pi has exactly one Wi-Fi interface, the script can select it. If it
+has none, or more than one, pass the interface. It never configures Ethernet.
 
 From the repository root:
 
 ```bash
-sudo bash scripts/setup_pi_ethernet.sh
+sudo bash scripts/setup_pi_access_point.sh
 ```
 
-The script refuses to run without root. It looks for Ethernet devices and
-ignores Wi-Fi:
-
-- no Ethernet device: it stops;
-- exactly one: it uses that device;
-- more than one: it stops and lists them. Pass the port cabled to the PC:
+Or, when the interface must be named:
 
 ```bash
-sudo bash scripts/setup_pi_ethernet.sh eth0
+sudo bash scripts/setup_pi_access_point.sh wlan0
 ```
 
-`eth0` is an example. Use the device name from `nmcli device status`. A Wi-Fi
-name is rejected. The name may contain only letters, digits, `.`, `_`, and
-`-`.
+`wlan0` is an example. Use the Wi-Fi device from `nmcli device status`.
 
-The script creates or updates one NetworkManager profile,
-`voicestock-ethernet`:
+The script refuses to run without root. It checks that the device is Wi-Fi,
+that NetworkManager manages it, and that it can report Access Point mode.
+Running it again updates `voicestock-ap`. It does not create a second
+profile.
 
-- type Ethernet, bound to the selected interface;
-- IPv4 method `manual`;
-- address `192.168.50.1/24`;
-- no IPv4 gateway and no IPv4 DNS;
-- `ipv4.never-default` enabled, so this profile is not the default route;
-- autoconnect enabled, with priority `100`;
-- IPv6 disabled on this profile.
+Other Wi-Fi profiles on the Pi have autoconnect turned off so the radio does
+not join another network after reboot. Those profiles are not deleted. A
+manual client connection replaces the access point until `voicestock-ap` is
+activated again.
 
-Running it again updates that same profile and activates it. It does not
-create `voicestock-ethernet-1`. NetworkManager stores the profile, so the
-address remains after reboot. The script does not change Wi-Fi profiles.
+The script does not enable DHCP, NAT, forwarding, or a bridge, and it does
+not install `hostapd` or `dnsmasq`.
 
-At the end it prints whether `192.168.50.1/24` is present, whether
-`voicestock-ethernet` is active on that interface, and whether the profile
-has no gateway, no DNS, and is not the default IPv4 route.
+## Arch Linux PC: VoiceStock Wi-Fi
 
-## Windows PC setup
+Leave the Internet Wi-Fi connected. Identify both interfaces before changing
+anything:
 
-Prerequisites:
-
-- Windows PowerShell 5.1 or newer, running as Administrator;
-- `netsh.exe`, which the script uses to store an empty IPv4 DNS list;
-- the exact `Name` of the Ethernet adapter cabled to the Pi.
-
-The script does not choose an adapter. List them and copy the `Name` of the
-dedicated port:
-
-```powershell
-Get-NetAdapter | Select-Object Name, InterfaceDescription, Status, MacAddress
+```bash
+nmcli device status
+ip -4 route
 ```
 
-Development and demo PCs often also have USB Ethernet, dock, VPN, Hyper-V,
-and Docker adapters. Do not pass a Wi-Fi name, a VPN name, or a virtual
-adapter. A Wi-Fi adapter is rejected and left unchanged. A wildcard such as
-`Ethernet*` is rejected.
+The Wi-Fi device named on the `default` route is the Internet interface. Do
+not pass that device to the VoiceStock script. Pass the other Wi-Fi device.
 
-In an Administrator PowerShell, from the repository root:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\setup_pc_ethernet.ps1 -InterfaceAlias "Ethernet"
+```bash
+sudo bash scripts/setup_pc_voicestock_wifi.sh wlan1
 ```
 
-Replace `Ethernet` with the exact `Name` from `Get-NetAdapter`.
+Replace `wlan1` with the VoiceStock interface. The argument is required. The
+script does not choose a device, and it stops if the machine does not show at
+least two Wi-Fi interfaces.
 
-On that adapter only, the script:
+It also stops, without writing a profile, when that interface owns the
+default route or already has an IPv4 gateway. That is the Internet path.
+If `voicestock-client` is already the active profile on the named interface,
+the script updates it in place so a later run can clear a gateway it finds
+there.
 
-- disables IPv4 DHCP;
-- sets `192.168.50.2/24`;
-- removes any IPv4 default route;
-- sets a static IPv4 DNS list with no servers;
-- removes other IPv4 addresses so a second run does not accumulate them.
+The script creates or updates one persistent profile, `voicestock-client`,
+bound to that interface and to its MAC address:
 
-Windows stores this in the persistent adapter configuration, so it remains
-after reboot. The script does not add a default route, does not change Wi-Fi,
-and does not enable Internet Connection Sharing.
+- infrastructure mode, 2.4 GHz, SSID `VoiceStock`, WPA2-PSK;
+- static address `192.168.50.2/24`;
+- no gateway, no DNS, IPv6 disabled, `ipv4.never-default`;
+- autoconnect enabled.
 
-A disabled adapter is left disabled. Enable it in Windows, then run the
-script again.
+Running it again updates the same profile. Other connection profiles,
+including the Internet Wi-Fi profile, are not modified.
 
-At the end it prints whether `192.168.50.2/24` is set and whether that
-adapter has no default gateway and no DNS server.
+## Verification
 
-## Local configuration verification
-
-These commands inspect configuration on one machine. They are not the
-physical acceptance test. Reachability between the PC and the Pi is
+These commands inspect the local configuration. They do not prove that the
+PC and the Raspberry Pi can reach each other. That remains
 LocalNetworkInfra-04.
 
-### Raspberry Pi
+On both machines:
 
 ```bash
+nmcli device status
+nmcli connection show --active
 ip -4 addr
 ip -4 route
-nmcli connection show --active
 ```
 
-Expected state:
-
-- the Ethernet interface has `inet 192.168.50.1/24`;
-- `ip -4 route` shows `192.168.50.0/24` on that interface;
-- `ip -4 route` does not show a `default` route via that interface;
-- `nmcli connection show --active` lists `voicestock-ethernet` on that
-  interface.
-
-`nmcli -g ipv4.gateway,ipv4.dns connection show voicestock-ethernet` should
-print nothing useful for either property (empty, or `--`).
-
-### Windows
-
-Replace `Ethernet` with the alias that was configured.
-
-```powershell
-Get-NetIPAddress -AddressFamily IPv4
-Get-NetRoute -AddressFamily IPv4
-Get-DnsClientServerAddress -AddressFamily IPv4
-```
-
-Read those three lists against the dedicated adapter, not against every
-adapter on the PC. Narrower checks:
-
-```powershell
-Get-NetIPAddress -InterfaceAlias "Ethernet" -AddressFamily IPv4
-Get-NetRoute -InterfaceAlias "Ethernet" -AddressFamily IPv4 -DestinationPrefix "0.0.0.0/0"
-Get-DnsClientServerAddress -InterfaceAlias "Ethernet" -AddressFamily IPv4
-Get-NetRoute -DestinationPrefix "0.0.0.0/0" -AddressFamily IPv4
-```
-
-Expected state:
+Expected shape:
 
 ```text
-Raspberry Pi Ethernet: 192.168.50.1/24
-PC Ethernet:           192.168.50.2/24
+PC Internet Wi-Fi:
+    default route -> Internet
 
-PC default route: Wi-Fi
-VoiceStock Ethernet default route: none
-VoiceStock Ethernet DNS: none
+PC VoiceStock Wi-Fi:
+    192.168.50.2/24
+    no gateway
+    no DNS
+
+Raspberry Pi:
+    AP VoiceStock
+    192.168.50.1/24
+    no gateway
+    no DNS
 ```
 
-On the PC that means prefix length `24` for `192.168.50.2`, no
-`0.0.0.0/0` route on the VoiceStock alias, an empty IPv4 DNS server list on
-that alias, and the `0.0.0.0/0` route on the Wi-Fi adapter when Internet is
-required.
+On the Raspberry Pi, `192.168.50.1/24` is on the access-point interface,
+`voicestock-ap` is the active profile on that interface, and `ip -4 route`
+has `192.168.50.0/24` on that interface and no `default` route via it.
 
-## Startup procedure
+```bash
+nmcli -g ipv4.gateway,ipv4.dns,ipv4.method,802-11-wireless.mode connection show voicestock-ap
+```
 
-Use this order for a normal session or a demonstration:
+That should report an empty gateway, an empty DNS list, `manual`, and `ap`.
 
-1. Power on the Raspberry Pi and wait until it has booted.
-2. Start the PC.
-3. Connect the Ethernet cable between the Pi and the dedicated PC port.
-4. If the session needs Internet, confirm the PC is joined to Wi-Fi.
-5. On the Pi, apply or verify `voicestock-ethernet` with
-   `sudo bash scripts/setup_pi_ethernet.sh`.
-6. On the PC, apply or verify the dedicated adapter with
-   `setup_pc_ethernet.ps1 -InterfaceAlias` set to that port's exact name.
-7. Continue with the VoiceStock application. The network guide stops here.
+On the PC, `192.168.50.2/24` is on the interface you passed, `voicestock-client`
+is active on that interface, and the `default` route still names the Internet
+Wi-Fi interface.
 
-Steps 5 and 6 are safe to repeat. Each script updates the same configuration
-instead of adding a second address or a second profile.
+```bash
+nmcli -g ipv4.gateway,ipv4.dns,ipv4.method,ipv4.never-default,connection.interface-name connection show voicestock-client
+```
+
+Gateway and DNS are empty, the method is `manual`, `never-default` is `yes`,
+and the interface name is the one you passed.
+
+## Startup sequence
+
+1. On the Raspberry Pi, confirm `iw reg get` shows country `AR`.
+2. On the Pi, from the repository root, run
+   `sudo bash scripts/setup_pi_access_point.sh` (add the interface name if
+   the script asks for it).
+3. Confirm `voicestock-ap` is active and the Pi address is `192.168.50.1/24`.
+4. On the PC, with Internet Wi-Fi already connected, run `nmcli device status`
+   and `ip -4 route`. Note which Wi-Fi interface owns the default route.
+5. Run `sudo bash scripts/setup_pc_voicestock_wifi.sh` with the other Wi-Fi
+   interface.
+6. Confirm `192.168.50.2/24` is on that interface and the default route is
+   still the Internet interface.
+7. Leave the ping, reboot, and application checks for LocalNetworkInfra-04.
+   Do not record them as done from this procedure alone.
 
 ## Troubleshooting
 
-### The Raspberry Pi does not have 192.168.50.1
+### The Raspberry Pi access point is not visible
 
-Run `ip -4 addr` and `nmcli connection show voicestock-ethernet`. Then run
-`sudo bash scripts/setup_pi_ethernet.sh` again from the repository root.
+Confirm the script finished without a `FAILED` line and that
+`nmcli connection show --active` lists `voicestock-ap`. Confirm
+`iw reg get` shows `AR`. A wrong country can keep the cell from starting or
+can reject the channel NetworkManager picked. The script does not set a
+fixed channel; it only forces the 2.4 GHz band.
 
-If the script reports that `nmcli` or `ip` is missing, NetworkManager is not
-available and this procedure cannot configure the link. If it reports that no
-Ethernet interface exists, the Pi does not see a wired device. If it reports
-that the profile is not active, or the address check fails, leave the cable
-seated and run the script again. Do not assign a second address by hand.
+Re-run `sudo bash scripts/setup_pi_access_point.sh` from the repository
+root. Re-running updates `voicestock-ap`.
 
-### The PC does not have 192.168.50.2
+### The PC VoiceStock adapter does not connect
 
-Check the alias you intend to use:
+Confirm the Pi access point is active first. Then confirm the PC command
+named the dedicated interface, not the Internet one. Re-run the PC script
+with that same interface. A `FAILED` line about the passphrase means
+`scripts/voicestock-network.conf` on the PC is not the same file the Pi
+used. Do not type a different password into NetworkManager. Update the
+single conf file and run both scripts again.
 
-```powershell
-Get-NetIPAddress -InterfaceAlias "Ethernet" -AddressFamily IPv4
-```
+### The wrong Wi-Fi interface was selected
 
-Run `setup_pc_ethernet.ps1` again as Administrator with that exact
-`-InterfaceAlias`. The script removes other IPv4 addresses on that adapter
-and sets `192.168.50.2/24`. If the adapter is disabled, enable it in Windows
-first. The script will not enable it.
-
-### The Windows script rejects the selected interface
-
-The value must be the `Name` column from `Get-NetAdapter`, character for
-character. The script does not guess and does not accept `*`, `?`, `[`, or
-`]`.
-
-- Unknown name: the error lists the adapters that exist. Copy one `Name`.
-- Disabled adapter: enable it, then run the script again. Nothing else was
-  changed.
-- Not running as Administrator: open PowerShell as Administrator. The script
-  stops before it edits any adapter.
-
-### A Wi-Fi adapter was selected by mistake
-
-The script stops when the alias is a Wi-Fi adapter and does not change it.
-Run it again with the Ethernet `Name` from `Get-NetAdapter`. Confirm Wi-Fi
-separately with `Get-NetAdapter` and with the `0.0.0.0/0` route. Do not use
-the VoiceStock script to repair Wi-Fi.
-
-### The Raspberry Pi reports more than one Ethernet interface
-
-The script prints the device names and stops, so it cannot configure the
-wrong port. Identify the port cabled to the PC with `nmcli device status`,
-then pass that name:
+On the PC, the script will not start if that interface owns the default
+route or has a gateway, unless `voicestock-client` is already the active
+profile there. If a previous run used the wrong interface and
+`voicestock-client` is active on it, do not leave it there. Disconnect that
+profile, restore the Internet connection on the correct interface, and run
+the script again with the dedicated VoiceStock interface:
 
 ```bash
-sudo bash scripts/setup_pi_ethernet.sh end0
+nmcli connection down voicestock-client
+sudo bash scripts/setup_pc_voicestock_wifi.sh <voice-stock-interface>
 ```
 
-Use the printed name, not this example. The script still configures only that
-device.
+The profile is bound to the interface name and to that interface's MAC, so
+it does not move onto the Internet adapter by itself.
 
-### The Ethernet interface is unmanaged by NetworkManager
-
-The script stops with "not managed by NetworkManager" and does not write the
-profile. `nmcli device status` shows the device as unmanaged. This procedure
-does not switch the Pi to another network backend. Mark that device managed,
-then run the script again:
-
-```bash
-sudo nmcli device set eth0 managed yes
-sudo bash scripts/setup_pi_ethernet.sh eth0
-```
-
-Replace `eth0` with the unmanaged Ethernet device. Do not run this against a
-Wi-Fi device.
-
-### An unexpected Ethernet default route exists
-
-On the Pi, `ip -4 route` must not show `default` via the VoiceStock Ethernet
-device. On the PC, this must print nothing:
-
-```powershell
-Get-NetRoute -InterfaceAlias "Ethernet" -AddressFamily IPv4 -DestinationPrefix "0.0.0.0/0"
-```
-
-Re-run the setup script for that machine. The Pi profile sets
-`ipv4.never-default` and clears a gateway on `voicestock-ethernet`. The
-Windows script removes `0.0.0.0/0` on the selected adapter only. Do not add a
-gateway so the Pi can reach the Internet.
-
-### The PC loses Internet after the Ethernet configuration
-
-Internet stays on Wi-Fi. List default routes:
-
-```powershell
-Get-NetRoute -DestinationPrefix "0.0.0.0/0" -AddressFamily IPv4
-```
-
-The `0.0.0.0/0` entry should name the Wi-Fi adapter. If it names the
-VoiceStock Ethernet adapter, run `setup_pc_ethernet.ps1` again for that
-alias so the script removes that route. If Wi-Fi itself is disconnected,
-reconnect it in Windows. The script does not join or repair Wi-Fi.
-
-### The Ethernet link does not come up
-
-Confirm the Pi is powered, the cable is seated at both ends, and the PC
-adapter you configured is the port that has the cable. `Get-NetAdapter` shows
-`Up` when the link has carrier, `Disconnected` when it does not, and
-`Disabled` when the adapter is turned off. On the Pi, `nmcli device status`
-shows the Ethernet device.
-
-`Disconnected` with no carrier is a cable or port problem. The saved address
-can already be correct. Seeing both addresses is still not a test that one
-host can reach the other. That check is LocalNetworkInfra-04.
-
-### `voicestock-ethernet` is not active after reboot
+### `voicestock-ap` is inactive after reboot
 
 On the Pi:
 
 ```bash
-nmcli connection show --active
-nmcli connection show voicestock-ethernet
+nmcli connection show voicestock-ap
+nmcli device status
 ```
 
-The profile should be bound to the Ethernet device, with autoconnect enabled.
-Its autoconnect priority is `100`, so it is preferred over the default wired
-profile. Run `sudo bash scripts/setup_pi_ethernet.sh` again. That updates
-`voicestock-ethernet` and activates it. It does not add another profile.
+The profile should name the Wi-Fi device, with autoconnect enabled. Another
+Wi-Fi profile with autoconnect still enabled can take the radio. The setup
+script turns autoconnect off on those other Wi-Fi profiles. Run
+`sudo bash scripts/setup_pi_access_point.sh` again. That updates
+`voicestock-ap` and activates it. It does not add another profile.
 
-If NetworkManager reports more than one profile with that exact name, the
-script stops. Delete the extra profiles with `nmcli connection delete`,
-keeping a single `voicestock-ethernet`, then run the script again.
+If NetworkManager reports more than one profile named `voicestock-ap`,
+delete the extras until one remains, then run the script again.
+
+### The PC loses Internet
+
+Internet stays on the Wi-Fi interface that is not passed to the script. List
+the default route:
+
+```bash
+ip -4 route show default
+```
+
+That line must name the Internet interface. If it names the VoiceStock
+interface, `voicestock-client` is wrong: `ipv4.never-default` should be
+`yes` and the profile should have no gateway. Run the PC script again for
+the VoiceStock interface and check the route again. If the Internet
+interface itself is disconnected, reconnect it with NetworkManager. The
+VoiceStock script does not join or repair that network.
+
+### The default route moves to the VoiceStock interface
+
+`ip -4 route` must not show `default` via the VoiceStock device on the PC or
+via the access-point device on the Pi. Re-run the setup script on that
+machine. Both profiles set `ipv4.never-default` and clear a gateway. Neither
+script adds a default route.
+
+### The passphrase does not match
+
+Both machines must source the same `scripts/voicestock-network.conf`. The
+scripts store that value in the NetworkManager profile and, when they can
+read it back, they fail if the stored value differs. They do not print the
+passphrase. Copy the repository file again and re-run the script. Do not
+create a second VoiceStock profile by hand.
+
+### NetworkManager reports an unmanaged interface
+
+The script stops before it writes the profile. `nmcli device status` shows
+the device as unmanaged. Mark that device managed, then run the script
+again. On the Pi:
+
+```bash
+sudo nmcli device set wlan0 managed yes
+sudo bash scripts/setup_pi_access_point.sh wlan0
+```
+
+On the PC, use the VoiceStock interface name, not the Internet interface:
+
+```bash
+sudo nmcli device set wlan1 managed yes
+sudo bash scripts/setup_pc_voicestock_wifi.sh wlan1
+```
+
+Replace the example names with the unmanaged VoiceStock device.
+
+### The adapter does not support the expected mode
+
+On the Pi, the script stops when the interface does not report Access Point
+mode. Pass the built-in Wi-Fi device, not an Ethernet device. If
+`WIFI-PROPERTIES.AP` is empty, the script also checks `iw phy`. A `no` from
+either check is final for that device.
+
+On the PC, the script only accepts a Wi-Fi device and asks NetworkManager
+for 2.4 GHz infrastructure mode. If activation fails, that adapter may not
+support 2.4 GHz client mode. Choose the other spare Wi-Fi interface. Do not
+point the script at the Internet interface to work around it.
+
+### Regulatory domain or channel problems
+
+If the cell does not appear, or NetworkManager reports that the access point
+could not select a channel, check `iw reg get` on the Pi. The country must
+be `AR` before `setup_pi_access_point.sh` will continue. Set it with the
+`raspi-config` command in [Regulatory domain](#regulatory-domain) and reboot.
+Do not edit unrelated NetworkManager or kernel files by hand for this step.
+The script will not change the domain for you.
 
 ## Do not
 
-- Do not configure a gateway on the VoiceStock Ethernet interface.
-- Do not configure DNS servers on that interface.
-- Do not enable Internet Connection Sharing.
-- Do not enable NAT.
-- Do not enable IP forwarding between Ethernet and Wi-Fi.
-- Do not use DHCP for this link.
-- Do not turn the Raspberry Pi into a Wi-Fi access point.
-- Do not change `192.168.50.1` or `192.168.50.2` without changing the
-  architecture recorded in the
-  [local network strategy](../research/local-network-strategy.md).
-- Do not pass a Wi-Fi, VPN, or virtual adapter as `-InterfaceAlias`.
+- Do not enable NAT or masquerading.
+- Do not enable DHCP on the VoiceStock network, and do not set the Pi
+  profile IPv4 method to `shared`.
+- Do not enable IP forwarding.
+- Do not bridge the VoiceStock interface to any other interface.
+- Do not connect the Raspberry Pi to the Internet, and do not make it a
+  Wi-Fi client of another network.
+- Do not put a gateway, a DNS server, or a default route on the VoiceStock
+  Wi-Fi interface.
+- Do not pass the PC's Internet Wi-Fi interface to
+  `setup_pc_voicestock_wifi.sh`.
+- Do not change `192.168.50.1` or `192.168.50.2` without changing
+  [`scripts/voicestock-network.conf`](../../scripts/voicestock-network.conf)
+  and the [local network strategy](../research/local-network-strategy.md).
 
-## Demo checklist
+## Before a demo
 
-Before a university demo or a test session:
+- [ ] Raspberry Pi regulatory domain is `AR`
+- [ ] `voicestock-ap` is active and the Pi address is `192.168.50.1/24`
+- [ ] The Pi has no gateway and no DNS on that profile
+- [ ] The PC VoiceStock interface was passed explicitly
+- [ ] `voicestock-client` is active and that interface is `192.168.50.2/24`
+- [ ] The PC default route is still the Internet Wi-Fi interface
+- [ ] The VoiceStock interface has no gateway and no DNS
 
-- [ ] Raspberry Pi booted
-- [ ] Ethernet cable connected to the dedicated PC port
-- [ ] Raspberry Pi Ethernet is `192.168.50.1/24`
-- [ ] PC Ethernet is `192.168.50.2/24`
-- [ ] PC Wi-Fi is connected when the session needs Internet
-- [ ] The VoiceStock Ethernet interfaces have no default gateway
-- [ ] The VoiceStock Ethernet interfaces have no DNS servers
-- [ ] `voicestock-ethernet` is the active profile on the Pi
-- [ ] The same addresses are still present after a reboot
+LocalNetworkInfra-04 is still open. The items below are not demonstrated by
+running the setup scripts:
+
+- the PC can reach the Raspberry Pi;
+- the Raspberry Pi can reach the PC;
+- the PC still has Internet through its Internet Wi-Fi adapter after the
+  VoiceStock link is up;
+- the VoiceStock Wi-Fi does not become the PC default route on the real
+  hardware;
+- the Raspberry Pi has no Internet access;
+- the configuration survives reboot;
+- the access point comes back after reboot;
+- application communication works over the real link.

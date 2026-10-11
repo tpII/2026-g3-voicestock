@@ -622,3 +622,42 @@ punto de acceso Wi-Fi que se había considerado antes.
   Raspberry Pi y el cable Ethernet reales. Todavía no se comprobó en hardware
   la conectividad de punta a punta, el aislamiento de Internet ni que la
   configuración sobreviva a un reinicio.
+
+---
+
+## 11/10/2026
+
+### Red local: del Ethernet al punto de acceso aislado
+
+Se revisó la arquitectura Ethernet de `LocalNetworkInfra` porque el montaje
+previsto no tiene el enlace cableado que esa decisión daba por existente. El
+trabajo Ethernet anterior queda en la bitácora y en el historial de Git. No
+se lo reescribe.
+
+La red pasa a un punto de acceso Wi-Fi aislado creado por la Raspberry Pi 3.
+La placa no se conecta a Internet ni entra como cliente de otra red: su
+interfaz Wi-Fi queda solo en modo access point, con el SSID `VoiceStock`.
+
+La PC de referencia es Arch Linux con NetworkManager. Usa dos interfaces
+Wi-Fi. Una sigue en la red de Internet, con su DHCP, su puerta de enlace, su
+DNS y la ruta por defecto. La otra se dedica a VoiceStock, con la dirección
+estática `192.168.50.2/24`. La Raspberry Pi queda en `192.168.50.1/24`. No hay
+DHCP, NAT, reenvío ni puente entre las dos redes.
+
+Se reemplazaron los scripts de Ethernet por
+`scripts/setup_pi_access_point.sh` y
+`scripts/setup_pc_voicestock_wifi.sh`. El de la PC exige el nombre de la
+interfaz VoiceStock y no elige ni modifica la interfaz de Internet. La
+contraseña de prototipo quedó en un solo archivo,
+`scripts/voicestock-network.conf`, a propósito para esta etapa académica.
+
+También se actualizaron la investigación, el ADR-0004, la guía de setup y la
+interfaz de comunicación Raspberry Pi–PC. Las direcciones que usa la
+aplicación no cambian.
+
+`LocalNetworkInfra-04` sigue pendiente. No se validó en hardware que la PC y
+la Raspberry se alcancen, que la PC conserve Internet, que VoiceStock no se
+vuelva la ruta por defecto, que la Raspberry no tenga Internet, que la
+configuración sobreviva a un reinicio, que el punto de acceso vuelva a
+levantarse, ni que la comunicación de la aplicación funcione sobre el enlace
+real.

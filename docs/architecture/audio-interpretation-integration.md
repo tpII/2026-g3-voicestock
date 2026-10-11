@@ -1,0 +1,80 @@
+# Audio and interpretation integration
+
+## Current implementation and proposed connection
+
+The PC benchmark already executes WAV → Whisper → interpreter → experimental
+JSON. It uses recorded fixtures and calls models directly. It does not exercise
+GPIO, the Pi HTTP client/server path or production operation validation.
+
+```mermaid
+flowchart LR
+    A[Pi PushToTalk WAV] --> B[Pi STT adapter: pending]
+    B --> C[HttpInterpretationClient]
+    C --> D[PC HTTP server]
+    D --> E[InterpretationService]
+    E --> F[Groq GPT OSS 20B provider: pending]
+    F --> G[InterpretationDraft: pending]
+```
+
+The graph is the planned application flow. Currently the PC registry only
+registers `StubProvider`. Benchmark JSON must not be treated as the official
+production operation contract.
+
+## Existing integration points
+
+| Component | File | Entry or responsibility |
+| --- | --- | --- |
+| Capture completion | `src/pi/push_to_talk/controller.py` | `on_capture_completed(AudioCaptureResult)` |
+| Captured audio | `src/pi/push_to_talk/result.py` | WAV path in `result.artifact.path` |
+| Pi transport | `src/pi/communication/client.py` | `HttpInterpretationClient.interpret(text)` |
+| Shared request | `src/shared/communication/contracts.py` | `InterpretationRequest(text=...)` and `TransportEnvelope` |
+| PC HTTP | `src/pc/communication/server.py` | `POST /api/v1/interpret`, injected handler |
+| PC composition | `src/pc/main.py` | Connects `InterpretationService.interpret` to HTTP |
+| Interpreter port | `src/pc/interpretation/providers.py` | `InterpretationProvider.interpret(text)`, `ProviderRegistry`, `ProviderError` |
+| Service result | `src/pc/interpretation/results.py` | `ServiceResult` and typed errors |
+
+Transport success is distinct from service success: callers must inspect both
+layers. PC address and timeout use `VOICESTOCK_PC_URL` and
+`VOICESTOCK_PC_TIMEOUT`; provider selection uses
+`VOICESTOCK_INTERPRETATION_PROVIDER`. Registering a real provider is still pending.
+
+## Proposed module boundaries
+
+The STT module belongs under `src/pi/speech_to_text/` and consumes already
+captured WAV PCM16 mono 16 kHz. Its public interface must hide whisper.cpp types
+and return text or a typed error. It does not capture, call an API or interpret
+inventory commands. Use a queued orchestration step rather than running costly
+inference inside GPIO callbacks; model loading should be reusable.
+
+The principal LLM provider belongs under `src/pc/interpretation/`, implements
+the existing provider port and encapsulates credentials, endpoint and failures.
+It produces the internal InterpretationDraft described by the interpretation
+workstream. The official contract mapper and downstream validation remain
+separate responsibilities; the benchmark schema does not implement them.
+
+[SpeechToText-03](https://app.clickup.com/t/86e3euw78) and
+[SpeechToText-04](https://app.clickup.com/t/86e3euwhw) own the STT interface and
+adapter; [StructuredCommandInterpretation-04](https://app.clickup.com/t/86e3ev4cx)
+owns the real interpreter. This PR contributes exploration and documentation,
+not those implementations.
+
+## Tooling and operation
+
+The Python pipeline starts `.tools/stt/whisper-benchmark-worker`, supplies
+float32 input file paths over stdin and reads one JSON result per line from
+stdout. The worker source is `scripts/benchmarks/native/whisper_worker.cpp`;
+its downloaded engine/build and weights are ignored by Git. Its subprocess
+protocol is tooling, not an application-level interface.
+
+Benchmark entry points are `audio_stt_llm_benchmark.py` for local Qwen,
+`audio_stt_gemini_benchmark.py` for Gemini and `audio_stt_groq_benchmark.py` for
+GPT OSS 20B. Shared corpus reading is in `stt_benchmark.py`; shared prompt,
+experimental schema and evaluation are in `precision_benchmark.py`.
+
+See [pipeline operation](../testing/audio-stt-llm-benchmark.md),
+[engine setup](../setup/speech-to-text-models.md),
+[API credentials](../setup/api-keys.md) and
+[the hardware validation plan](../research/speech-to-text-engine-evaluation.md#validation-still-required).
+The credential helper currently serves benchmark scripts; production configuration
+must be introduced with the real provider rather than importing benchmark code
+into `src/`.

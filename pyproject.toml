@@ -35,11 +35,32 @@ packages = ["src/pc", "src/pi", "src/shared"]
 "src/pi/web/static/app.js" = "pi/web/static/app.js"
 
 [project.optional-dependencies]
+stt-benchmark = [
+    "vosk==0.3.45",
+    "psutil>=5.9",
+    "av==19.0.1",
+]
+stt-sherpa = [
+    "sherpa-onnx==1.13.8",
+    "numpy>=2",
+]
+stt-moonshine = [
+    "moonshine-voice==0.1.5",
+]
+stt-vosk = [
+    "vosk==0.3.45",
+]
 dev = [
     "ruff>=0.16",
     "pytest>=8.0",
     "pytest-cov>=6.0",
     "pre-commit>=4.0",
+]
+benchmark = [
+    "psutil>=5.9",
+]
+gemini = [
+    "google-genai>=1.0",
 ]
 
 [tool.ruff]

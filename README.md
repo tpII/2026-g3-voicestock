@@ -35,6 +35,9 @@ verifica. Los tests siguen la misma división (`tests/pc`, `tests/pi`,
 
 ## Arranque rápido
 
+Si usás Conda, activá tu entorno antes de ejecutar setup; se instalará ahí.
+Sin Conda activo, los scripts crean o reutilizan `.venv`.
+
 ```bash
 git clone <url-del-repositorio>
 cd voicestock
@@ -124,11 +127,27 @@ vivo.
 - [Cómo instalarlo, arrancarlo y abrirlo](docs/setup/pi-web.md)
 - [Contrato HTTP](docs/interfaces/pending-operation-web-api.md)
 - [Qué muestra la página](docs/interfaces/pending-operation-web-ui.md)
+## Estado de la evaluación de voz
+
+La elección para la próxima integración es **Whisper Small Q5_1 mediante
+whisper.cpp** como STT offline en Raspberry Pi y **GPT OSS 20B vía Groq** como
+LLM principal en la PC. Qwen local queda como segunda opción. La exploración
+en PC está registrada; faltan pruebas en la Pi 3, adaptadores de producción
+y validación del flujo físico. Ver [evaluación y pendientes](docs/research/speech-to-text-engine-evaluation.md).
 
 ## Documentación
 
+- [Claves locales de API y carga automática](docs/setup/api-keys.md)
+- [Modelos para evaluación de Speech-to-Text](docs/setup/speech-to-text-models.md)
+- [Benchmark de Speech-to-Text en CPU](docs/testing/speech-to-text-benchmark.md)
+- [Benchmark audio → STT → LLM → JSON](docs/testing/audio-stt-llm-benchmark.md)
+- [ADR-0005: Whisper Small Q5 pendiente de validación en Pi](docs/decisions/0005-use-whisper-small-q5-for-offline-stt.md)
+- [Integración de captura, STT e interpretación](docs/architecture/audio-interpretation-integration.md)
+
 - [Guía de contribución](CONTRIBUTING.md)
 - [Guía de documentación](docs/guides/documentation-guide.md)
+- [ADR-0004: API inicial y alternativa local sustituible](docs/decisions/0004-use-api-provider-for-stock-interpretation.md)
+- [Investigación: estrategia y evaluación de interpretación](docs/research/stock-interpretation-strategy-and-evaluation.md)
 - [Flujo de trabajo de desarrollo](docs/guides/development-workflow.md)
 - [Comunicación Raspberry Pi–PC](docs/interfaces/pc-communication.md)
 - [Servicio de interpretación](docs/interfaces/interpretation-service.md)

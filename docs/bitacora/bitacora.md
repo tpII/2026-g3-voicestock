@@ -764,3 +764,68 @@ un éxito de ejecución seguido de un fallo al resolver el slot queda para el
 executor real. Flow sigue siendo el dueño de la FSM y del slot.
 
 No se creó un ADR: no hay una decisión de arquitectura nueva.
+### Interpretación estructurada: experimentos y organización documental
+
+Se organizaron los scripts y resultados de los experimentos realizados en
+septiembre con Ollama, Groq y Gemini. El benchmark original evalúa extracción
+de productos y cantidades; el de precisión incorpora diez casos de operaciones,
+correcciones y cancelaciones. Los reportes preservan respuestas originales,
+exactitud y errores de solicitud.
+
+La [investigación de estrategias](../research/stock-interpretation-strategy-and-evaluation.md)
+registra resultados y limitaciones. Qwen 3 4B Instruct y GPT-OSS 20B completaron
+cada uno una corrida de precisión con 10/10. Gemini contestó nueve casos
+correctamente y tuvo un error de API; el caso restante se evaluó después con
+`contract.txt` en vez de `contract-copy.txt`. Se verificó que ambos archivos
+tienen contenido idéntico en el repositorio actual. Sus nombres distintos no
+implican instrucciones diferentes. Los resultados no garantizan precisión
+sobre frases nuevas. Los umbrales operativos se registran en la entrada del 09/10.
+
+Después de incorporar develop, se reservó
+[ADR-0004](../decisions/0004-use-api-provider-for-stock-interpretation.md)
+para la estrategia de interpretación, conservando los ADR existentes 0001–0003.
+El proveedor de producción todavía no está implementado.
+
+---
+
+## 09/10/2026
+
+### Estrategia inicial y límites operativos
+
+Se definió una API externa como primera opción (Groq o Gemini, configurable)
+y el modelo local como segunda opción. Se aceptan hasta 8 segundos por solicitud
+para API, y hasta 40 segundos y 3 GB RAM para local. No se exige fallback
+automático. Los límites se definieron después de los experimentos de septiembre.
+Las medias registradas están por debajo de los límites de latencia; falta
+comprobar el límite por solicitud y la RAM local, cuyo pico histórico fue
+aproximadamente 3,132 MB. La decisión sigue propuesta para revisión del equipo.
+
+---
+
+## 10/10/2026
+
+### Exploración de STT y pipeline de interpretación
+
+Se prepararon diez grabaciones en WAV PCM16 mono 16 kHz conservando originales
+y hashes, y se organizaron textos y audios en básico, habitual y exigente.
+Se compararon Vosk, Whisper Tiny/Base/Small Q5_1, Moonshine Tiny/Small y Kroko
+en PC, con calentamiento y tres repeticiones por audio. La revisión cualitativa
+separó sentido inequívoco, ambigüedad y pérdidas críticas de información.
+
+Se seleccionó Whisper Small Q5_1 como candidato principal para validar en
+Raspberry Pi 3. Moonshine Small y Kroko permanecen como candidatos comparativos.
+[ADR-0005](../decisions/0005-use-whisper-small-q5-for-offline-stt.md) queda propuesto.
+
+La cadena de seis audios básicos/habituales devolvió 6/6 JSON esperados con
+GPT OSS 20B vía Groq, 5/6 con Qwen local y cuatro correctos con Gemini 3.8 Flash
+más dos errores de API. Se actualizó ADR-0004 con GPT OSS 20B como LLM principal
+y Qwen como segunda opción. Los intentos de API fallidos se conservaron aparte.
+Las claves locales se cargan desde config/api-keys.env, ignorado por Git, con
+una plantilla vacía versionable y procedimiento documentado.
+
+[La investigación](../research/speech-to-text-engine-evaluation.md) conserva
+las limitaciones: referencias sin verificar escuchando, corpus pequeño,
+paralelismo distinto entre motores, hueco de RAM de la primera carga de Qwen
+y falta de aceptación de latencia/recursos. Quedan pendientes hardware real,
+interfaz/adaptador STT, proveedor de producción y flujo físico. No se modificó
+el estado de las tareas de ClickUp ni se considera cerrada la feature STT.

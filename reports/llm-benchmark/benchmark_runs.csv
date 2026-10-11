@@ -1,0 +1,1311 @@
+model,params,run,warmup,status,error,time_to_first_token_ms,total_latency_ms,tokens_per_second,ollama_total_duration_ms,load_duration_ms,prompt_eval_duration_ms,eval_duration_ms,inference_duration_ms,prompt_tokens,output_tokens,ram_before_mb,ram_mid_mb,ram_peak_mb,ram_after_mb,valid_json,schema_valid,expected_products,correct_products,missing_products,extra_products,correct_quantities,incorrect_quantities,excluded_water_correctly,exact_match,raw_response
+llama3.2:1b,~1B,1,True,ok,,16700.09,36621.23,13.016,36614.24,5337.28,11340.43,19899.15,31239.58,598,259,1847.49,1540.29,1847.49,1541.91,False,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola 1.5L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 4
+    },
+    {
+      ""producto"": ""Agua Villavicencio 1.5L"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 0
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]"
+llama3.2:1b,~1B,1,False,ok,,153.83,20192.2,12.938,20169.75,29.96,106.73,20018.93,20125.66,598,259,1541.91,1541.95,1541.98,1541.98,False,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola 1.5L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 4
+    },
+    {
+      ""producto"": ""Agua Villavicencio 1.5L"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 0
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]"
+llama3.2:1b,~1B,2,False,ok,,149.9,20609.91,12.662,20602.45,20.21,112.43,20455.51,20567.95,598,259,1541.98,1542.05,1542.19,1542.19,False,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola 1.5L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 4
+    },
+    {
+      ""producto"": ""Agua Villavicencio 1.5L"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 0
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]"
+llama3.2:1b,~1B,3,False,ok,,152.56,20840.83,12.522,20826.24,7.37,123.35,20684.42,20807.77,598,259,1542.19,1542.29,1542.35,1542.35,False,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola 1.5L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 4
+    },
+    {
+      ""producto"": ""Agua Villavicencio 1.5L"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 0
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]"
+llama3.2:1b,~1B,4,False,ok,,156.98,20325.67,12.844,20318.17,28.31,110.5,20164.63,20275.13,598,259,1542.35,1542.38,1542.56,1542.56,False,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola 1.5L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 4
+    },
+    {
+      ""producto"": ""Agua Villavicencio 1.5L"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 0
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]"
+llama3.2:1b,~1B,5,False,ok,,143.01,21070.92,12.379,21063.14,10.15,115.56,20923.33,21038.9,598,259,1542.56,1542.6,1542.6,1540.8,False,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola 1.5L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 4
+    },
+    {
+      ""producto"": ""Agua Villavicencio 1.5L"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 0
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]"
+qwen3:1.7b,~1.7B,1,True,ok,,20188.9,38520.37,11.736,38512.26,6751.34,13387.21,18319.18,31706.39,596,215,25.3,1883.24,1883.39,1883.39,True,True,8,8,0,0,8,0,True,True,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen3:1.7b,~1.7B,1,False,ok,,142.22,19541.82,12.581,19531.97,15.88,110.57,19394.54,19505.11,596,244,1883.39,1883.43,1883.43,1524.66,True,True,8,8,0,1,8,0,False,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Agua Villavicencio 1.5L"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen3:1.7b,~1.7B,2,False,ok,,151.04,18675.31,13.175,18667.91,13.56,113.44,18519.71,18633.15,596,244,1524.61,1524.7,1524.77,1524.77,True,True,8,8,0,1,8,0,False,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Agua Villavicencio 1.5L"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen3:1.7b,~1.7B,3,False,ok,,208.2,20186.92,12.215,20156.7,11.07,113.91,19974.99,20088.9,596,244,1524.77,1524.83,1525.04,1525.04,True,True,8,8,0,1,8,0,False,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Agua Villavicencio 1.5L"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen3:1.7b,~1.7B,4,False,ok,,145.52,19921.38,12.342,19913.27,12.08,101.16,19770.62,19871.78,596,244,1525.04,1525.49,1525.49,1523.32,True,True,8,8,0,1,8,0,False,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Agua Villavicencio 1.5L"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen3:1.7b,~1.7B,5,False,ok,,134.22,19273.87,12.751,19272.19,14.37,107.15,19135.77,19242.92,596,244,1523.32,1523.4,1523.56,1523.56,True,True,8,8,0,1,8,0,False,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Agua Villavicencio 1.5L"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+granite3.1-dense:2b,~2B,1,True,ok,,33792.89,56272.61,9.257,56265.52,6713.82,27041.57,22468.28,49509.84,741,208,26.27,1948.98,1949.32,1949.32,True,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+granite3.1-dense:2b,~2B,1,False,ok,,217.14,22797.7,9.213,22778.38,20.82,164.1,22575.68,22739.78,741,208,1949.32,1949.36,1949.36,1948.25,True,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+granite3.1-dense:2b,~2B,2,False,ok,,167.5,22860.76,9.174,22837.67,10.63,139.57,22672.95,22812.51,741,208,1948.25,1948.26,1948.29,1948.29,True,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+granite3.1-dense:2b,~2B,3,False,ok,,186.26,22646.35,9.263,22638.17,10.23,135.55,22454.92,22590.47,741,208,1948.29,1948.31,1948.32,1948.32,True,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+granite3.1-dense:2b,~2B,4,False,ok,,206.39,24089.08,8.711,24082.51,6.46,187.04,23877.76,24064.79,741,208,1948.32,1948.34,1948.36,1948.36,True,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+granite3.1-dense:2b,~2B,5,False,ok,,192.86,23650.49,8.87,23640.77,10.66,165.37,23450.93,23616.31,741,208,1948.36,1948.36,1948.36,1948.36,True,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen3.5:2b,~2B,1,True,ok,,4579.09,33990.55,8.1,33970.03,28.34,4078.09,29381.02,33459.11,568,238,26.95,2027.73,2032.26,2032.26,True,True,8,8,0,0,6,2,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen3.5:2b,~2B,1,False,ok,,294.19,28732.98,8.375,28710.69,25.8,245.11,28419.52,28664.63,568,238,2032.26,2032.14,2043.76,2043.76,True,True,8,8,0,0,6,2,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen3.5:2b,~2B,2,False,ok,,288.81,28842.57,8.341,28819.41,9.25,262.74,28533.9,28796.64,568,238,2043.76,2043.78,2043.78,2042.21,True,True,8,8,0,0,6,2,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen3.5:2b,~2B,3,False,ok,,317.38,28576.24,8.428,28551.73,13.91,249.53,28239.37,28488.9,568,238,2042.21,2042.29,2042.4,2042.4,True,True,8,8,0,0,6,2,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen3.5:2b,~2B,4,False,ok,,308.71,28572.97,8.422,28565.06,33.39,254.61,28260.81,28515.42,568,238,2042.4,2042.3,2042.4,2042.35,True,True,8,8,0,0,6,2,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen3.5:2b,~2B,5,False,ok,,270.12,28160.65,8.535,28153.39,11.49,239.83,27886.13,28125.95,568,238,2042.35,2042.38,2042.41,2042.41,True,True,8,8,0,0,6,2,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen2.5:3b-instruct,~3B,1,True,ok,,31849.93,49198.42,8.876,49190.05,8226.52,23591.82,17350.34,40942.16,609,154,34.71,2165.43,2165.56,2165.56,True,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L""
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L""
+    },
+    {
+      ""producto"": ""Sprite 1.5L""
+    },
+    {
+      ""producto"": ""Sprite 2L""
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg""
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g""
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml""
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L""
+    }
+  ]
+}"
+qwen2.5:3b-instruct,~3B,1,False,ok,,206.96,17531.66,8.891,17506.36,17.72,154.83,17320.63,17475.47,609,154,2165.56,2164.86,2165.56,2164.84,True,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L""
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L""
+    },
+    {
+      ""producto"": ""Sprite 1.5L""
+    },
+    {
+      ""producto"": ""Sprite 2L""
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg""
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g""
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml""
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L""
+    }
+  ]
+}"
+qwen2.5:3b-instruct,~3B,2,False,ok,,199.61,18085.67,8.612,18063.87,10.93,159.65,17882.28,18041.93,609,154,2164.84,2164.86,2164.86,2164.33,True,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L""
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L""
+    },
+    {
+      ""producto"": ""Sprite 1.5L""
+    },
+    {
+      ""producto"": ""Sprite 2L""
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg""
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g""
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml""
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L""
+    }
+  ]
+}"
+qwen2.5:3b-instruct,~3B,3,False,ok,,205.24,17535.47,8.888,17526.44,12.35,175.21,17326.24,17501.44,609,154,2164.33,2164.35,2164.38,2164.38,True,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L""
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L""
+    },
+    {
+      ""producto"": ""Sprite 1.5L""
+    },
+    {
+      ""producto"": ""Sprite 2L""
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg""
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g""
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml""
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L""
+    }
+  ]
+}"
+qwen2.5:3b-instruct,~3B,4,False,ok,,218.35,17694.85,8.814,17687.9,9.84,177.67,17472.9,17650.58,609,154,2164.38,2164.39,2164.39,2164.39,True,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L""
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L""
+    },
+    {
+      ""producto"": ""Sprite 1.5L""
+    },
+    {
+      ""producto"": ""Sprite 2L""
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg""
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g""
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml""
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L""
+    }
+  ]
+}"
+qwen2.5:3b-instruct,~3B,5,False,ok,,192.97,17677.4,8.819,17651.85,11.21,165.62,17461.94,17627.56,609,154,2164.39,2164.46,2164.63,2164.63,True,False,8,0,8,0,0,8,True,False,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L""
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L""
+    },
+    {
+      ""producto"": ""Sprite 1.5L""
+    },
+    {
+      ""producto"": ""Sprite 2L""
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg""
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g""
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml""
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L""
+    }
+  ]
+}"
+qwen3:4b-instruct,~4B,1,True,ok,,41778.71,75433.38,6.391,75427.33,11279.85,30449.82,33639.59,64089.41,588,215,35.55,3131.71,3131.71,3131.42,True,True,8,8,0,0,8,0,True,True,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen3:4b-instruct,~4B,1,False,ok,,275.33,34531.55,6.277,34492.25,20.3,189.81,34252.55,34442.36,588,215,3131.42,3131.47,3131.52,3131.52,True,True,8,8,0,0,8,0,True,True,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen3:4b-instruct,~4B,2,False,ok,,272.3,34432.1,6.295,34425.05,13.47,234.11,34156.3,34390.4,588,215,3131.59,3131.62,3131.62,3131.61,True,True,8,8,0,0,8,0,True,True,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen3:4b-instruct,~4B,3,False,ok,,251.36,33859.47,6.398,33852.35,10.29,199.93,33604.7,33804.63,588,215,3131.61,3131.77,3131.77,3131.71,True,True,8,8,0,0,8,0,True,True,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen3:4b-instruct,~4B,4,False,ok,,259.69,33945.05,6.383,33938.6,11.27,210.6,33681.81,33892.4,588,215,3131.71,3131.72,3131.72,3131.72,True,True,8,8,0,0,8,0,True,True,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"
+qwen3:4b-instruct,~4B,5,False,ok,,277.04,34388.91,6.303,34386.08,30.97,213.7,34108.44,34322.14,588,215,3131.72,3131.72,3131.78,3131.78,True,True,8,8,0,0,8,0,True,True,"{
+  ""productos"": [
+    {
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 20
+    },
+    {
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 12
+    },
+    {
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 8
+    },
+    {
+      ""producto"": ""Sprite 2L"",
+      ""cantidad"": 6
+    },
+    {
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 15
+    },
+    {
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 24
+    },
+    {
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 9
+    },
+    {
+      ""producto"": ""Leche La Serenísima 1L"",
+      ""cantidad"": 18
+    }
+  ]
+}"

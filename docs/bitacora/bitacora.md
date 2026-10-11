@@ -623,6 +623,178 @@ punto de acceso Wi-Fi que se había considerado antes.
   la conectividad de punta a punta, el aislamiento de Internet ni que la
   configuración sobreviva a un reinicio.
 
+
+
+---
+
+## 07/10/2026
+
+### Puertos de la operación pendiente (`PendingOperationWeb-02`)
+
+Se definió la frontera que va a usar la web para consultar y resolver la
+operación pendiente, sin implementar `PendingOperationFlow`. Esa feature sigue
+siendo la dueña futura de la operación y de la máquina de estados. Acá no se
+creó un segundo modelo de dominio ni una FSM paralela.
+
+El código quedó en `pi.pending_operation`:
+
+- `PendingOperationQueryPort.get_current()` devuelve un
+  `PendingOperationView` o nada;
+- `PendingOperationResolutionPort` expone `confirm(operation_id)` y
+  `cancel(operation_id)`, con `ResolutionResult` en lugar de un booleano;
+- `PendingOperationGateway` aplica esa política con un único lock;
+- `ProvisionalOperationExecutor` responde éxito y no toca inventario;
+- el estado real entra por `PendingOperationSlot`, que Flow tiene que
+  implementar.
+
+Confirmar solo cierra la pendiente después de una ejecución exitosa. Cancelar
+no ejecuta inventario. Un reintento de la misma acción devuelve
+`already_resolved` y no vuelve a ejecutar; la acción contraria devuelve
+`conflict`. Esa memoria es solo la resolución anterior en el proceso y se
+pierde al reiniciar.
+
+El registro para integrar Flow está en
+[pending operation web flow contract](../research/pending-operation-web-flow-contract.md).
+No se agregó un ADR nuevo: la topología y el rol de HTTP ya están en ADR-0004,
+y este contrato es el hand-off hasta que Flow exista.
+
+---
+
+## 08/10/2026
+
+### Servidor web inicial (`PendingOperationWeb-03`)
+
+Se agregó la capa `pi.web`: FastAPI en `create_app`, Uvicorn en `run_server`,
+y la página estática de marcador de posición. `GET /health` solo indica que
+el servidor HTTP responde. `GET /` sirve el HTML local, y `/static/*` los
+archivos CSS y JavaScript. No hay API de operación pendiente, CORS, HTTPS ni
+login.
+
+El comando `voicestock-pi-web` arranca ese servidor para desarrollo y
+validación. En la Raspberry Pi el default es `192.168.50.1:8000`. En otra
+máquina se puede usar `VOICESTOCK_WEB_HOST=127.0.0.1`. No es un segundo
+proceso productivo: ADR-0004 sigue pidiendo un único proceso cuando exista el
+orquestador. Cómo se componen ambos queda pendiente.
+
+La guía está en [servidor web de la Raspberry Pi](../setup/pi-web.md).
+Los frameworks HTTP siguen permitidos solo en el servidor de la PC y en
+`pi/web`.
+
+### API de la operación pendiente (`PendingOperationWeb-04`)
+
+Se agregó el API versionado en `pi.web`: `GET /api/v1/pending-operation`,
+`POST .../confirm` y `POST .../cancel`. Las rutas llaman a los puertos de
+aplicación y traducen `ResolutionResult` a HTTP. No hay body en confirm ni
+cancel. Un GET sin pendiente responde `204`. Un reintento de la misma acción
+responde `200` con `already_resolved`. Conflicto y id viejo responden `409`.
+Un fallo de ejecución responde `503` sin texto de excepción.
+
+Si `voicestock-pi-web` arranca sin puertos, `/health` sigue en `200` y el
+API responde `503` con `application_not_ready`. Un `operation_id` en blanco
+responde `422`.
+
+El contrato está en
+[API de la operación pendiente](../interfaces/pending-operation-web-api.md).
+No se creó un ADR: el mapeo es el contrato HTTP, y la decisión de que HTTP
+es un adaptador ya está en ADR-0004.
+
+### Interfaz de la operación pendiente (`PendingOperationWeb-05`)
+
+La página dejó de ser un marcador de posición. Muestra la frase de
+confirmación, los datos estructurados y el texto reconocido. Si no hay
+operación, pide usar el botón físico. Confirmar y cancelar llaman al API
+con el `operation_id` visible.
+
+La consulta se repite cerca de una vez por segundo, esperando a que termine
+la anterior. Un reintento exitoso se muestra como confirmación o
+cancelación, no como error. Si la operación cambió, la página se actualiza.
+Si la ejecución falla, la tarjeta sigue y se pueden reintentar los botones.
+Si la aplicación no está lista o se corta la red, el encabezado dice que no
+está disponible y sigue reintentando.
+
+El comportamiento está en
+[página de la operación pendiente](../interfaces/pending-operation-web-ui.md).
+
+### Documentación del servidor y de la página (`PendingOperationWeb-06`)
+
+Se consolidó la documentación de la feature sin agregar comportamiento. Cada
+tema quedó en un documento: la decisión en ADR-0004, el hand-off con
+`PendingOperationFlow` en el contrato de flujo, el arranque en la guía del
+servidor web, el HTTP en el contrato del API y la página en su interfaz.
+
+La guía deja explícito que `GET /health` solo indica que el servidor HTTP
+está vivo. El contrato de flujo registra que el executor de octubre no
+modifica inventario, que `last_resolution` no es idempotencia durable, y que
+un éxito de ejecución seguido de un fallo al resolver el slot queda para el
+executor real. Flow sigue siendo el dueño de la FSM y del slot.
+
+No se creó un ADR: no hay una decisión de arquitectura nueva.
+### Interpretación estructurada: experimentos y organización documental
+
+Se organizaron los scripts y resultados de los experimentos realizados en
+septiembre con Ollama, Groq y Gemini. El benchmark original evalúa extracción
+de productos y cantidades; el de precisión incorpora diez casos de operaciones,
+correcciones y cancelaciones. Los reportes preservan respuestas originales,
+exactitud y errores de solicitud.
+
+La [investigación de estrategias](../research/stock-interpretation-strategy-and-evaluation.md)
+registra resultados y limitaciones. Qwen 3 4B Instruct y GPT-OSS 20B completaron
+cada uno una corrida de precisión con 10/10. Gemini contestó nueve casos
+correctamente y tuvo un error de API; el caso restante se evaluó después con
+`contract.txt` en vez de `contract-copy.txt`. Se verificó que ambos archivos
+tienen contenido idéntico en el repositorio actual. Sus nombres distintos no
+implican instrucciones diferentes. Los resultados no garantizan precisión
+sobre frases nuevas. Los umbrales operativos se registran en la entrada del 09/10.
+
+Después de incorporar develop, se reservó
+[ADR-0004](../decisions/0004-use-api-provider-for-stock-interpretation.md)
+para la estrategia de interpretación, conservando los ADR existentes 0001–0003.
+El proveedor de producción todavía no está implementado.
+
+---
+
+## 09/10/2026
+
+### Estrategia inicial y límites operativos
+
+Se definió una API externa como primera opción (Groq o Gemini, configurable)
+y el modelo local como segunda opción. Se aceptan hasta 8 segundos por solicitud
+para API, y hasta 40 segundos y 3 GB RAM para local. No se exige fallback
+automático. Los límites se definieron después de los experimentos de septiembre.
+Las medias registradas están por debajo de los límites de latencia; falta
+comprobar el límite por solicitud y la RAM local, cuyo pico histórico fue
+aproximadamente 3,132 MB. La decisión sigue propuesta para revisión del equipo.
+
+---
+
+## 10/10/2026
+
+### Exploración de STT y pipeline de interpretación
+
+Se prepararon diez grabaciones en WAV PCM16 mono 16 kHz conservando originales
+y hashes, y se organizaron textos y audios en básico, habitual y exigente.
+Se compararon Vosk, Whisper Tiny/Base/Small Q5_1, Moonshine Tiny/Small y Kroko
+en PC, con calentamiento y tres repeticiones por audio. La revisión cualitativa
+separó sentido inequívoco, ambigüedad y pérdidas críticas de información.
+
+Se seleccionó Whisper Small Q5_1 como candidato principal para validar en
+Raspberry Pi 3. Moonshine Small y Kroko permanecen como candidatos comparativos.
+[ADR-0005](../decisions/0005-use-whisper-small-q5-for-offline-stt.md) queda propuesto.
+
+La cadena de seis audios básicos/habituales devolvió 6/6 JSON esperados con
+GPT OSS 20B vía Groq, 5/6 con Qwen local y cuatro correctos con Gemini 3.8 Flash
+más dos errores de API. Se actualizó ADR-0004 con GPT OSS 20B como LLM principal
+y Qwen como segunda opción. Los intentos de API fallidos se conservaron aparte.
+Las claves locales se cargan desde config/api-keys.env, ignorado por Git, con
+una plantilla vacía versionable y procedimiento documentado.
+
+[La investigación](../research/speech-to-text-engine-evaluation.md) conserva
+las limitaciones: referencias sin verificar escuchando, corpus pequeño,
+paralelismo distinto entre motores, hueco de RAM de la primera carga de Qwen
+y falta de aceptación de latencia/recursos. Quedan pendientes hardware real,
+interfaz/adaptador STT, proveedor de producción y flujo físico. No se modificó
+el estado de las tareas de ClickUp ni se considera cerrada la feature STT.
+
 ---
 
 ## 11/10/2026

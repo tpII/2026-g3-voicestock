@@ -949,6 +949,14 @@ LLM_MODEL=
 
 ---
 
+Para las claves de los benchmarks, se versiona la plantilla vacía
+`config/api-keys.env.example`; la copia local `config/api-keys.env` está
+ignorada. Los nuevos scripts deben reutilizar el cargador compartido y respetar
+la prioridad de las variables del entorno. Ver
+[configuración de claves de API](docs/setup/api-keys.md) para el formato,
+la carga automática y cómo actualizar claves.
+
+
 # 26. Limpieza del repositorio
 
 No deberán subirse archivos generados localmente que no formen parte del proyecto.
@@ -980,7 +988,7 @@ La primera vez, después de clonar:
 ./scripts/setup.sh
 ```
 
-Eso crea `.venv`, instala el proyecto con las dependencias de desarrollo e instala los hooks de pre-commit.
+Eso usa el entorno Conda activo si existe; en caso contrario crea o reutiliza `.venv`. Instala el proyecto con las dependencias de desarrollo y los hooks de pre-commit. Para incluir Vosk, agregar `--stt` en Bash o `-Stt` en PowerShell.
 
 Actualizar `develop`:
 

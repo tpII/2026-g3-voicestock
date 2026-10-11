@@ -1,0 +1,167 @@
+{
+  "format": "WAV PCM signed 16-bit mono 16000 Hz",
+  "reference_source": "LLM precision prompts; human verification pending",
+  "converter": "PyAV 19.0.1",
+  "cases": [
+    {
+      "id": "solo_agregar",
+      "original": "originals/basico/solo_agregar.m4a",
+      "wav": "wav/basico/solo_agregar.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 8.576,
+      "original_sha256": "433e8d30e0dbc243cba46be1c7bc7b2ebd1de86689da8e24f5795cf80e628187",
+      "wav_sha256": "5d2c36972d6db24e4ca0a9d7db0b0ccda7dac08eb9e04ecd0dca67cfb2cb4857",
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros y cuatro Sprite comunes de 1,5 litros.",
+      "reference_verified_by_human": false,
+      "level": "basico",
+      "text_prompt": "scripts/benchmarks/prompts/precision/basico/solo_agregar.txt"
+    },
+    {
+      "id": "solo_restar",
+      "original": "originals/basico/solo_restar.m4a",
+      "wav": "wav/basico/solo_restar.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 4.992,
+      "original_sha256": "41d52801e43bdad7f834cf5910101c67a79d0af612217a6c2bc38b0d7e8486f3",
+      "wav_sha256": "24e6248d5ec7e3b031f2af2dadf48a449122e9e70b77c951d40421243c3588d3",
+      "expected_text": "Restá dos paquetes de arroz Gallo de 1 kg.",
+      "reference_verified_by_human": false,
+      "level": "basico",
+      "text_prompt": "scripts/benchmarks/prompts/precision/basico/solo_restar.txt"
+    },
+    {
+      "id": "restar_ambos",
+      "original": "originals/habitual/restar_ambos.m4a",
+      "wav": "wav/habitual/restar_ambos.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 8.448,
+      "original_sha256": "2e93c9fedc5d4d711b7247348ed93f4524db9acc540e54c12048fd75ed8f4939",
+      "wav_sha256": "a2775a73742d8c279fc098ecf71ff9d5bdb152f2f63e06eaff1e9cf234366695",
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros y cuatro envases de detergente Magistral de 750 ml.",
+      "reference_verified_by_human": false,
+      "level": "habitual",
+      "text_prompt": "scripts/benchmarks/prompts/precision/habitual/restar_ambos.txt"
+    },
+    {
+      "id": "corregir_cantidad",
+      "original": "originals/habitual/corregir_cantidad.m4a",
+      "wav": "wav/habitual/corregir_cantidad.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 8.064,
+      "original_sha256": "cb896dc77dacfeb1fcab3581cf2e2ba0b933aee47dc011f032472bd4bc920bc4",
+      "wav_sha256": "6bf0158324ae691b8926c445b91c42e76d9bf18464136372fec1cbef7f0b08fd",
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros. Perdón, eran dos.",
+      "reference_verified_by_human": false,
+      "level": "habitual",
+      "text_prompt": "scripts/benchmarks/prompts/precision/habitual/corregir_cantidad.txt"
+    },
+    {
+      "id": "negar_agregacion",
+      "original": "originals/habitual/negar_agregacion.m4a",
+      "wav": "wav/habitual/negar_agregacion.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 9.664,
+      "original_sha256": "01c995c0b7f68ab930245f6d78af81d30872bd1dcf59a92086277727fb8ca4ed",
+      "wav_sha256": "ba2f734234741787378d24abbd128fc4372886f4fa976ae55dfbd2a4e7e5ab22",
+      "expected_text": "Agregá cinco botellas de agua Villavicencio de 1,5 litros. Perdón, esas no llegaron; no las cargues.",
+      "reference_verified_by_human": false,
+      "level": "habitual",
+      "text_prompt": "scripts/benchmarks/prompts/precision/habitual/negar_agregacion.txt"
+    },
+    {
+      "id": "negar_restacion",
+      "original": "originals/habitual/negar_restacion.m4a",
+      "wav": "wav/habitual/negar_restacion.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 11.072,
+      "original_sha256": "b6ffd453c5ea7db87a8d5f6ace1b22b821aaa850eea681edeb4e922f007a6314",
+      "wav_sha256": "9deab639854c43375349f22acc9c0f5bd2c37d30590dc9e914b1fa6f4b316ee7",
+      "expected_text": "Restá cuatro envases de detergente Magistral de 750 ml. Perdón, no se vendieron; no los restes.",
+      "reference_verified_by_human": false,
+      "level": "habitual",
+      "text_prompt": "scripts/benchmarks/prompts/precision/habitual/negar_restacion.txt"
+    },
+    {
+      "id": "negar_varias_agregaciones",
+      "original": "originals/exigente/negar_varias_agregaciones.m4a",
+      "wav": "wav/exigente/negar_varias_agregaciones.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 20.032,
+      "original_sha256": "22743bd07c7779579063f0fd6c1706076f4cfce47c4741bfaac27196719bd4ac",
+      "wav_sha256": "e532fb3acba22125efc6845b7b922acb9e3a69b322b118e44f744d4dfc802d92",
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros, cuatro Sprite comunes de 1,5 litros y cinco paquetes de arroz Gallo de 1 kg. Me equivoque las Coca Cola comunes de 2 litros y las Sprite comunes de 1,5 no las cargues.",
+      "reference_verified_by_human": false,
+      "level": "exigente",
+      "text_prompt": "scripts/benchmarks/prompts/precision/exigente/negar_varias_agregaciones.txt"
+    },
+    {
+      "id": "negar_varias_restaciones",
+      "original": "originals/exigente/negar_varias_restaciones.m4a",
+      "wav": "wav/exigente/negar_varias_restaciones.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 16.576,
+      "original_sha256": "76ba3cf7903c35204a6a0138838879a23a44941f72e1d6e40f3334f516f79f7d",
+      "wav_sha256": "1e33dfcd5f3096096127845fb95a96658cb99738a4fcea9a70b6221830817101",
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros, tres paquetes de arroz Gallo de 1 kg y cuatro envases de detergente Magistral de 750 ml. Las Coca Zero y el arroz no se vendieron; no los restes.",
+      "reference_verified_by_human": false,
+      "level": "exigente",
+      "text_prompt": "scripts/benchmarks/prompts/precision/exigente/negar_varias_restaciones.txt"
+    },
+    {
+      "id": "negar_agregacion_y_restacion",
+      "original": "originals/exigente/negar_agregacion_y_restacion.m4a",
+      "wav": "wav/exigente/negar_agregacion_y_restacion.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 13.888,
+      "original_sha256": "a28b2c4030006293f622045398d5af336589509abc769950f12bd7d5e41095bd",
+      "wav_sha256": "c853f313fbc18f9e928cba6e20197aa2d8ea201148df7197359d28c8cc82ec02",
+      "expected_text": "Agregá cuatro Sprite comunes de 2 litros y restá dos paquetes de arroz Gallo de 1 kg. Perdón, las Sprite no llegaron y el arroz no se vendió; no hagas ninguna de esas dos operaciones.",
+      "reference_verified_by_human": false,
+      "level": "exigente",
+      "text_prompt": "scripts/benchmarks/prompts/precision/exigente/negar_agregacion_y_restacion.txt"
+    },
+    {
+      "id": "caso_integral",
+      "original": "originals/exigente/caso_integral.m4a",
+      "wav": "wav/exigente/caso_integral.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 51.264,
+      "original_sha256": "fa59ad283b628d85e2a7844131091056e2300c90b96fde8edbc53aba88f2be5c",
+      "wav_sha256": "57af9c80b807b77344cd7bb8802422e4ad6f8c7cd852540522554c0608c0f54e",
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros; perdón, eran dos. Agregá cuatro Sprite comunes de 1,5 litros y cinco botellas de agua Villavicencio de 1,5 litros; perdón, no llegó ninguno de esos dos productos, así que no los cargues. Restá dos paquetes de arroz Gallo de 1 kg y tres paquetes de fideos Matarazzo de 500 g. Restá cuatro Coca Cola Zero de 2 litros y cinco envases de detergente Magistral de 750 ml; perdón, ni las Coca Zero ni los detergentes se vendieron. No restes ninguno de esos dos productos. Agregá seis envases de leche La Serenísima de 1 litro y restá dos Sprite comunes de 2 litros. Perdón, la leche no llegó y esas Sprite no se vendieron; no cargues la leche ni restes esas Sprite.",
+      "reference_verified_by_human": false,
+      "level": "exigente",
+      "text_prompt": "scripts/benchmarks/prompts/precision/exigente/caso_integral.txt"
+    }
+  ]
+}

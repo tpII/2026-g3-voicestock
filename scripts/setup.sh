@@ -4,6 +4,14 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+INSTALL_EXTRAS="dev"
+if [[ "${1:-}" == "--stt" && $# -eq 1 ]]; then
+  INSTALL_EXTRAS="dev,stt-vosk"
+elif [[ $# -ne 0 ]]; then
+  printf 'Usage: %s [--stt]\n' "$0" >&2
+  exit 2
+fi
+
 info() {
   printf '==> %s\n' "$1"
 }
@@ -54,32 +62,43 @@ venv_python() {
   fi
 }
 
-info "Checking Python 3.11 or newer..."
-PYTHON_CMD=()
-find_python || error "Python 3.11 or newer is required (official CPython). MSYS2 Python is not supported because several development wheels are unavailable."
-info "Using interpreter: ${PYTHON_CMD[*]} ($("${PYTHON_CMD[@]}" -c "import sys; print('.'.join(map(str, sys.version_info[:3])))"))"
-
-if [[ ! -x "$ROOT/.venv/bin/python" && ! -x "$ROOT/.venv/Scripts/python.exe" ]]; then
-  info "Creating virtual environment at .venv..."
-  "${PYTHON_CMD[@]}" -m venv "$ROOT/.venv"
+if [[ -n "${CONDA_PREFIX:-}" ]]; then
+  ENV_PYTHON=""
+  for candidate in "$CONDA_PREFIX/bin/python" "$CONDA_PREFIX/python.exe"; do
+    if [[ -x "$candidate" ]] && python_is_usable "$candidate"; then
+      ENV_PYTHON="$candidate"
+      break
+    fi
+  done
+  [[ -n "$ENV_PYTHON" ]] || error "The active Conda environment must provide compatible Python 3.11 or newer."
+  info "Using active Conda environment: $CONDA_PREFIX"
 else
-  info "Virtual environment already exists; reusing it."
+  info "Checking Python 3.11 or newer..."
+  PYTHON_CMD=()
+  find_python || error "Python 3.11 or newer is required (official CPython). MSYS2 Python is not supported."
+  if [[ ! -x "$ROOT/.venv/bin/python" && ! -x "$ROOT/.venv/Scripts/python.exe" ]]; then
+    info "Creating virtual environment at .venv..."
+    "${PYTHON_CMD[@]}" -m venv "$ROOT/.venv"
+  else
+    info "Virtual environment already exists; reusing it."
+  fi
+  ENV_PYTHON="$(venv_python)" || error "Could not find the virtual environment interpreter."
 fi
-
-VENV_PYTHON="$(venv_python)" || error "Could not find the virtual environment interpreter."
+info "Using interpreter: $ENV_PYTHON"
 
 info "Upgrading pip..."
-"$VENV_PYTHON" -m pip install --upgrade pip
+"$ENV_PYTHON" -m pip install --upgrade pip
 
 info "Installing VoiceStock with development dependencies..."
-"$VENV_PYTHON" -m pip install -e ".[dev]"
+"$ENV_PYTHON" -m pip install -e ".[${INSTALL_EXTRAS}]"
 
 info "Installing pre-commit hooks..."
-"$VENV_PYTHON" -m pre_commit install
+"$ENV_PYTHON" -m pre_commit install
 
 info "Setup completed successfully."
-info "Activate the environment with:"
-if [[ -x "$ROOT/.venv/bin/python" ]]; then
+if [[ -n "${CONDA_PREFIX:-}" ]]; then
+  info "Conda environment is already active."
+elif [[ -x "$ROOT/.venv/bin/python" ]]; then
   info "  source .venv/bin/activate"
 else
   info "  .venv\\Scripts\\Activate.ps1"

@@ -18,6 +18,8 @@ ENV/
 .env
 .env.*
 !.env.example
+api-keys.env
+apikey.env
 
 # Testing and coverage
 .pytest_cache/
@@ -63,3 +65,9 @@ ehthumbs.db
 
 # Local tooling
 .python-version
+
+# Downloaded STT model weights
+models/stt/
+
+# Local STT inference engine sources and builds
+.tools/stt/

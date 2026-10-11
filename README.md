@@ -5,10 +5,12 @@ Sistema de gestión de inventario asistido por voz, pensado para ejecutarse en u
 La Raspberry Pi capturará audio, hará Speech-to-Text, se comunicará con un modelo de lenguaje a través de una interfaz independiente del proveedor, validará respuestas estructuradas, administrará el inventario, persistirá datos en SQLite y expondrá una interfaz web.
 
 El proyecto está en una etapa inicial. Ya incluye la captura push-to-talk en la
-Raspberry Pi y el servidor de comunicación de la PC, conectado a un servicio de
-interpretación con proveedor intercambiable (por ahora un stub). STT, el modelo
-de lenguaje, inventario e interfaz web continúan en desarrollo. La prueba física
-del pulsador y del micrófono USB todavía no se hizo.
+Raspberry Pi, el servidor de comunicación de la PC (conectado a un servicio de
+interpretación con proveedor intercambiable, por ahora un stub) y la página
+web para confirmar o cancelar la operación pendiente. STT, el modelo de
+lenguaje e inventario continúan en desarrollo. Confirmar en la página todavía
+no modifica el inventario. La prueba física del pulsador y del micrófono USB
+todavía no se hizo.
 
 ## Requisitos
 
@@ -23,7 +25,7 @@ El código está dividido según la máquina donde corre
 ```text
 src/
 ├── pc/       lo que corre en la PC: servidor HTTP e interpretación
-├── pi/       lo que corre en la Raspberry Pi: push-to-talk y cliente de la PC
+├── pi/       lo que corre en la Raspberry Pi: push-to-talk, cliente y web
 └── shared/   contratos que intercambian ambas (TransportEnvelope)
 ```
 
@@ -32,6 +34,9 @@ verifica. Los tests siguen la misma división (`tests/pc`, `tests/pi`,
 `tests/shared`, más `tests/integration` para pruebas que usan ambos lados).
 
 ## Arranque rápido
+
+Si usás Conda, activá tu entorno antes de ejecutar setup; se instalará ahí.
+Sin Conda activo, los scripts crean o reutilizan `.venv`.
 
 ```bash
 git clone <url-del-repositorio>
@@ -104,16 +109,54 @@ el contrato de audio y la prueba en la placa están separados:
 - [Interfaz de captura](docs/interfaces/push-to-talk-capture.md)
 - [Conexión, configuración y prueba manual](docs/setup/push-to-talk.md)
 
+### Web en la Raspberry Pi
+
+`voicestock-pi-web` sirve la página de la operación pendiente. En la
+Raspberry Pi escucha en `192.168.50.1:8000`. Desde la PC:
+`http://192.168.50.1:8000/`. En una máquina de desarrollo:
+
+```bash
+VOICESTOCK_WEB_HOST=127.0.0.1 VOICESTOCK_WEB_PORT=8123 voicestock-pi-web
+```
+
+El comando es temporal, para desarrollo y validación, hasta que el orquestador
+exista. Sin ese runtime `GET /health` sigue respondiendo y el API dice que la
+aplicación no está lista. `GET /health` solo indica que el servidor HTTP está
+vivo.
+
+- [Cómo instalarlo, arrancarlo y abrirlo](docs/setup/pi-web.md)
+- [Contrato HTTP](docs/interfaces/pending-operation-web-api.md)
+- [Qué muestra la página](docs/interfaces/pending-operation-web-ui.md)
+## Estado de la evaluación de voz
+
+La elección para la próxima integración es **Whisper Small Q5_1 mediante
+whisper.cpp** como STT offline en Raspberry Pi y **GPT OSS 20B vía Groq** como
+LLM principal en la PC. Qwen local queda como segunda opción. La exploración
+en PC está registrada; faltan pruebas en la Pi 3, adaptadores de producción
+y validación del flujo físico. Ver [evaluación y pendientes](docs/research/speech-to-text-engine-evaluation.md).
+
 ## Documentación
+
+- [Claves locales de API y carga automática](docs/setup/api-keys.md)
+- [Modelos para evaluación de Speech-to-Text](docs/setup/speech-to-text-models.md)
+- [Benchmark de Speech-to-Text en CPU](docs/testing/speech-to-text-benchmark.md)
+- [Benchmark audio → STT → LLM → JSON](docs/testing/audio-stt-llm-benchmark.md)
+- [ADR-0005: Whisper Small Q5 pendiente de validación en Pi](docs/decisions/0005-use-whisper-small-q5-for-offline-stt.md)
+- [Integración de captura, STT e interpretación](docs/architecture/audio-interpretation-integration.md)
 
 - [Guía de contribución](CONTRIBUTING.md)
 - [Guía de documentación](docs/guides/documentation-guide.md)
+- [ADR-0004: API inicial y alternativa local sustituible](docs/decisions/0004-use-api-provider-for-stock-interpretation.md)
+- [Investigación: estrategia y evaluación de interpretación](docs/research/stock-interpretation-strategy-and-evaluation.md)
 - [Flujo de trabajo de desarrollo](docs/guides/development-workflow.md)
 - [Comunicación Raspberry Pi–PC](docs/interfaces/pc-communication.md)
 - [Servicio de interpretación](docs/interfaces/interpretation-service.md)
 - [Captura push-to-talk](docs/interfaces/push-to-talk-capture.md)
 - [Prueba manual de push-to-talk](docs/setup/push-to-talk.md)
 - [Red local VoiceStock](docs/setup/local-network.md)
+- [Servidor web de la Raspberry Pi](docs/setup/pi-web.md)
+- [API de la operación pendiente](docs/interfaces/pending-operation-web-api.md)
+- [Página de la operación pendiente](docs/interfaces/pending-operation-web-ui.md)
 - [Bitácora](docs/bitacora/bitacora.md)
 
 ## Licencia

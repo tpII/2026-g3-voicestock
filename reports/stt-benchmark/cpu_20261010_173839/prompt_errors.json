@@ -1,0 +1,3023 @@
+[
+  {
+    "configuration": "kroko_es",
+    "case_id": "solo_agregar",
+    "run": 1,
+    "warmup": false,
+    "duration_s": 8.576,
+    "expected_text": "Agregá tres Coca Cola comunes de 2 litros y cuatro Sprite comunes de 1,5 litros.",
+    "text": "Agregar tres Coca-Cola comunes de dos litros y cuatro sprays comunes de uno coma cinco li",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.3876385530002153,
+    "rtf": 0.045200390974838536,
+    "ram_base_mib": 314.02734375,
+    "ram_peak_mib": 314.02734375,
+    "cpu_s": 2.530000000000001,
+    "cpu_pct": 651.3921791807678,
+    "request_wall_s": 0.388398891000179,
+    "word_errors": 7,
+    "reference_words": 16,
+    "char_errors": 21,
+    "reference_chars": 79,
+    "wer_pct": 43.75,
+    "cer_pct": 26.582278481012658,
+    "exact_match": false,
+    "substitution": 6,
+    "deletion": 0,
+    "insertion": 1,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agregar",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 6
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "sprays",
+        "reference_index": 10,
+        "hypothesis_index": 10
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 13,
+        "hypothesis_index": 13
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "coma",
+        "reference_index": 13,
+        "hypothesis_index": 14
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 14,
+        "hypothesis_index": 15
+      },
+      {
+        "type": "substitution",
+        "expected": "litros",
+        "returned": "li",
+        "reference_index": 15,
+        "hypothesis_index": 16
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "solo_agregar",
+    "run": 2,
+    "warmup": false,
+    "duration_s": 8.576,
+    "expected_text": "Agregá tres Coca Cola comunes de 2 litros y cuatro Sprite comunes de 1,5 litros.",
+    "text": "Agregar tres Coca-Cola comunes de dos litros y cuatro sprays comunes de uno coma cinco li",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.38306309200015676,
+    "rtf": 0.0446668717350929,
+    "ram_base_mib": 314.02734375,
+    "ram_peak_mib": 314.03125,
+    "cpu_s": 2.5199999999999996,
+    "cpu_pct": 656.4742030360932,
+    "request_wall_s": 0.3838688539999566,
+    "word_errors": 7,
+    "reference_words": 16,
+    "char_errors": 21,
+    "reference_chars": 79,
+    "wer_pct": 43.75,
+    "cer_pct": 26.582278481012658,
+    "exact_match": false,
+    "substitution": 6,
+    "deletion": 0,
+    "insertion": 1,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agregar",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 6
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "sprays",
+        "reference_index": 10,
+        "hypothesis_index": 10
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 13,
+        "hypothesis_index": 13
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "coma",
+        "reference_index": 13,
+        "hypothesis_index": 14
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 14,
+        "hypothesis_index": 15
+      },
+      {
+        "type": "substitution",
+        "expected": "litros",
+        "returned": "li",
+        "reference_index": 15,
+        "hypothesis_index": 16
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "solo_agregar",
+    "run": 3,
+    "warmup": false,
+    "duration_s": 8.576,
+    "expected_text": "Agregá tres Coca Cola comunes de 2 litros y cuatro Sprite comunes de 1,5 litros.",
+    "text": "Agregar tres Coca-Cola comunes de dos litros y cuatro sprays comunes de uno coma cinco li",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.40105160599887313,
+    "rtf": 0.0467644130129283,
+    "ram_base_mib": 314.03125,
+    "ram_peak_mib": 314.03125,
+    "cpu_s": 2.8500000000000014,
+    "cpu_pct": 708.9185135397665,
+    "request_wall_s": 0.402020817000448,
+    "word_errors": 7,
+    "reference_words": 16,
+    "char_errors": 21,
+    "reference_chars": 79,
+    "wer_pct": 43.75,
+    "cer_pct": 26.582278481012658,
+    "exact_match": false,
+    "substitution": 6,
+    "deletion": 0,
+    "insertion": 1,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agregar",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 6
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "sprays",
+        "reference_index": 10,
+        "hypothesis_index": 10
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 13,
+        "hypothesis_index": 13
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "coma",
+        "reference_index": 13,
+        "hypothesis_index": 14
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 14,
+        "hypothesis_index": 15
+      },
+      {
+        "type": "substitution",
+        "expected": "litros",
+        "returned": "li",
+        "reference_index": 15,
+        "hypothesis_index": 16
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "solo_restar",
+    "run": 1,
+    "warmup": false,
+    "duration_s": 4.992,
+    "expected_text": "Restá dos paquetes de arroz Gallo de 1 kg.",
+    "text": "Resta dos paquetes de arroz gaso de un kilo",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.2652749949993449,
+    "rtf": 0.05314002303672775,
+    "ram_base_mib": 314.03515625,
+    "ram_peak_mib": 314.03515625,
+    "cpu_s": 1.889999999999997,
+    "cpu_pct": 710.4423580629893,
+    "request_wall_s": 0.26603143499960424,
+    "word_errors": 4,
+    "reference_words": 9,
+    "char_errors": 8,
+    "reference_chars": 41,
+    "wer_pct": 44.44444444444444,
+    "cer_pct": 19.51219512195122,
+    "exact_match": false,
+    "substitution": 4,
+    "deletion": 0,
+    "insertion": 0,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "resta",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "gallo",
+        "returned": "gaso",
+        "reference_index": 5,
+        "hypothesis_index": 5
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 7,
+        "hypothesis_index": 7
+      },
+      {
+        "type": "substitution",
+        "expected": "kg",
+        "returned": "kilo",
+        "reference_index": 8,
+        "hypothesis_index": 8
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "solo_restar",
+    "run": 2,
+    "warmup": false,
+    "duration_s": 4.992,
+    "expected_text": "Restá dos paquetes de arroz Gallo de 1 kg.",
+    "text": "Resta dos paquetes de arroz gaso de un kilo",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.2621959309999511,
+    "rtf": 0.052523223357361995,
+    "ram_base_mib": 314.03515625,
+    "ram_peak_mib": 314.03515625,
+    "cpu_s": 1.8599999999999994,
+    "cpu_pct": 707.4318353891713,
+    "request_wall_s": 0.2629228579990013,
+    "word_errors": 4,
+    "reference_words": 9,
+    "char_errors": 8,
+    "reference_chars": 41,
+    "wer_pct": 44.44444444444444,
+    "cer_pct": 19.51219512195122,
+    "exact_match": false,
+    "substitution": 4,
+    "deletion": 0,
+    "insertion": 0,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "resta",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "gallo",
+        "returned": "gaso",
+        "reference_index": 5,
+        "hypothesis_index": 5
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 7,
+        "hypothesis_index": 7
+      },
+      {
+        "type": "substitution",
+        "expected": "kg",
+        "returned": "kilo",
+        "reference_index": 8,
+        "hypothesis_index": 8
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "solo_restar",
+    "run": 3,
+    "warmup": false,
+    "duration_s": 4.992,
+    "expected_text": "Restá dos paquetes de arroz Gallo de 1 kg.",
+    "text": "Resta dos paquetes de arroz gaso de un kilo",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.2632399180001812,
+    "rtf": 0.05273235536862604,
+    "ram_base_mib": 314.03515625,
+    "ram_peak_mib": 314.03515625,
+    "cpu_s": 1.8599999999999994,
+    "cpu_pct": 704.5871959966215,
+    "request_wall_s": 0.2639843600009044,
+    "word_errors": 4,
+    "reference_words": 9,
+    "char_errors": 8,
+    "reference_chars": 41,
+    "wer_pct": 44.44444444444444,
+    "cer_pct": 19.51219512195122,
+    "exact_match": false,
+    "substitution": 4,
+    "deletion": 0,
+    "insertion": 0,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "resta",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "gallo",
+        "returned": "gaso",
+        "reference_index": 5,
+        "hypothesis_index": 5
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 7,
+        "hypothesis_index": 7
+      },
+      {
+        "type": "substitution",
+        "expected": "kg",
+        "returned": "kilo",
+        "reference_index": 8,
+        "hypothesis_index": 8
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "restar_ambos",
+    "run": 1,
+    "warmup": false,
+    "duration_s": 8.448,
+    "expected_text": "Restá dos Coca Cola Zero de 2 litros y cuatro envases de detergente Magistral de 750 ml.",
+    "text": "Coca-Cola cero de dos litros y cuatro envases de detergente magistral de setecientos cincuenta mililitros",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.38691964200006623,
+    "rtf": 0.045800147017053296,
+    "ram_base_mib": 314.03515625,
+    "ram_peak_mib": 314.03515625,
+    "cpu_s": 2.7399999999999984,
+    "cpu_pct": 706.6436068393205,
+    "request_wall_s": 0.3877485020002496,
+    "word_errors": 7,
+    "reference_words": 17,
+    "char_errors": 43,
+    "reference_chars": 87,
+    "wer_pct": 41.1764705882353,
+    "cer_pct": 49.42528735632184,
+    "exact_match": false,
+    "substitution": 4,
+    "deletion": 2,
+    "insertion": 1,
+    "word_alignment_errors": [
+      {
+        "type": "deletion",
+        "expected": "restá",
+        "returned": "",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "deletion",
+        "expected": "dos",
+        "returned": "",
+        "reference_index": 1,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "zero",
+        "returned": "cero",
+        "reference_index": 4,
+        "hypothesis_index": 2
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 4
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "setecientos",
+        "reference_index": 15,
+        "hypothesis_index": 13
+      },
+      {
+        "type": "substitution",
+        "expected": "750",
+        "returned": "cincuenta",
+        "reference_index": 15,
+        "hypothesis_index": 14
+      },
+      {
+        "type": "substitution",
+        "expected": "ml",
+        "returned": "mililitros",
+        "reference_index": 16,
+        "hypothesis_index": 15
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "restar_ambos",
+    "run": 2,
+    "warmup": false,
+    "duration_s": 8.448,
+    "expected_text": "Restá dos Coca Cola Zero de 2 litros y cuatro envases de detergente Magistral de 750 ml.",
+    "text": "Coca-Cola cero de dos litros y cuatro envases de detergente magistral de setecientos cincuenta mililitros",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.38089848599884135,
+    "rtf": 0.045087415482817396,
+    "ram_base_mib": 314.03515625,
+    "ram_peak_mib": 314.0390625,
+    "cpu_s": 2.7699999999999996,
+    "cpu_pct": 725.7907021987548,
+    "request_wall_s": 0.3816527260005387,
+    "word_errors": 7,
+    "reference_words": 17,
+    "char_errors": 43,
+    "reference_chars": 87,
+    "wer_pct": 41.1764705882353,
+    "cer_pct": 49.42528735632184,
+    "exact_match": false,
+    "substitution": 4,
+    "deletion": 2,
+    "insertion": 1,
+    "word_alignment_errors": [
+      {
+        "type": "deletion",
+        "expected": "restá",
+        "returned": "",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "deletion",
+        "expected": "dos",
+        "returned": "",
+        "reference_index": 1,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "zero",
+        "returned": "cero",
+        "reference_index": 4,
+        "hypothesis_index": 2
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 4
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "setecientos",
+        "reference_index": 15,
+        "hypothesis_index": 13
+      },
+      {
+        "type": "substitution",
+        "expected": "750",
+        "returned": "cincuenta",
+        "reference_index": 15,
+        "hypothesis_index": 14
+      },
+      {
+        "type": "substitution",
+        "expected": "ml",
+        "returned": "mililitros",
+        "reference_index": 16,
+        "hypothesis_index": 15
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "restar_ambos",
+    "run": 3,
+    "warmup": false,
+    "duration_s": 8.448,
+    "expected_text": "Restá dos Coca Cola Zero de 2 litros y cuatro envases de detergente Magistral de 750 ml.",
+    "text": "Coca-Cola cero de dos litros y cuatro envases de detergente magistral de setecientos cincuenta mililitros",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.4108561720004218,
+    "rtf": 0.04863354308717114,
+    "ram_base_mib": 314.0390625,
+    "ram_peak_mib": 314.0390625,
+    "cpu_s": 2.8900000000000006,
+    "cpu_pct": 702.2877546085545,
+    "request_wall_s": 0.4115122299990617,
+    "word_errors": 7,
+    "reference_words": 17,
+    "char_errors": 43,
+    "reference_chars": 87,
+    "wer_pct": 41.1764705882353,
+    "cer_pct": 49.42528735632184,
+    "exact_match": false,
+    "substitution": 4,
+    "deletion": 2,
+    "insertion": 1,
+    "word_alignment_errors": [
+      {
+        "type": "deletion",
+        "expected": "restá",
+        "returned": "",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "deletion",
+        "expected": "dos",
+        "returned": "",
+        "reference_index": 1,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "zero",
+        "returned": "cero",
+        "reference_index": 4,
+        "hypothesis_index": 2
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 4
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "setecientos",
+        "reference_index": 15,
+        "hypothesis_index": 13
+      },
+      {
+        "type": "substitution",
+        "expected": "750",
+        "returned": "cincuenta",
+        "reference_index": 15,
+        "hypothesis_index": 14
+      },
+      {
+        "type": "substitution",
+        "expected": "ml",
+        "returned": "mililitros",
+        "reference_index": 16,
+        "hypothesis_index": 15
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "corregir_cantidad",
+    "run": 1,
+    "warmup": false,
+    "duration_s": 8.064,
+    "expected_text": "Agregá tres Coca Cola comunes de 2 litros. Perdón, eran dos.",
+    "text": "Agregar tres Coca-Cola comunes de dos litros, perdón, eran dos",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.37778238499959116,
+    "rtf": 0.04684801401284613,
+    "ram_base_mib": 314.0390625,
+    "ram_peak_mib": 314.0390625,
+    "cpu_s": 2.789999999999999,
+    "cpu_pct": 737.1730229422311,
+    "request_wall_s": 0.3784728840000753,
+    "word_errors": 2,
+    "reference_words": 11,
+    "char_errors": 5,
+    "reference_chars": 57,
+    "wer_pct": 18.181818181818183,
+    "cer_pct": 8.771929824561404,
+    "exact_match": false,
+    "substitution": 2,
+    "deletion": 0,
+    "insertion": 0,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agregar",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 6
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "corregir_cantidad",
+    "run": 2,
+    "warmup": false,
+    "duration_s": 8.064,
+    "expected_text": "Agregá tres Coca Cola comunes de 2 litros. Perdón, eran dos.",
+    "text": "Agregar tres Coca-Cola comunes de dos litros, perdón, eran dos",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.38797992700165196,
+    "rtf": 0.0481125901539747,
+    "ram_base_mib": 314.0390625,
+    "ram_peak_mib": 314.0390625,
+    "cpu_s": 2.799999999999997,
+    "cpu_pct": 720.4683639262695,
+    "request_wall_s": 0.38863607900020725,
+    "word_errors": 2,
+    "reference_words": 11,
+    "char_errors": 5,
+    "reference_chars": 57,
+    "wer_pct": 18.181818181818183,
+    "cer_pct": 8.771929824561404,
+    "exact_match": false,
+    "substitution": 2,
+    "deletion": 0,
+    "insertion": 0,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agregar",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 6
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "corregir_cantidad",
+    "run": 3,
+    "warmup": false,
+    "duration_s": 8.064,
+    "expected_text": "Agregá tres Coca Cola comunes de 2 litros. Perdón, eran dos.",
+    "text": "Agregar tres Coca-Cola comunes de dos litros, perdón, eran dos",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.37825227599932987,
+    "rtf": 0.046906284226107375,
+    "ram_base_mib": 314.0390625,
+    "ram_peak_mib": 314.0390625,
+    "cpu_s": 2.780000000000001,
+    "cpu_pct": 733.6917169270522,
+    "request_wall_s": 0.3789057360008883,
+    "word_errors": 2,
+    "reference_words": 11,
+    "char_errors": 5,
+    "reference_chars": 57,
+    "wer_pct": 18.181818181818183,
+    "cer_pct": 8.771929824561404,
+    "exact_match": false,
+    "substitution": 2,
+    "deletion": 0,
+    "insertion": 0,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agregar",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 6
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "negar_agregacion",
+    "run": 1,
+    "warmup": false,
+    "duration_s": 9.664,
+    "expected_text": "Agregá cinco botellas de agua Villavicencio de 1,5 litros. Perdón, esas no llegaron; no las cargues.",
+    "text": "Agrega cinco botellas de agua visuavicencio de uno coma cinco litros. Perdón, esas no llegaron, no las car",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.46297830199910095,
+    "rtf": 0.04790752297176128,
+    "ram_base_mib": 314.0390625,
+    "ram_peak_mib": 314.0390625,
+    "cpu_s": 3.0600000000000023,
+    "cpu_pct": 659.9156974524052,
+    "request_wall_s": 0.4636955919995671,
+    "word_errors": 6,
+    "reference_words": 17,
+    "char_errors": 20,
+    "reference_chars": 96,
+    "wer_pct": 35.294117647058826,
+    "cer_pct": 20.833333333333332,
+    "exact_match": false,
+    "substitution": 5,
+    "deletion": 0,
+    "insertion": 1,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "villavicencio",
+        "returned": "visuavicencio",
+        "reference_index": 5,
+        "hypothesis_index": 5
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 7,
+        "hypothesis_index": 7
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "coma",
+        "reference_index": 7,
+        "hypothesis_index": 8
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 8,
+        "hypothesis_index": 9
+      },
+      {
+        "type": "substitution",
+        "expected": "cargues",
+        "returned": "car",
+        "reference_index": 16,
+        "hypothesis_index": 17
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "negar_agregacion",
+    "run": 2,
+    "warmup": false,
+    "duration_s": 9.664,
+    "expected_text": "Agregá cinco botellas de agua Villavicencio de 1,5 litros. Perdón, esas no llegaron; no las cargues.",
+    "text": "Agrega cinco botellas de agua visuavicencio de uno coma cinco litros. Perdón, esas no llegaron, no las car",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.46769022199987376,
+    "rtf": 0.0483950974751525,
+    "ram_base_mib": 314.0390625,
+    "ram_peak_mib": 314.0390625,
+    "cpu_s": 3.3200000000000003,
+    "cpu_pct": 708.7019570772837,
+    "request_wall_s": 0.46846209000068484,
+    "word_errors": 6,
+    "reference_words": 17,
+    "char_errors": 20,
+    "reference_chars": 96,
+    "wer_pct": 35.294117647058826,
+    "cer_pct": 20.833333333333332,
+    "exact_match": false,
+    "substitution": 5,
+    "deletion": 0,
+    "insertion": 1,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "villavicencio",
+        "returned": "visuavicencio",
+        "reference_index": 5,
+        "hypothesis_index": 5
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 7,
+        "hypothesis_index": 7
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "coma",
+        "reference_index": 7,
+        "hypothesis_index": 8
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 8,
+        "hypothesis_index": 9
+      },
+      {
+        "type": "substitution",
+        "expected": "cargues",
+        "returned": "car",
+        "reference_index": 16,
+        "hypothesis_index": 17
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "negar_agregacion",
+    "run": 3,
+    "warmup": false,
+    "duration_s": 9.664,
+    "expected_text": "Agregá cinco botellas de agua Villavicencio de 1,5 litros. Perdón, esas no llegaron; no las cargues.",
+    "text": "Agrega cinco botellas de agua visuavicencio de uno coma cinco litros. Perdón, esas no llegaron, no las car",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.4556125590006559,
+    "rtf": 0.04714533930056456,
+    "ram_base_mib": 314.0390625,
+    "ram_peak_mib": 314.0390625,
+    "cpu_s": 3.3100000000000023,
+    "cpu_pct": 725.4654658743101,
+    "request_wall_s": 0.45625879600083863,
+    "word_errors": 6,
+    "reference_words": 17,
+    "char_errors": 20,
+    "reference_chars": 96,
+    "wer_pct": 35.294117647058826,
+    "cer_pct": 20.833333333333332,
+    "exact_match": false,
+    "substitution": 5,
+    "deletion": 0,
+    "insertion": 1,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "villavicencio",
+        "returned": "visuavicencio",
+        "reference_index": 5,
+        "hypothesis_index": 5
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 7,
+        "hypothesis_index": 7
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "coma",
+        "reference_index": 7,
+        "hypothesis_index": 8
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 8,
+        "hypothesis_index": 9
+      },
+      {
+        "type": "substitution",
+        "expected": "cargues",
+        "returned": "car",
+        "reference_index": 16,
+        "hypothesis_index": 17
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "negar_restacion",
+    "run": 1,
+    "warmup": false,
+    "duration_s": 11.072,
+    "expected_text": "Restá cuatro envases de detergente Magistral de 750 ml. Perdón, no se vendieron; no los restes.",
+    "text": "Pero está cuatro envases de detergentes magistral de setecientos cincuenta mililitros. Perdón, no se vendieron, no los restes",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.5162318969996704,
+    "rtf": 0.046624990697224575,
+    "ram_base_mib": 314.0390625,
+    "ram_peak_mib": 314.0390625,
+    "cpu_s": 3.720000000000013,
+    "cpu_pct": 719.6387028356187,
+    "request_wall_s": 0.5169260610000492,
+    "word_errors": 6,
+    "reference_words": 16,
+    "char_errors": 34,
+    "reference_chars": 91,
+    "wer_pct": 37.5,
+    "cer_pct": 37.362637362637365,
+    "exact_match": false,
+    "substitution": 4,
+    "deletion": 0,
+    "insertion": 2,
+    "word_alignment_errors": [
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "pero",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "está",
+        "reference_index": 0,
+        "hypothesis_index": 1
+      },
+      {
+        "type": "substitution",
+        "expected": "detergente",
+        "returned": "detergentes",
+        "reference_index": 4,
+        "hypothesis_index": 5
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "setecientos",
+        "reference_index": 7,
+        "hypothesis_index": 8
+      },
+      {
+        "type": "substitution",
+        "expected": "750",
+        "returned": "cincuenta",
+        "reference_index": 7,
+        "hypothesis_index": 9
+      },
+      {
+        "type": "substitution",
+        "expected": "ml",
+        "returned": "mililitros",
+        "reference_index": 8,
+        "hypothesis_index": 10
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "negar_restacion",
+    "run": 2,
+    "warmup": false,
+    "duration_s": 11.072,
+    "expected_text": "Restá cuatro envases de detergente Magistral de 750 ml. Perdón, no se vendieron; no los restes.",
+    "text": "Pero está cuatro envases de detergentes magistral de setecientos cincuenta mililitros. Perdón, no se vendieron, no los restes",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.5235156660000939,
+    "rtf": 0.047282845556366866,
+    "ram_base_mib": 314.0390625,
+    "ram_peak_mib": 314.0390625,
+    "cpu_s": 3.700000000000003,
+    "cpu_pct": 705.8434505315125,
+    "request_wall_s": 0.5241955559995404,
+    "word_errors": 6,
+    "reference_words": 16,
+    "char_errors": 34,
+    "reference_chars": 91,
+    "wer_pct": 37.5,
+    "cer_pct": 37.362637362637365,
+    "exact_match": false,
+    "substitution": 4,
+    "deletion": 0,
+    "insertion": 2,
+    "word_alignment_errors": [
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "pero",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "está",
+        "reference_index": 0,
+        "hypothesis_index": 1
+      },
+      {
+        "type": "substitution",
+        "expected": "detergente",
+        "returned": "detergentes",
+        "reference_index": 4,
+        "hypothesis_index": 5
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "setecientos",
+        "reference_index": 7,
+        "hypothesis_index": 8
+      },
+      {
+        "type": "substitution",
+        "expected": "750",
+        "returned": "cincuenta",
+        "reference_index": 7,
+        "hypothesis_index": 9
+      },
+      {
+        "type": "substitution",
+        "expected": "ml",
+        "returned": "mililitros",
+        "reference_index": 8,
+        "hypothesis_index": 10
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "negar_restacion",
+    "run": 3,
+    "warmup": false,
+    "duration_s": 11.072,
+    "expected_text": "Restá cuatro envases de detergente Magistral de 750 ml. Perdón, no se vendieron; no los restes.",
+    "text": "Pero está cuatro envases de detergentes magistral de setecientos cincuenta mililitros. Perdón, no se vendieron, no los restes",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.5406570860013744,
+    "rtf": 0.04883102294087558,
+    "ram_base_mib": 314.0390625,
+    "ram_peak_mib": 314.0390625,
+    "cpu_s": 3.8100000000000023,
+    "cpu_pct": 703.6931599359864,
+    "request_wall_s": 0.5414291649994993,
+    "word_errors": 6,
+    "reference_words": 16,
+    "char_errors": 34,
+    "reference_chars": 91,
+    "wer_pct": 37.5,
+    "cer_pct": 37.362637362637365,
+    "exact_match": false,
+    "substitution": 4,
+    "deletion": 0,
+    "insertion": 2,
+    "word_alignment_errors": [
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "pero",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "está",
+        "reference_index": 0,
+        "hypothesis_index": 1
+      },
+      {
+        "type": "substitution",
+        "expected": "detergente",
+        "returned": "detergentes",
+        "reference_index": 4,
+        "hypothesis_index": 5
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "setecientos",
+        "reference_index": 7,
+        "hypothesis_index": 8
+      },
+      {
+        "type": "substitution",
+        "expected": "750",
+        "returned": "cincuenta",
+        "reference_index": 7,
+        "hypothesis_index": 9
+      },
+      {
+        "type": "substitution",
+        "expected": "ml",
+        "returned": "mililitros",
+        "reference_index": 8,
+        "hypothesis_index": 10
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "negar_varias_agregaciones",
+    "run": 1,
+    "warmup": false,
+    "duration_s": 20.032,
+    "expected_text": "Agregá tres Coca Cola comunes de 2 litros, cuatro Sprite comunes de 1,5 litros y cinco paquetes de arroz Gallo de 1 kg. Me equivoque las Coca Cola comunes de 2 litros y las Sprite comunes de 1,5 no las cargues.",
+    "text": "Agrega tres Coca-Cola común es de dos litros, cuatro sprays comunes de uno comas cinco litros y cinco paquetes de arroz gallo de un kilo. Me equivoqué, las Coca-Colas comunes de dos litros y las spray comunes, de uno coma cinco, no las cargues",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.9820099030002893,
+    "rtf": 0.04902205985424767,
+    "ram_base_mib": 316.48828125,
+    "ram_peak_mib": 316.48828125,
+    "cpu_s": 6.890000000000001,
+    "cpu_pct": 700.6788990724964,
+    "request_wall_s": 0.9833320240013563,
+    "word_errors": 17,
+    "reference_words": 43,
+    "char_errors": 49,
+    "reference_chars": 207,
+    "wer_pct": 39.53488372093023,
+    "cer_pct": 23.67149758454106,
+    "exact_match": false,
+    "substitution": 14,
+    "deletion": 0,
+    "insertion": 3,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "común",
+        "reference_index": 4,
+        "hypothesis_index": 4
+      },
+      {
+        "type": "substitution",
+        "expected": "comunes",
+        "returned": "es",
+        "reference_index": 4,
+        "hypothesis_index": 5
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 7
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "sprays",
+        "reference_index": 9,
+        "hypothesis_index": 10
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 12,
+        "hypothesis_index": 13
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "comas",
+        "reference_index": 12,
+        "hypothesis_index": 14
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 13,
+        "hypothesis_index": 15
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 22,
+        "hypothesis_index": 24
+      },
+      {
+        "type": "substitution",
+        "expected": "kg",
+        "returned": "kilo",
+        "reference_index": 23,
+        "hypothesis_index": 25
+      },
+      {
+        "type": "substitution",
+        "expected": "equivoque",
+        "returned": "equivoqué",
+        "reference_index": 25,
+        "hypothesis_index": 27
+      },
+      {
+        "type": "substitution",
+        "expected": "cola",
+        "returned": "colas",
+        "reference_index": 28,
+        "hypothesis_index": 30
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 31,
+        "hypothesis_index": 33
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "spray",
+        "reference_index": 35,
+        "hypothesis_index": 37
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 38,
+        "hypothesis_index": 40
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "coma",
+        "reference_index": 38,
+        "hypothesis_index": 41
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 39,
+        "hypothesis_index": 42
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "negar_varias_agregaciones",
+    "run": 2,
+    "warmup": false,
+    "duration_s": 20.032,
+    "expected_text": "Agregá tres Coca Cola comunes de 2 litros, cuatro Sprite comunes de 1,5 litros y cinco paquetes de arroz Gallo de 1 kg. Me equivoque las Coca Cola comunes de 2 litros y las Sprite comunes de 1,5 no las cargues.",
+    "text": "Agrega tres Coca-Cola común es de dos litros, cuatro sprays comunes de uno comas cinco litros y cinco paquetes de arroz gallo de un kilo. Me equivoqué, las Coca-Colas comunes de dos litros y las spray comunes, de uno coma cinco, no las cargues",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.9383478220006509,
+    "rtf": 0.04684244319092706,
+    "ram_base_mib": 316.48828125,
+    "ram_peak_mib": 316.48828125,
+    "cpu_s": 6.799999999999997,
+    "cpu_pct": 723.9573703026846,
+    "request_wall_s": 0.9392818249998527,
+    "word_errors": 17,
+    "reference_words": 43,
+    "char_errors": 49,
+    "reference_chars": 207,
+    "wer_pct": 39.53488372093023,
+    "cer_pct": 23.67149758454106,
+    "exact_match": false,
+    "substitution": 14,
+    "deletion": 0,
+    "insertion": 3,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "común",
+        "reference_index": 4,
+        "hypothesis_index": 4
+      },
+      {
+        "type": "substitution",
+        "expected": "comunes",
+        "returned": "es",
+        "reference_index": 4,
+        "hypothesis_index": 5
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 7
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "sprays",
+        "reference_index": 9,
+        "hypothesis_index": 10
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 12,
+        "hypothesis_index": 13
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "comas",
+        "reference_index": 12,
+        "hypothesis_index": 14
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 13,
+        "hypothesis_index": 15
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 22,
+        "hypothesis_index": 24
+      },
+      {
+        "type": "substitution",
+        "expected": "kg",
+        "returned": "kilo",
+        "reference_index": 23,
+        "hypothesis_index": 25
+      },
+      {
+        "type": "substitution",
+        "expected": "equivoque",
+        "returned": "equivoqué",
+        "reference_index": 25,
+        "hypothesis_index": 27
+      },
+      {
+        "type": "substitution",
+        "expected": "cola",
+        "returned": "colas",
+        "reference_index": 28,
+        "hypothesis_index": 30
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 31,
+        "hypothesis_index": 33
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "spray",
+        "reference_index": 35,
+        "hypothesis_index": 37
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 38,
+        "hypothesis_index": 40
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "coma",
+        "reference_index": 38,
+        "hypothesis_index": 41
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 39,
+        "hypothesis_index": 42
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "negar_varias_agregaciones",
+    "run": 3,
+    "warmup": false,
+    "duration_s": 20.032,
+    "expected_text": "Agregá tres Coca Cola comunes de 2 litros, cuatro Sprite comunes de 1,5 litros y cinco paquetes de arroz Gallo de 1 kg. Me equivoque las Coca Cola comunes de 2 litros y las Sprite comunes de 1,5 no las cargues.",
+    "text": "Agrega tres Coca-Cola común es de dos litros, cuatro sprays comunes de uno comas cinco litros y cinco paquetes de arroz gallo de un kilo. Me equivoqué, las Coca-Colas comunes de dos litros y las spray comunes, de uno coma cinco, no las cargues",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.9936814829998184,
+    "rtf": 0.04960470661939988,
+    "ram_base_mib": 316.48828125,
+    "ram_peak_mib": 316.48828125,
+    "cpu_s": 6.900000000000006,
+    "cpu_pct": 693.7820752801014,
+    "request_wall_s": 0.9945486119995621,
+    "word_errors": 17,
+    "reference_words": 43,
+    "char_errors": 49,
+    "reference_chars": 207,
+    "wer_pct": 39.53488372093023,
+    "cer_pct": 23.67149758454106,
+    "exact_match": false,
+    "substitution": 14,
+    "deletion": 0,
+    "insertion": 3,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "común",
+        "reference_index": 4,
+        "hypothesis_index": 4
+      },
+      {
+        "type": "substitution",
+        "expected": "comunes",
+        "returned": "es",
+        "reference_index": 4,
+        "hypothesis_index": 5
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 7
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "sprays",
+        "reference_index": 9,
+        "hypothesis_index": 10
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 12,
+        "hypothesis_index": 13
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "comas",
+        "reference_index": 12,
+        "hypothesis_index": 14
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 13,
+        "hypothesis_index": 15
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 22,
+        "hypothesis_index": 24
+      },
+      {
+        "type": "substitution",
+        "expected": "kg",
+        "returned": "kilo",
+        "reference_index": 23,
+        "hypothesis_index": 25
+      },
+      {
+        "type": "substitution",
+        "expected": "equivoque",
+        "returned": "equivoqué",
+        "reference_index": 25,
+        "hypothesis_index": 27
+      },
+      {
+        "type": "substitution",
+        "expected": "cola",
+        "returned": "colas",
+        "reference_index": 28,
+        "hypothesis_index": 30
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 31,
+        "hypothesis_index": 33
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "spray",
+        "reference_index": 35,
+        "hypothesis_index": 37
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 38,
+        "hypothesis_index": 40
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "coma",
+        "reference_index": 38,
+        "hypothesis_index": 41
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 39,
+        "hypothesis_index": 42
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "negar_varias_restaciones",
+    "run": 1,
+    "warmup": false,
+    "duration_s": 16.576,
+    "expected_text": "Restá dos Coca Cola Zero de 2 litros, tres paquetes de arroz Gallo de 1 kg y cuatro envases de detergente Magistral de 750 ml. Las Coca Zero y el arroz no se vendieron; no los restes.",
+    "text": "Presta dos Coca-Cola cero de dos litros, tres paquetes de rosgallo de un kilo y cuatro envases de detergente magistral de setecientos cincuenta mililitros. Las cocas cero y el arroz no se vendieron, no los restes.",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.9213433879995137,
+    "rtf": 0.05558297466213282,
+    "ram_base_mib": 316.48828125,
+    "ram_peak_mib": 316.48828125,
+    "cpu_s": 6.450000000000003,
+    "cpu_pct": 699.475608017673,
+    "request_wall_s": 0.92211935999876,
+    "word_errors": 12,
+    "reference_words": 37,
+    "char_errors": 46,
+    "reference_chars": 179,
+    "wer_pct": 32.432432432432435,
+    "cer_pct": 25.69832402234637,
+    "exact_match": false,
+    "substitution": 10,
+    "deletion": 1,
+    "insertion": 1,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "presta",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "zero",
+        "returned": "cero",
+        "reference_index": 4,
+        "hypothesis_index": 4
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 6
+      },
+      {
+        "type": "deletion",
+        "expected": "arroz",
+        "returned": "",
+        "reference_index": 11,
+        "hypothesis_index": 11
+      },
+      {
+        "type": "substitution",
+        "expected": "gallo",
+        "returned": "rosgallo",
+        "reference_index": 12,
+        "hypothesis_index": 11
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 14,
+        "hypothesis_index": 13
+      },
+      {
+        "type": "substitution",
+        "expected": "kg",
+        "returned": "kilo",
+        "reference_index": 15,
+        "hypothesis_index": 14
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "setecientos",
+        "reference_index": 23,
+        "hypothesis_index": 22
+      },
+      {
+        "type": "substitution",
+        "expected": "750",
+        "returned": "cincuenta",
+        "reference_index": 23,
+        "hypothesis_index": 23
+      },
+      {
+        "type": "substitution",
+        "expected": "ml",
+        "returned": "mililitros",
+        "reference_index": 24,
+        "hypothesis_index": 24
+      },
+      {
+        "type": "substitution",
+        "expected": "coca",
+        "returned": "cocas",
+        "reference_index": 26,
+        "hypothesis_index": 26
+      },
+      {
+        "type": "substitution",
+        "expected": "zero",
+        "returned": "cero",
+        "reference_index": 27,
+        "hypothesis_index": 27
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "negar_varias_restaciones",
+    "run": 2,
+    "warmup": false,
+    "duration_s": 16.576,
+    "expected_text": "Restá dos Coca Cola Zero de 2 litros, tres paquetes de arroz Gallo de 1 kg y cuatro envases de detergente Magistral de 750 ml. Las Coca Zero y el arroz no se vendieron; no los restes.",
+    "text": "Presta dos Coca-Cola cero de dos litros, tres paquetes de rosgallo de un kilo y cuatro envases de detergente magistral de setecientos cincuenta mililitros. Las cocas cero y el arroz no se vendieron, no los restes.",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.8175007390000246,
+    "rtf": 0.049318336088321944,
+    "ram_base_mib": 316.48828125,
+    "ram_peak_mib": 316.4921875,
+    "cpu_s": 5.930000000000007,
+    "cpu_pct": 724.7065935526542,
+    "request_wall_s": 0.8182621840005595,
+    "word_errors": 12,
+    "reference_words": 37,
+    "char_errors": 46,
+    "reference_chars": 179,
+    "wer_pct": 32.432432432432435,
+    "cer_pct": 25.69832402234637,
+    "exact_match": false,
+    "substitution": 10,
+    "deletion": 1,
+    "insertion": 1,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "presta",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "zero",
+        "returned": "cero",
+        "reference_index": 4,
+        "hypothesis_index": 4
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 6
+      },
+      {
+        "type": "deletion",
+        "expected": "arroz",
+        "returned": "",
+        "reference_index": 11,
+        "hypothesis_index": 11
+      },
+      {
+        "type": "substitution",
+        "expected": "gallo",
+        "returned": "rosgallo",
+        "reference_index": 12,
+        "hypothesis_index": 11
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 14,
+        "hypothesis_index": 13
+      },
+      {
+        "type": "substitution",
+        "expected": "kg",
+        "returned": "kilo",
+        "reference_index": 15,
+        "hypothesis_index": 14
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "setecientos",
+        "reference_index": 23,
+        "hypothesis_index": 22
+      },
+      {
+        "type": "substitution",
+        "expected": "750",
+        "returned": "cincuenta",
+        "reference_index": 23,
+        "hypothesis_index": 23
+      },
+      {
+        "type": "substitution",
+        "expected": "ml",
+        "returned": "mililitros",
+        "reference_index": 24,
+        "hypothesis_index": 24
+      },
+      {
+        "type": "substitution",
+        "expected": "coca",
+        "returned": "cocas",
+        "reference_index": 26,
+        "hypothesis_index": 26
+      },
+      {
+        "type": "substitution",
+        "expected": "zero",
+        "returned": "cero",
+        "reference_index": 27,
+        "hypothesis_index": 27
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "negar_varias_restaciones",
+    "run": 3,
+    "warmup": false,
+    "duration_s": 16.576,
+    "expected_text": "Restá dos Coca Cola Zero de 2 litros, tres paquetes de arroz Gallo de 1 kg y cuatro envases de detergente Magistral de 750 ml. Las Coca Zero y el arroz no se vendieron; no los restes.",
+    "text": "Presta dos Coca-Cola cero de dos litros, tres paquetes de rosgallo de un kilo y cuatro envases de detergente magistral de setecientos cincuenta mililitros. Las cocas cero y el arroz no se vendieron, no los restes.",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.8002570640001068,
+    "rtf": 0.048278056467187906,
+    "ram_base_mib": 316.4921875,
+    "ram_peak_mib": 316.4921875,
+    "cpu_s": 5.799999999999983,
+    "cpu_pct": 723.9845184988601,
+    "request_wall_s": 0.8011221030010347,
+    "word_errors": 12,
+    "reference_words": 37,
+    "char_errors": 46,
+    "reference_chars": 179,
+    "wer_pct": 32.432432432432435,
+    "cer_pct": 25.69832402234637,
+    "exact_match": false,
+    "substitution": 10,
+    "deletion": 1,
+    "insertion": 1,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "presta",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "zero",
+        "returned": "cero",
+        "reference_index": 4,
+        "hypothesis_index": 4
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 6
+      },
+      {
+        "type": "deletion",
+        "expected": "arroz",
+        "returned": "",
+        "reference_index": 11,
+        "hypothesis_index": 11
+      },
+      {
+        "type": "substitution",
+        "expected": "gallo",
+        "returned": "rosgallo",
+        "reference_index": 12,
+        "hypothesis_index": 11
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 14,
+        "hypothesis_index": 13
+      },
+      {
+        "type": "substitution",
+        "expected": "kg",
+        "returned": "kilo",
+        "reference_index": 15,
+        "hypothesis_index": 14
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "setecientos",
+        "reference_index": 23,
+        "hypothesis_index": 22
+      },
+      {
+        "type": "substitution",
+        "expected": "750",
+        "returned": "cincuenta",
+        "reference_index": 23,
+        "hypothesis_index": 23
+      },
+      {
+        "type": "substitution",
+        "expected": "ml",
+        "returned": "mililitros",
+        "reference_index": 24,
+        "hypothesis_index": 24
+      },
+      {
+        "type": "substitution",
+        "expected": "coca",
+        "returned": "cocas",
+        "reference_index": 26,
+        "hypothesis_index": 26
+      },
+      {
+        "type": "substitution",
+        "expected": "zero",
+        "returned": "cero",
+        "reference_index": 27,
+        "hypothesis_index": 27
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "negar_agregacion_y_restacion",
+    "run": 1,
+    "warmup": false,
+    "duration_s": 13.888,
+    "expected_text": "Agregá cuatro Sprite comunes de 2 litros y restá dos paquetes de arroz Gallo de 1 kg. Perdón, las Sprite no llegaron y el arroz no se vendió; no hagas ninguna de esas dos operaciones.",
+    "text": "Agrega cuatro spys comunes de dos litros y resta dos paquetes de arroz gallo de un kilo. Perdón, las spike no llegaron y el arroz no se vendió. Novas ninguna de esas dos operaciones",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.6854106089995184,
+    "rtf": 0.049352722422200346,
+    "ram_base_mib": 316.4921875,
+    "ram_peak_mib": 316.4921875,
+    "cpu_s": 4.840000000000003,
+    "cpu_pct": 705.3131751537197,
+    "request_wall_s": 0.68621998999879,
+    "word_errors": 9,
+    "reference_words": 35,
+    "char_errors": 20,
+    "reference_chars": 179,
+    "wer_pct": 25.714285714285715,
+    "cer_pct": 11.1731843575419,
+    "exact_match": false,
+    "substitution": 8,
+    "deletion": 1,
+    "insertion": 0,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "spys",
+        "reference_index": 2,
+        "hypothesis_index": 2
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 5,
+        "hypothesis_index": 5
+      },
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "resta",
+        "reference_index": 8,
+        "hypothesis_index": 8
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 15,
+        "hypothesis_index": 15
+      },
+      {
+        "type": "substitution",
+        "expected": "kg",
+        "returned": "kilo",
+        "reference_index": 16,
+        "hypothesis_index": 16
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "spike",
+        "reference_index": 19,
+        "hypothesis_index": 19
+      },
+      {
+        "type": "deletion",
+        "expected": "no",
+        "returned": "",
+        "reference_index": 28,
+        "hypothesis_index": 28
+      },
+      {
+        "type": "substitution",
+        "expected": "hagas",
+        "returned": "novas",
+        "reference_index": 29,
+        "hypothesis_index": 28
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "negar_agregacion_y_restacion",
+    "run": 2,
+    "warmup": false,
+    "duration_s": 13.888,
+    "expected_text": "Agregá cuatro Sprite comunes de 2 litros y restá dos paquetes de arroz Gallo de 1 kg. Perdón, las Sprite no llegaron y el arroz no se vendió; no hagas ninguna de esas dos operaciones.",
+    "text": "Agrega cuatro spys comunes de dos litros y resta dos paquetes de arroz gallo de un kilo. Perdón, las spike no llegaron y el arroz no se vendió. Novas ninguna de esas dos operaciones",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.6694520420005574,
+    "rtf": 0.04820363205649175,
+    "ram_base_mib": 316.4921875,
+    "ram_peak_mib": 316.4921875,
+    "cpu_s": 4.699999999999989,
+    "cpu_pct": 701.2951781967006,
+    "request_wall_s": 0.6701885519996722,
+    "word_errors": 9,
+    "reference_words": 35,
+    "char_errors": 20,
+    "reference_chars": 179,
+    "wer_pct": 25.714285714285715,
+    "cer_pct": 11.1731843575419,
+    "exact_match": false,
+    "substitution": 8,
+    "deletion": 1,
+    "insertion": 0,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "spys",
+        "reference_index": 2,
+        "hypothesis_index": 2
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 5,
+        "hypothesis_index": 5
+      },
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "resta",
+        "reference_index": 8,
+        "hypothesis_index": 8
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 15,
+        "hypothesis_index": 15
+      },
+      {
+        "type": "substitution",
+        "expected": "kg",
+        "returned": "kilo",
+        "reference_index": 16,
+        "hypothesis_index": 16
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "spike",
+        "reference_index": 19,
+        "hypothesis_index": 19
+      },
+      {
+        "type": "deletion",
+        "expected": "no",
+        "returned": "",
+        "reference_index": 28,
+        "hypothesis_index": 28
+      },
+      {
+        "type": "substitution",
+        "expected": "hagas",
+        "returned": "novas",
+        "reference_index": 29,
+        "hypothesis_index": 28
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "negar_agregacion_y_restacion",
+    "run": 3,
+    "warmup": false,
+    "duration_s": 13.888,
+    "expected_text": "Agregá cuatro Sprite comunes de 2 litros y restá dos paquetes de arroz Gallo de 1 kg. Perdón, las Sprite no llegaron y el arroz no se vendió; no hagas ninguna de esas dos operaciones.",
+    "text": "Agrega cuatro spys comunes de dos litros y resta dos paquetes de arroz gallo de un kilo. Perdón, las spike no llegaron y el arroz no se vendió. Novas ninguna de esas dos operaciones",
+    "status": "ok",
+    "error": null,
+    "inference_s": 0.6439088620008988,
+    "rtf": 0.046364405386009416,
+    "ram_base_mib": 316.4921875,
+    "ram_peak_mib": 316.4921875,
+    "cpu_s": 4.430000000000007,
+    "cpu_pct": 687.1057815892141,
+    "request_wall_s": 0.6447333319993049,
+    "word_errors": 9,
+    "reference_words": 35,
+    "char_errors": 20,
+    "reference_chars": 179,
+    "wer_pct": 25.714285714285715,
+    "cer_pct": 11.1731843575419,
+    "exact_match": false,
+    "substitution": 8,
+    "deletion": 1,
+    "insertion": 0,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "spys",
+        "reference_index": 2,
+        "hypothesis_index": 2
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 5,
+        "hypothesis_index": 5
+      },
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "resta",
+        "reference_index": 8,
+        "hypothesis_index": 8
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 15,
+        "hypothesis_index": 15
+      },
+      {
+        "type": "substitution",
+        "expected": "kg",
+        "returned": "kilo",
+        "reference_index": 16,
+        "hypothesis_index": 16
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "spike",
+        "reference_index": 19,
+        "hypothesis_index": 19
+      },
+      {
+        "type": "deletion",
+        "expected": "no",
+        "returned": "",
+        "reference_index": 28,
+        "hypothesis_index": 28
+      },
+      {
+        "type": "substitution",
+        "expected": "hagas",
+        "returned": "novas",
+        "reference_index": 29,
+        "hypothesis_index": 28
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "caso_integral",
+    "run": 1,
+    "warmup": false,
+    "duration_s": 51.264,
+    "expected_text": "Agregá tres Coca Cola comunes de 2 litros; perdón, eran dos. Agregá cuatro Sprite comunes de 1,5 litros y cinco botellas de agua Villavicencio de 1,5 litros; perdón, no llegó ninguno de esos dos productos, así que no los cargues. Restá dos paquetes de arroz Gallo de 1 kg y tres paquetes de fideos Matarazzo de 500 g. Restá cuatro Coca Cola Zero de 2 litros y cinco envases de detergente Magistral de 750 ml; perdón, ni las Coca Zero ni los detergentes se vendieron. No restes ninguno de esos dos productos. Agregá seis envases de leche La Serenísima de 1 litro y restá dos Sprite comunes de 2 litros. Perdón, la leche no llegó y esas Sprite no se vendieron; no cargues la leche ni restes esas Sprite.",
+    "text": "Agrega tres Coca-Cola comunes de dos litros, perdón, eran dos. Agrega cuatro sprays comunes de uno coma cinco litros y cinco botellas de agua villavicencio de uno comas cinco litros. Perdón, no llegó ninguno de esos dos productos, así que no los cargués. Resta dos paquetes de arroz gallo de un kilo y tres paquetes de fideos matarazos de quinientos gramos. Resta cuatro Coca-Cola, cero de dos litros y cinco envases de detergente magistral de setecientos cincuenta mililitros. Perdón, ni las coca ceros ni los detergentes se vendieron, no restes ninguno de esos dos productos. Agrega seis envases de leche la serenísima, de un litro y resta dos spray comunes de dos litros. Perdón, la leche no llegó y esas sprays no se vendieron. No cargues la leche ni restes esas sprays.",
+    "status": "ok",
+    "error": null,
+    "inference_s": 2.53190204800012,
+    "rtf": 0.049389475031213326,
+    "ram_base_mib": 323.43359375,
+    "ram_peak_mib": 323.43359375,
+    "cpu_s": 18.22,
+    "cpu_pct": 719.2573429655646,
+    "request_wall_s": 2.533168437999848,
+    "word_errors": 31,
+    "reference_words": 131,
+    "char_errors": 111,
+    "reference_chars": 685,
+    "wer_pct": 23.66412213740458,
+    "cer_pct": 16.204379562043794,
+    "exact_match": false,
+    "substitution": 28,
+    "deletion": 0,
+    "insertion": 3,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 6
+      },
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 11,
+        "hypothesis_index": 11
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "sprays",
+        "reference_index": 13,
+        "hypothesis_index": 13
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 16,
+        "hypothesis_index": 16
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "coma",
+        "reference_index": 16,
+        "hypothesis_index": 17
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 17,
+        "hypothesis_index": 18
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 26,
+        "hypothesis_index": 27
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "comas",
+        "reference_index": 26,
+        "hypothesis_index": 28
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 27,
+        "hypothesis_index": 29
+      },
+      {
+        "type": "substitution",
+        "expected": "cargues",
+        "returned": "cargués",
+        "reference_index": 41,
+        "hypothesis_index": 43
+      },
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "resta",
+        "reference_index": 42,
+        "hypothesis_index": 44
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 49,
+        "hypothesis_index": 51
+      },
+      {
+        "type": "substitution",
+        "expected": "kg",
+        "returned": "kilo",
+        "reference_index": 50,
+        "hypothesis_index": 52
+      },
+      {
+        "type": "substitution",
+        "expected": "matarazzo",
+        "returned": "matarazos",
+        "reference_index": 56,
+        "hypothesis_index": 58
+      },
+      {
+        "type": "substitution",
+        "expected": "500",
+        "returned": "quinientos",
+        "reference_index": 58,
+        "hypothesis_index": 60
+      },
+      {
+        "type": "substitution",
+        "expected": "g",
+        "returned": "gramos",
+        "reference_index": 59,
+        "hypothesis_index": 61
+      },
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "resta",
+        "reference_index": 60,
+        "hypothesis_index": 62
+      },
+      {
+        "type": "substitution",
+        "expected": "zero",
+        "returned": "cero",
+        "reference_index": 64,
+        "hypothesis_index": 66
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 66,
+        "hypothesis_index": 68
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "setecientos",
+        "reference_index": 75,
+        "hypothesis_index": 77
+      },
+      {
+        "type": "substitution",
+        "expected": "750",
+        "returned": "cincuenta",
+        "reference_index": 75,
+        "hypothesis_index": 78
+      },
+      {
+        "type": "substitution",
+        "expected": "ml",
+        "returned": "mililitros",
+        "reference_index": 76,
+        "hypothesis_index": 79
+      },
+      {
+        "type": "substitution",
+        "expected": "zero",
+        "returned": "ceros",
+        "reference_index": 81,
+        "hypothesis_index": 84
+      },
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 94,
+        "hypothesis_index": 97
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 102,
+        "hypothesis_index": 105
+      },
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "resta",
+        "reference_index": 105,
+        "hypothesis_index": 108
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "spray",
+        "reference_index": 107,
+        "hypothesis_index": 110
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 110,
+        "hypothesis_index": 113
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "sprays",
+        "reference_index": 119,
+        "hypothesis_index": 122
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "sprays",
+        "reference_index": 130,
+        "hypothesis_index": 133
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "caso_integral",
+    "run": 2,
+    "warmup": false,
+    "duration_s": 51.264,
+    "expected_text": "Agregá tres Coca Cola comunes de 2 litros; perdón, eran dos. Agregá cuatro Sprite comunes de 1,5 litros y cinco botellas de agua Villavicencio de 1,5 litros; perdón, no llegó ninguno de esos dos productos, así que no los cargues. Restá dos paquetes de arroz Gallo de 1 kg y tres paquetes de fideos Matarazzo de 500 g. Restá cuatro Coca Cola Zero de 2 litros y cinco envases de detergente Magistral de 750 ml; perdón, ni las Coca Zero ni los detergentes se vendieron. No restes ninguno de esos dos productos. Agregá seis envases de leche La Serenísima de 1 litro y restá dos Sprite comunes de 2 litros. Perdón, la leche no llegó y esas Sprite no se vendieron; no cargues la leche ni restes esas Sprite.",
+    "text": "Agrega tres Coca-Cola comunes de dos litros, perdón, eran dos. Agrega cuatro sprays comunes de uno coma cinco litros y cinco botellas de agua villavicencio de uno comas cinco litros. Perdón, no llegó ninguno de esos dos productos, así que no los cargués. Resta dos paquetes de arroz gallo de un kilo y tres paquetes de fideos matarazos de quinientos gramos. Resta cuatro Coca-Cola, cero de dos litros y cinco envases de detergente magistral de setecientos cincuenta mililitros. Perdón, ni las coca ceros ni los detergentes se vendieron, no restes ninguno de esos dos productos. Agrega seis envases de leche la serenísima, de un litro y resta dos spray comunes de dos litros. Perdón, la leche no llegó y esas sprays no se vendieron. No cargues la leche ni restes esas sprays.",
+    "status": "ok",
+    "error": null,
+    "inference_s": 2.639834711999356,
+    "rtf": 0.051494903089875074,
+    "ram_base_mib": 323.43359375,
+    "ram_peak_mib": 323.43359375,
+    "cpu_s": 18.72,
+    "cpu_pct": 708.8212538860109,
+    "request_wall_s": 2.6410043289997702,
+    "word_errors": 31,
+    "reference_words": 131,
+    "char_errors": 111,
+    "reference_chars": 685,
+    "wer_pct": 23.66412213740458,
+    "cer_pct": 16.204379562043794,
+    "exact_match": false,
+    "substitution": 28,
+    "deletion": 0,
+    "insertion": 3,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 6
+      },
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 11,
+        "hypothesis_index": 11
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "sprays",
+        "reference_index": 13,
+        "hypothesis_index": 13
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 16,
+        "hypothesis_index": 16
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "coma",
+        "reference_index": 16,
+        "hypothesis_index": 17
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 17,
+        "hypothesis_index": 18
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 26,
+        "hypothesis_index": 27
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "comas",
+        "reference_index": 26,
+        "hypothesis_index": 28
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 27,
+        "hypothesis_index": 29
+      },
+      {
+        "type": "substitution",
+        "expected": "cargues",
+        "returned": "cargués",
+        "reference_index": 41,
+        "hypothesis_index": 43
+      },
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "resta",
+        "reference_index": 42,
+        "hypothesis_index": 44
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 49,
+        "hypothesis_index": 51
+      },
+      {
+        "type": "substitution",
+        "expected": "kg",
+        "returned": "kilo",
+        "reference_index": 50,
+        "hypothesis_index": 52
+      },
+      {
+        "type": "substitution",
+        "expected": "matarazzo",
+        "returned": "matarazos",
+        "reference_index": 56,
+        "hypothesis_index": 58
+      },
+      {
+        "type": "substitution",
+        "expected": "500",
+        "returned": "quinientos",
+        "reference_index": 58,
+        "hypothesis_index": 60
+      },
+      {
+        "type": "substitution",
+        "expected": "g",
+        "returned": "gramos",
+        "reference_index": 59,
+        "hypothesis_index": 61
+      },
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "resta",
+        "reference_index": 60,
+        "hypothesis_index": 62
+      },
+      {
+        "type": "substitution",
+        "expected": "zero",
+        "returned": "cero",
+        "reference_index": 64,
+        "hypothesis_index": 66
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 66,
+        "hypothesis_index": 68
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "setecientos",
+        "reference_index": 75,
+        "hypothesis_index": 77
+      },
+      {
+        "type": "substitution",
+        "expected": "750",
+        "returned": "cincuenta",
+        "reference_index": 75,
+        "hypothesis_index": 78
+      },
+      {
+        "type": "substitution",
+        "expected": "ml",
+        "returned": "mililitros",
+        "reference_index": 76,
+        "hypothesis_index": 79
+      },
+      {
+        "type": "substitution",
+        "expected": "zero",
+        "returned": "ceros",
+        "reference_index": 81,
+        "hypothesis_index": 84
+      },
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 94,
+        "hypothesis_index": 97
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 102,
+        "hypothesis_index": 105
+      },
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "resta",
+        "reference_index": 105,
+        "hypothesis_index": 108
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "spray",
+        "reference_index": 107,
+        "hypothesis_index": 110
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 110,
+        "hypothesis_index": 113
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "sprays",
+        "reference_index": 119,
+        "hypothesis_index": 122
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "sprays",
+        "reference_index": 130,
+        "hypothesis_index": 133
+      }
+    ]
+  },
+  {
+    "configuration": "kroko_es",
+    "case_id": "caso_integral",
+    "run": 3,
+    "warmup": false,
+    "duration_s": 51.264,
+    "expected_text": "Agregá tres Coca Cola comunes de 2 litros; perdón, eran dos. Agregá cuatro Sprite comunes de 1,5 litros y cinco botellas de agua Villavicencio de 1,5 litros; perdón, no llegó ninguno de esos dos productos, así que no los cargues. Restá dos paquetes de arroz Gallo de 1 kg y tres paquetes de fideos Matarazzo de 500 g. Restá cuatro Coca Cola Zero de 2 litros y cinco envases de detergente Magistral de 750 ml; perdón, ni las Coca Zero ni los detergentes se vendieron. No restes ninguno de esos dos productos. Agregá seis envases de leche La Serenísima de 1 litro y restá dos Sprite comunes de 2 litros. Perdón, la leche no llegó y esas Sprite no se vendieron; no cargues la leche ni restes esas Sprite.",
+    "text": "Agrega tres Coca-Cola comunes de dos litros, perdón, eran dos. Agrega cuatro sprays comunes de uno coma cinco litros y cinco botellas de agua villavicencio de uno comas cinco litros. Perdón, no llegó ninguno de esos dos productos, así que no los cargués. Resta dos paquetes de arroz gallo de un kilo y tres paquetes de fideos matarazos de quinientos gramos. Resta cuatro Coca-Cola, cero de dos litros y cinco envases de detergente magistral de setecientos cincuenta mililitros. Perdón, ni las coca ceros ni los detergentes se vendieron, no restes ninguno de esos dos productos. Agrega seis envases de leche la serenísima, de un litro y resta dos spray comunes de dos litros. Perdón, la leche no llegó y esas sprays no se vendieron. No cargues la leche ni restes esas sprays.",
+    "status": "ok",
+    "error": null,
+    "inference_s": 2.6322886329999164,
+    "rtf": 0.05134770273486104,
+    "ram_base_mib": 323.43359375,
+    "ram_peak_mib": 323.43359375,
+    "cpu_s": 18.97999999999999,
+    "cpu_pct": 720.6688586154293,
+    "request_wall_s": 2.6336645149985998,
+    "word_errors": 31,
+    "reference_words": 131,
+    "char_errors": 111,
+    "reference_chars": 685,
+    "wer_pct": 23.66412213740458,
+    "cer_pct": 16.204379562043794,
+    "exact_match": false,
+    "substitution": 28,
+    "deletion": 0,
+    "insertion": 3,
+    "word_alignment_errors": [
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 0,
+        "hypothesis_index": 0
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 6,
+        "hypothesis_index": 6
+      },
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 11,
+        "hypothesis_index": 11
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "sprays",
+        "reference_index": 13,
+        "hypothesis_index": 13
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 16,
+        "hypothesis_index": 16
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "coma",
+        "reference_index": 16,
+        "hypothesis_index": 17
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 17,
+        "hypothesis_index": 18
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "uno",
+        "reference_index": 26,
+        "hypothesis_index": 27
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "comas",
+        "reference_index": 26,
+        "hypothesis_index": 28
+      },
+      {
+        "type": "substitution",
+        "expected": "5",
+        "returned": "cinco",
+        "reference_index": 27,
+        "hypothesis_index": 29
+      },
+      {
+        "type": "substitution",
+        "expected": "cargues",
+        "returned": "cargués",
+        "reference_index": 41,
+        "hypothesis_index": 43
+      },
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "resta",
+        "reference_index": 42,
+        "hypothesis_index": 44
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 49,
+        "hypothesis_index": 51
+      },
+      {
+        "type": "substitution",
+        "expected": "kg",
+        "returned": "kilo",
+        "reference_index": 50,
+        "hypothesis_index": 52
+      },
+      {
+        "type": "substitution",
+        "expected": "matarazzo",
+        "returned": "matarazos",
+        "reference_index": 56,
+        "hypothesis_index": 58
+      },
+      {
+        "type": "substitution",
+        "expected": "500",
+        "returned": "quinientos",
+        "reference_index": 58,
+        "hypothesis_index": 60
+      },
+      {
+        "type": "substitution",
+        "expected": "g",
+        "returned": "gramos",
+        "reference_index": 59,
+        "hypothesis_index": 61
+      },
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "resta",
+        "reference_index": 60,
+        "hypothesis_index": 62
+      },
+      {
+        "type": "substitution",
+        "expected": "zero",
+        "returned": "cero",
+        "reference_index": 64,
+        "hypothesis_index": 66
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 66,
+        "hypothesis_index": 68
+      },
+      {
+        "type": "insertion",
+        "expected": "",
+        "returned": "setecientos",
+        "reference_index": 75,
+        "hypothesis_index": 77
+      },
+      {
+        "type": "substitution",
+        "expected": "750",
+        "returned": "cincuenta",
+        "reference_index": 75,
+        "hypothesis_index": 78
+      },
+      {
+        "type": "substitution",
+        "expected": "ml",
+        "returned": "mililitros",
+        "reference_index": 76,
+        "hypothesis_index": 79
+      },
+      {
+        "type": "substitution",
+        "expected": "zero",
+        "returned": "ceros",
+        "reference_index": 81,
+        "hypothesis_index": 84
+      },
+      {
+        "type": "substitution",
+        "expected": "agregá",
+        "returned": "agrega",
+        "reference_index": 94,
+        "hypothesis_index": 97
+      },
+      {
+        "type": "substitution",
+        "expected": "1",
+        "returned": "un",
+        "reference_index": 102,
+        "hypothesis_index": 105
+      },
+      {
+        "type": "substitution",
+        "expected": "restá",
+        "returned": "resta",
+        "reference_index": 105,
+        "hypothesis_index": 108
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "spray",
+        "reference_index": 107,
+        "hypothesis_index": 110
+      },
+      {
+        "type": "substitution",
+        "expected": "2",
+        "returned": "dos",
+        "reference_index": 110,
+        "hypothesis_index": 113
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "sprays",
+        "reference_index": 119,
+        "hypothesis_index": 122
+      },
+      {
+        "type": "substitution",
+        "expected": "sprite",
+        "returned": "sprays",
+        "reference_index": 130,
+        "hypothesis_index": 133
+      }
+    ]
+  }
+]

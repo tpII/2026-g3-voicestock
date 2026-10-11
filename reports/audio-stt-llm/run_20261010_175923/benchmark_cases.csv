@@ -1,0 +1,45 @@
+case_id,level,status,valid_json,schema_valid,correct_operation,correct_product,correct_quantity,exact_match,stt_peak_mib,llm_peak_mib,simultaneous_peak_mib,transcription,raw_json
+solo_agregar,basico,ok,True,True,True,True,True,True,344.82421875,,," Agrega 3 Coca-Cola comunes de 2 litros y 4 Sprite comunes de 1,5 litros.","{
+  ""operaciones"": [
+    {
+      ""operacion"": ""agregar_stock"",
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 3
+    },
+    {
+      ""operacion"": ""agregar_stock"",
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 4
+    }
+  ]
+}"
+solo_restar,basico,ok,True,True,True,True,True,True,346.3828125,3137.8046875,, Resta dos paquetes de arroz gallo de un kilo.,"{
+  ""operaciones"": [
+    {
+      ""operacion"": ""restar_stock"",
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 2
+    }
+  ]
+}"
+restar_ambos,habitual,ok,True,True,True,False,True,False,347.09765625,3158.20703125,, Resta 2 Coca-Cola 0 de 2 litros y 4 en bases de detergente magistral de 750 mililitros.,"{
+  ""operaciones"": [
+    {
+      ""operacion"": ""restar_stock"",
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 2
+    },
+    {
+      ""operacion"": ""restar_stock"",
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 4
+    }
+  ]
+}"
+corregir_cantidad,habitual,ok,True,True,True,True,True,True,347.09765625,3158.35546875,," Agrega 3 Coca-Cola comunes de 2 litros, perdón eran 2.","{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Coca Cola 2L"", ""cantidad"": 2}]}"
+negar_agregacion,habitual,ok,True,True,True,True,True,True,347.09765625,3158.35546875,," Agrega 5 botellas de agua billa de licencia de 1,5 litros. Perdón, esas no llegaron, no las cargues.","{
+  ""operaciones"": []
+}"
+negar_restacion,habitual,ok,True,True,True,True,True,True,347.03125,3151.62890625,," Resta 4 en bases de detergentes magistral de 750 mililitros. Perdón, no se vendieron, no los restes.","{
+  ""operaciones"": []
+}"

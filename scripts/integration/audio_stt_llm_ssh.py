@@ -2,6 +2,7 @@
 
 import argparse
 import csv
+import hashlib
 import json
 import os
 import re
@@ -51,6 +52,11 @@ def save(out, rows, metadata):
             .get("resources", {})
             .get("ram_peak_mib"),
             "pc_api_client_peak_mib": r.get("api_resources", {}).get("ram_peak_mib"),
+            "pi_stt_s": r.get("remote_stt", {})
+            .get("resources", {})
+            .get("request_wall_s"),
+            "llm_api_s": r.get("api_resources", {}).get("request_wall_s"),
+            "pi_cpu_pct": r.get("remote_stt", {}).get("resources", {}).get("cpu_pct"),
             "error": r.get("error"),
         }
         for r in rows
@@ -79,6 +85,71 @@ def save(out, rows, metadata):
         ),
         "SSH/scp configuration and host hardware are recorded in environment.json.",
         "No microphone capture or inventory updates occur in this fixture experiment.",
+    ]
+    expected_count = len(metadata.get("audio_cases", [])) or 6
+    lines += [
+        "",
+        "## Summary",
+        "",
+        f"Exact JSON success: {exact}/{expected_count} "
+        f"({100 * exact / expected_count:.1f}%).",
+        f"Processed: {len(rows)}/{expected_count}; execution errors: "
+        f"{sum(r.get('status') != 'ok' for r in rows)}.",
+        "",
+        "| Case | Exact JSON | Pi STT (s) | LLM API (s) | Whisper peak RAM (MiB) |",
+        "|---|---|---:|---:|---:|",
+    ]
+    for level in ("basico", "habitual"):
+        expected_level = sum(
+            c.get("level") == level for c in metadata.get("audio_cases", [])
+        )
+        correct = sum(
+            r.get("level") == level
+            and r.get("evaluation", {}).get("exact_match", False)
+            for r in rows
+        )
+        if expected_level:
+            lines += [
+                "",
+                f"{level}: {correct}/{expected_level} exact "
+                f"({100 * correct / expected_level:.1f}%).",
+            ]
+    stt_times, api_times, peaks = [], [], []
+
+    def number(value):
+        return f"{value:.3f}" if isinstance(value, (int, float)) else "N/A"
+
+    for row in flat:
+        stt = row["pi_stt_s"]
+        api = row["llm_api_s"]
+        peak = row["pi_stt_peak_mib"]
+        if stt is not None:
+            stt_times.append(stt)
+        if api is not None:
+            api_times.append(api)
+        if peak is not None:
+            peaks.append(peak)
+        lines.append(
+            f"| {row['case_id']} | {row.get('exact_match', False)} | "
+            f"{number(stt)} | {number(api)} | {number(peak)} |"
+        )
+    for label, values in [("Pi STT", stt_times), ("LLM API", api_times)]:
+        if values:
+            lines += [
+                "",
+                f"{label}: mean {sum(values) / len(values):.3f} s; "
+                f"range {min(values):.3f}–{max(values):.3f} s; "
+                f"sum {sum(values):.3f} s ({len(values)} measurements).",
+            ]
+    load = metadata.get("remote_environment", {}).get("load", {}).get("load_s")
+    lines += ["", f"Initial model load: {number(load)} s."]
+    if peaks:
+        lines += ["", f"Whisper maximum sampled RSS: {max(peaks):.2f} MiB."]
+    lines += [
+        "",
+        "Pi STT includes WAV reading/conversion and inference. "
+        "LLM API includes network and response handling. Stage sums exclude "
+        "SSH transfers, model load and orchestration; they are not total run duration.",
     ]
     for r in rows:
         lines += [
@@ -132,7 +203,13 @@ def main():
     )
     parser.add_argument("--remote-python", default="python3")
     parser.add_argument("--stt-model", default="ggml-small-q5_1.bin")
-    parser.add_argument("--stt-prompt", type=Path, help="Local UTF-8 STT context file")
+    parser.add_argument(
+        "--stt-prompt",
+        type=Path,
+        nargs="+",
+        action="extend",
+        help="Local UTF-8 context files, concatenated in the given order",
+    )
     parser.add_argument("--port", type=int, default=22)
     parser.add_argument(
         "--ssh-password",
@@ -155,13 +232,22 @@ def main():
     ):
         parser.error("stt-model must be a model filename ending in .bin")
     prompt_bytes = None
-    if args.stt_prompt is not None:
-        try:
-            prompt_bytes = args.stt_prompt.read_bytes()
-            if not prompt_bytes.decode("utf-8").strip():
-                parser.error("STT prompt is empty")
-        except (OSError, UnicodeError):
-            parser.error("STT prompt must be a readable UTF-8 file")
+    prompt_files = []
+    if args.stt_prompt:
+        texts = []
+        for path in args.stt_prompt:
+            try:
+                data = path.read_bytes()
+                text = data.decode("utf-8").strip()
+                if not text:
+                    parser.error(f"STT prompt is empty: {path}")
+            except (OSError, UnicodeError):
+                parser.error(f"STT prompt must be a readable UTF-8 file: {path}")
+            texts.append(text)
+            prompt_files.append(
+                {"path": str(path), "sha256": hashlib.sha256(data).hexdigest()}
+            )
+        prompt_bytes = ("\n\n".join(texts) + "\n").encode("utf-8")
     load_api_keys()
     key = os.environ.get("GROQ_API_KEY")
     if not key:
@@ -194,11 +280,13 @@ def main():
         "remote_inputs": remote_dir,
         "llm_model": MODEL,
         "stt_model": args.stt_model,
-        "stt_prompt_path": str(args.stt_prompt) if args.stt_prompt else None,
+        "stt_prompt_files": prompt_files,
         "stt_prompt_text": prompt_bytes.decode("utf-8")
         if prompt_bytes is not None
         else None,
-        "stt_prompt_sha256": sha256(args.stt_prompt) if args.stt_prompt else None,
+        "stt_prompt_sha256": hashlib.sha256(prompt_bytes).hexdigest()
+        if prompt_bytes is not None
+        else None,
         "runs_per_case": 1,
         "warmups": 0,
         "retries": 0,

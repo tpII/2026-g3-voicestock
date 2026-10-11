@@ -1,0 +1,3 @@
+Registro de movimientos de stock de un comercio, en español argentino.
+Se mencionan cantidades, marcas y tamaños de envases.
+Vocabulario habitual: agregá, restá, paquetes, botellas, envases, litros, mililitros, kilos, perdón, no los restes, no las cargues.

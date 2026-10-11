@@ -161,7 +161,8 @@ transcripciones concurrentes.
 
 `--stt-model` acepta el nombre del archivo instalado en
 `models/stt/whisper/` de la Raspberry; por defecto `ggml-small-q5_1.bin`.
-`--stt-prompt` acepta la ruta local en la PC de un TXT UTF-8 no vacío.
+`--stt-prompt` acepta una o varias rutas locales en la PC de TXT UTF-8 no vacíos.
+Se concatenan en el orden indicado, separados por una línea en blanco.
 El coordinador copia ese texto a la Pi y registra contenido y SHA-256 en el
 informe. Sin este parámetro no se usa contexto. El catálogo contiene sólo
 vocabulario de productos, sin cantidades ni respuestas esperadas.
@@ -175,7 +176,7 @@ python scripts/integration/audio_stt_llm_ssh.py \
   --remote-python /ruta/al/repositorio/.venv/bin/python \
   --ssh-password \
   --stt-model ggml-base.bin \
-  --stt-prompt scripts/benchmarks/prompts/catalogo-stt.txt
+  --stt-prompt scripts/benchmarks/prompts/contexto-stt.txt scripts/benchmarks/prompts/productos-stt.txt
 ```
 
 Descargá previamente `ggml-base.bin` en la carpeta de modelos de la Pi.
@@ -185,3 +186,9 @@ usa `initial_prompt` de whisper.cpp en cada solicitud y lo mantiene en cada
 ventana del mismo audio; no conserva contexto entre audios. El contexto puede
 sesgar la transcripción y no garantiza reconocimiento correcto.
 Los workers y ejecutores de benchmarks anteriores permanecen sin cambios.
+
+El reporte incluye tasa de JSON exacto general y por nivel, tabla por prompt
+con tiempos STT/API y RAM, promedios, rangos, sumas y carga inicial.
+El CSV incluye tiempos y CPU. `environment.json` registra las rutas y hashes
+de ambos TXT y el contexto combinado enviado a Whisper. El catálogo anterior
+se llama ahora `productos-stt.txt`; no hay que recompilar por cambiar estos TXT.

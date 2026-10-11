@@ -89,10 +89,10 @@ rest of the Raspberry system uses the client class directly
 ## Running on the local network
 
 On the real setup the server runs on the PC and the client on the Raspberry Pi,
-connected through the isolated Ethernet network provided by `LocalNetworkInfra`.
-This interface only consumes that network: it does not configure addresses or
-the firewall. How to prepare the link is the
-[Ethernet setup guide](../setup/local-network.md).
+connected through the isolated local network provided by `LocalNetworkInfra`.
+This interface only consumes that network: it does not configure addresses,
+choose Ethernet or Wi-Fi, or change the firewall. How to prepare the link is
+the [local network setup guide](../setup/local-network.md).
 
 1. **PC: start the server listening on the network.** The default
    `127.0.0.1` only accepts local connections:
@@ -104,9 +104,9 @@ the firewall. How to prepare the link is the
    The PC firewall must allow that TCP port on the isolated network. Do not
    expose this unauthenticated endpoint to an untrusted network.
 
-2. **PC: use its VoiceStock Ethernet address**, `192.168.50.2`. That address
-   is applied by the [Ethernet setup guide](../setup/local-network.md). Do not
-   use the PC's Wi-Fi address for this client.
+2. **PC: use its VoiceStock address**, `192.168.50.2`. That address is applied
+   by the [local network setup guide](../setup/local-network.md). Do not use
+   the PC's Internet address for this client.
 
 3. **Raspberry Pi: point the client at the PC** and send a text:
 
@@ -416,5 +416,6 @@ pytest tests/pc/communication tests/pc/test_pc_main.py tests/pi \
 ## Pending physical verification
 
 The roundtrip has not yet been run between the physical PC and Raspberry Pi.
-The PC address on the VoiceStock Ethernet link is `192.168.50.2`. Evidence of
-that physical roundtrip is still pending.
+The PC address on the VoiceStock network is `192.168.50.2`. The Raspberry Pi
+address is `192.168.50.1`. Evidence of that physical roundtrip is still
+pending.

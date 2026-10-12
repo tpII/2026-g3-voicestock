@@ -5,10 +5,12 @@ Sistema de gestión de inventario asistido por voz, pensado para ejecutarse en u
 La Raspberry Pi capturará audio, hará Speech-to-Text, se comunicará con un modelo de lenguaje a través de una interfaz independiente del proveedor, validará respuestas estructuradas, administrará el inventario, persistirá datos en SQLite y expondrá una interfaz web.
 
 El proyecto está en una etapa inicial. Ya incluye la captura push-to-talk en la
-Raspberry Pi y el servidor de comunicación de la PC, conectado a un servicio de
-interpretación con proveedor intercambiable (por ahora un stub). STT, el modelo
-de lenguaje, inventario e interfaz web continúan en desarrollo. La prueba física
-del pulsador y del micrófono USB todavía no se hizo.
+Raspberry Pi, el servidor de comunicación de la PC (conectado a un servicio de
+interpretación con proveedor intercambiable, por ahora un stub) y la página
+web para confirmar o cancelar la operación pendiente. STT, el modelo de
+lenguaje e inventario continúan en desarrollo. Confirmar en la página todavía
+no modifica el inventario. La prueba física del pulsador y del micrófono USB
+todavía no se hizo.
 
 ## Requisitos
 
@@ -23,7 +25,7 @@ El código está dividido según la máquina donde corre
 ```text
 src/
 ├── pc/       lo que corre en la PC: servidor HTTP e interpretación
-├── pi/       lo que corre en la Raspberry Pi: push-to-talk y cliente de la PC
+├── pi/       lo que corre en la Raspberry Pi: push-to-talk, cliente y web
 └── shared/   contratos que intercambian ambas (TransportEnvelope)
 ```
 
@@ -107,6 +109,24 @@ el contrato de audio y la prueba en la placa están separados:
 - [Interfaz de captura](docs/interfaces/push-to-talk-capture.md)
 - [Conexión, configuración y prueba manual](docs/setup/push-to-talk.md)
 
+### Web en la Raspberry Pi
+
+`voicestock-pi-web` sirve la página de la operación pendiente. En la
+Raspberry Pi escucha en `192.168.50.1:8000`. Desde la PC:
+`http://192.168.50.1:8000/`. En una máquina de desarrollo:
+
+```bash
+VOICESTOCK_WEB_HOST=127.0.0.1 VOICESTOCK_WEB_PORT=8123 voicestock-pi-web
+```
+
+El comando es temporal, para desarrollo y validación, hasta que el orquestador
+exista. Sin ese runtime `GET /health` sigue respondiendo y el API dice que la
+aplicación no está lista. `GET /health` solo indica que el servidor HTTP está
+vivo.
+
+- [Cómo instalarlo, arrancarlo y abrirlo](docs/setup/pi-web.md)
+- [Contrato HTTP](docs/interfaces/pending-operation-web-api.md)
+- [Qué muestra la página](docs/interfaces/pending-operation-web-ui.md)
 ## Estado de la evaluación de voz
 
 La elección para la próxima integración es **Whisper Small Q5_1 mediante
@@ -135,7 +155,10 @@ y validación del flujo físico. Ver [evaluación y pendientes](docs/research/sp
 - [Servicio de interpretación](docs/interfaces/interpretation-service.md)
 - [Captura push-to-talk](docs/interfaces/push-to-talk-capture.md)
 - [Prueba manual de push-to-talk](docs/setup/push-to-talk.md)
-- [Red Ethernet local](docs/setup/local-network.md)
+- [Red local VoiceStock](docs/setup/local-network.md)
+- [Servidor web de la Raspberry Pi](docs/setup/pi-web.md)
+- [API de la operación pendiente](docs/interfaces/pending-operation-web-api.md)
+- [Página de la operación pendiente](docs/interfaces/pending-operation-web-ui.md)
 - [Bitácora](docs/bitacora/bitacora.md)
 
 ## Licencia

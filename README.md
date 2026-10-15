@@ -141,6 +141,8 @@ y validación del flujo físico. Ver [evaluación y pendientes](docs/research/sp
 - [Modelos para evaluación de Speech-to-Text](docs/setup/speech-to-text-models.md)
 - [Benchmark de Speech-to-Text en CPU](docs/testing/speech-to-text-benchmark.md)
 - [Benchmark audio → STT → LLM → JSON](docs/testing/audio-stt-llm-benchmark.md)
+- [Prueba de prompts con STT en Raspberry por SSH](docs/testing/raspberry-stt-ssh.md)
+- [Interfaz pública de Speech-to-Text](docs/interfaces/speech-to-text.md)
 - [ADR-0005: Whisper Small Q5 pendiente de validación en Pi](docs/decisions/0005-use-whisper-small-q5-for-offline-stt.md)
 - [Integración de captura, STT e interpretación](docs/architecture/audio-interpretation-integration.md)
 

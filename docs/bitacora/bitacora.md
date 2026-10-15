@@ -795,6 +795,21 @@ y falta de aceptación de latencia/recursos. Quedan pendientes hardware real,
 interfaz/adaptador STT, proveedor de producción y flujo físico. No se modificó
 el estado de las tareas de ClickUp ni se considera cerrada la feature STT.
 
+### Preparación de la prueba distribuida por SSH
+
+Después de integrar el PR de exploración, se implementó el puerto SpeechToText
+y el adaptador secuencial Whisper en `src/pi/speech_to_text/`. Se agregó un
+nuevo coordinador que transfiere los seis WAV básicos/habituales a la Pi por
+SSH, recibe texto y métricas del worker remoto y llama a GPT OSS 20B vía Groq
+desde la PC. Las claves permanecen locales en la PC.
+
+Se documentaron [la interfaz](../interfaces/speech-to-text.md) y
+[la preparación y ejecución](../testing/raspberry-stt-ssh.md), incluyendo venv
+en la Raspberry sin requerir Conda, compilación para la arquitectura destino,
+transferencia de pesos, hashes y conservación de resultados parciales.
+Los tests y benchmarks anteriores quedaron intactos. Se verificó formato y
+lint; no se ejecutó la prueba SSH en hardware ni nuevos tests de contrato.
+Las tareas STT siguen pendientes de sus criterios de aceptación completos.
 ---
 
 ## 11/10/2026

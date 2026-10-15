@@ -95,7 +95,8 @@ Before closing
 2. Freeze reference transcripts and thresholds for quality, load, inference,
    RSS and stability before measuring. The 40-second/3-GB limits of ADR-0004
    concern the local LLM on PC; they are not STT thresholds for the Pi.
-3. Implement the public STT interface and replaceable adapter on the Pi.
+3. Validate the newly implemented public STT interface and replaceable adapter
+   on the Pi; automated contract tests also remain pending.
 4. Measure model loading separately from transcription, with CPU and RAM,
    including at least one real PushToTalk recording and silent/non-speech audio.
 5. Verify offline runtime and write a usable/not-usable verdict. Reopen the
@@ -105,3 +106,11 @@ The small corpus was used to compare candidates and is not an independent
 holdout. One pipeline pass per prompt does not establish repeatability. Units,
 attributes and the official production operation contract remain outside this
 experimental JSON result's validation scope.
+
+## SSH integration follow-up
+
+The next increment introduces a separate public STT port and Whisper adapter
+under `src/pi/speech_to_text/`, with a new coordinator in `scripts/integration/`.
+Existing benchmark tests remain unchanged. The SSH experiment transfers the
+recorded prompts and invokes Groq from the PC; no actual Raspberry measurements
+have been recorded yet. See [the execution guide](../testing/raspberry-stt-ssh.md).

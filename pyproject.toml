@@ -40,6 +40,9 @@ stt-benchmark = [
     "psutil>=5.9",
     "av==19.0.1",
 ]
+stt-integration = [
+    "psutil>=5.9",
+]
 stt-sherpa = [
     "sherpa-onnx==1.13.8",
     "numpy>=2",

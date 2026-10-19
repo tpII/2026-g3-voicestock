@@ -848,3 +848,189 @@ vuelva la ruta por defecto, que la Raspberry no tenga Internet, que la
 configuración sobreviva a un reinicio, que el punto de acceso vuelva a
 levantarse, ni que la comunicación de la aplicación funcione sobre el enlace
 real.
+
+---
+
+## 17/10/2026
+
+### Puesta al día del entorno de trabajo
+
+Se retomó el trabajo sobre las tareas de interpretación y contrato. Antes se
+actualizó el entorno:
+
+- ClickUp se consulta ahora con el conector oficial (OAuth). Reemplaza el
+  acceso por API REST con token personal que se había usado el 01/10.
+- Se instaló Tailscale en la PC y se accedió a la Raspberry Pi, compartida desde
+  la cuenta de Martin. El acceso es por SSH con clave. La Raspberry solo aparece
+  en Tailscale cuando tiene Internet (modo mantenimiento). En operación es un
+  punto de acceso aislado y no se la puede alcanzar desde afuera.
+- El `.venv` local no tenía las dependencias del proyecto ni los hooks de
+  pre-commit instalados. Se instalaron con `pip install -e ".[dev]"` y
+  `pre-commit install`. El `.venv` local usa Python 3.14, mientras que el CI y
+  la Raspberry usan 3.11. Por eso el código que corre en la Raspberry también se
+  probó ahí.
+
+Se siguió la convención de una tarea de ClickUp por commit y por Pull Request,
+con Squash and Merge.
+
+### Fronteras del servicio de interpretación (`InterpretationService-03`)
+
+Se completó la
+[documentación del servicio](../interfaces/interpretation-service.md). Ya
+cubría `interpret(text) -> ServiceResult`, el puerto de proveedor y el
+`TransportEnvelope`. Se agregaron:
+
+- la cadena completa de capas: `InterpretationDraft` → `ContractPayload` →
+  `ServiceResult` → `TransportEnvelope` → validación en la Raspberry →
+  `ValidatedOperation` o `ValidationRejection` → `PendingOperation`, con el
+  dueño, la máquina y la especificación de cada una;
+- las fronteras con StructuredCommandInterpretation (no emite el contrato),
+  OperationContractValidation (el servicio no define ni valida el esquema) y
+  FaultHandlingRecovery (el servicio informa errores, no se recupera de ellos).
+
+### Política de identificación de productos (`OperationContractValidation-01`)
+
+Se registró la decisión en el
+[ADR-0006](../decisions/0006-identify-products-by-unique-attribute-match.md),
+en estado propuesto hasta la revisión del equipo:
+
+- El catálogo es la única autoridad de identidad. El contrato describe el
+  producto con atributos (`name` obligatorio; `brand`, `variant` y
+  `presentation` opcionales) y nunca lleva un identificador elegido por el
+  modelo.
+- Los atributos se normalizan de forma fija: sin acentos, sin distinguir
+  mayúsculas, con la puntuación convertida en espacios. No hay coincidencia
+  aproximada.
+- Si coincide exactamente un producto, queda identificado. Si no coincide
+  ninguno, es `unknown_product`; si coinciden varios, `ambiguous_product`, sin
+  desempate.
+- Todo producto del catálogo debe poder identificarse con sus propios
+  atributos.
+
+Se compararon la clave compuesta exacta, el subconjunto unívoco de atributos, la
+normalización y el identificador aportado por el modelo. Se descartaron también
+las coincidencias por distancia de edición, porque eligen candidatos con un
+umbral oculto.
+
+### Contrato versionado y validación estructural (`OperationContractValidation-02`)
+
+Se definió el `ContractPayload` versión 1 como modelo pydantic en
+`src/shared/operation_contract/`. Es la única definición del contrato, y la
+importan tanto el productor (PC) como el validador (Raspberry). En
+`src/pi/operation_contract/` se implementó la validación estructural, que
+devuelve el contrato o un `ValidationRejection` con un motivo distinguible.
+
+Decisiones acordadas para octubre:
+
+- `operations` es una lista, porque un comando hablado puede mencionar varios
+  productos y el intérprete ya devuelve una lista. Como la operación pendiente
+  es única, la Raspberry acepta exactamente una (`no_operations` y
+  `too_many_operations` en otro caso).
+- Las operaciones son `add_stock` y `remove_stock`, y la única unidad es
+  `unit`.
+- Los campos desconocidos se rechazan en todos los niveles y los tipos son
+  estrictos.
+- La versión se verifica antes que los campos, para que un contrato de otra
+  versión se informe como `unsupported_version`.
+- No se agregaron dependencias: pydantic ya venía con FastAPI y está instalado
+  en la Raspberry.
+
+Se agregaron 53 tests. Además se ejecutaron en la Raspberry Pi (Python 3.11.2),
+desde una copia temporal y sin modificar su instalación: los 53 pasaron.
+
+---
+
+## 19/10/2026
+
+### Commit de benchmark recuperado
+
+Un commit de Martin con la comparación del pipeline audio → Whisper (Groq) →
+GPT OSS 20B había quedado en la rama `feature/stt-ssh-integration` después del
+merge de su Pull Request, sin llegar a `develop`. Se lo incorporó con
+cherry-pick y sin cambios, conservando su autoría.
+
+### Mapper del contrato en la PC (`OperationContractValidation-04`)
+
+StructuredCommandInterpretation todavía no tiene un tipo `InterpretationDraft`.
+Hoy el draft es el JSON que devuelve el modelo en el benchmark de precisión:
+`{"operaciones": [{"operacion", "producto", "cantidad"}]}`. En `producto` el
+modelo usa el nombre exacto del catálogo (por ejemplo `Coca Cola Zero 2L`) y no
+devuelve unidad.
+
+Sobre esa base se implementó `map_draft` en `src/pc/operation_contract/`, el
+único productor del contrato:
+
+- `agregar_stock` y `restar_stock` pasan a `add_stock` y `remove_stock`;
+  `producto` pasa sin cambios a `product.name`, y la unidad es siempre `unit`.
+- Si falta o sobra un campo, la operación es desconocida, el producto está
+  vacío o la cantidad no es entera, falla con `DraftMappingError`. Nunca
+  completa datos.
+- No valida el dominio: cuántas operaciones se aceptan, el signo de la
+  cantidad y la existencia del producto se deciden en la Raspberry.
+
+Se agregaron 46 tests con golden fixtures tomados de las salidas esperadas del
+benchmark. Cada uno pasa por el mapper y por el validador estructural de la
+Raspberry. El mapper todavía no está conectado al servicio, porque el único
+proveedor registrado es el stub.
+
+### Identificación de productos y validación semántica (`OperationContractValidation-03`)
+
+Se implementó en la Raspberry la política del ADR-0006 y un único punto de
+entrada para PendingOperationFlow, `OperationValidator`. Recibe el contrato
+crudo y devuelve una `ValidatedOperation` (operación, `product_id` asignado por
+el catálogo, nombre para mostrar, cantidad y unidad) o un `ValidationRejection`.
+
+- Las etapas corren en orden: estructural, identificación y reglas semánticas
+  (cantidad positiva y unidad compatible con el producto). La primera que
+  falla decide el rechazo.
+- La identificación pasa por el puerto `ProductResolver`, que no depende de
+  SQLite. Su implementación en memoria verifica al cargarse que todo producto
+  sea identificable y que no haya identificadores repetidos.
+- Los tests del puerto están escritos para que cualquier implementación futura,
+  como ProductCatalog, tenga que pasarlos.
+- El catálogo de octubre es provisorio: los diez productos del benchmark, con
+  nombre completo. Se reemplaza por el fixture de
+  StructuredCommandInterpretation-02 sin cambiar el contrato.
+
+Con nombres completos, "Coca Cola" sola es `unknown_product` y no
+`ambiguous_product`, porque cada atributo se compara por igualdad. Se agregaron
+60 tests.
+
+### Documentación del contrato (`OperationContractValidation-05`)
+
+Se escribió la [interfaz del contrato de operación](../interfaces/operation-contract.md):
+
+- responsabilidades de cada componente;
+- campos, tipos y enumeraciones de la versión 1;
+- cómo producir el contrato en la PC y cómo validarlo en la Raspberry;
+- resumen de la política de identificación;
+- todos los motivos de rechazo, con ejemplos verificados contra el validador;
+- cómo introducir una versión 2;
+- qué queda fuera (catálogo SQLite, interfaz web y recuperación de fallos).
+
+Se publicó el JSON Schema en `docs/interfaces/schemas/`, con un test que falla
+si se desincroniza del modelo. Un test de integración recorre la cadena
+completa: draft → mapper → `ServiceResult` → `TransportEnvelope` → JSON →
+validador de la Raspberry con el catálogo de octubre. La suite quedó en **369
+tests aprobados**.
+
+### Problemas encontrados
+
+- El CI de un Pull Request falló antes de ejecutar los checks, por una descarga
+  de pip cortada en el runner de GitHub (`IncompleteRead`). Volver a ejecutar el
+  job alcanzó para que pasara.
+- La Raspberry no estaba en línea en Tailscale. La validación semántica no se
+  pudo probar en el hardware; queda cubierta por el CI con Python 3.11.
+- Después de los merges quedaban nueve ramas remotas ya integradas. Se
+  verificó que ninguna tuviera commits fuera de `develop` y se borraron.
+
+### Estado de OperationContractValidation
+
+Las cinco tareas están integradas en `develop`. Quedan pendientes:
+
+- conectar el mapper al servicio cuando exista el proveedor real de
+  StructuredCommandInterpretation-04;
+- reemplazar el catálogo provisorio por el de StructuredCommandInterpretation-02;
+- ejecutar la validación semántica en la Raspberry;
+- probar el viaje Raspberry → PC → Raspberry entre las dos máquinas físicas;
+- la revisión del ADR-0006 por el equipo.

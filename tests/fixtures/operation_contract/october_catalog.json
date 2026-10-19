@@ -1,0 +1,42 @@
+[
+  {
+    "product_id": "coca-cola-2l",
+    "name": "Coca Cola 2L"
+  },
+  {
+    "product_id": "coca-cola-1-5l",
+    "name": "Coca Cola 1.5L"
+  },
+  {
+    "product_id": "coca-cola-zero-2l",
+    "name": "Coca Cola Zero 2L"
+  },
+  {
+    "product_id": "sprite-2l",
+    "name": "Sprite 2L"
+  },
+  {
+    "product_id": "sprite-1-5l",
+    "name": "Sprite 1.5L"
+  },
+  {
+    "product_id": "agua-villavicencio-1-5l",
+    "name": "Agua Villavicencio 1.5L"
+  },
+  {
+    "product_id": "arroz-gallo-1kg",
+    "name": "Arroz Gallo 1kg"
+  },
+  {
+    "product_id": "fideos-matarazzo-500g",
+    "name": "Fideos Matarazzo 500g"
+  },
+  {
+    "product_id": "detergente-magistral-750ml",
+    "name": "Detergente Magistral 750ml"
+  },
+  {
+    "product_id": "leche-la-serenisima-1l",
+    "name": "Leche La Serenísima 1L"
+  }
+]

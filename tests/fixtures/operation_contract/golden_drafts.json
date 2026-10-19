@@ -1,0 +1,95 @@
+[
+  {
+    "case": "single_remove",
+    "source": "precision benchmark: solo_restar",
+    "draft": {
+      "operaciones": [
+        {"operacion": "restar_stock", "producto": "Arroz Gallo 1kg", "cantidad": 2}
+      ]
+    },
+    "contract": {
+      "contract_version": "1",
+      "operations": [
+        {
+          "operation": "remove_stock",
+          "product": {"name": "Arroz Gallo 1kg", "brand": null, "variant": null, "presentation": null},
+          "quantity": 2,
+          "unit": "unit"
+        }
+      ]
+    }
+  },
+  {
+    "case": "single_add_with_variant_in_name",
+    "source": "precision benchmark catalog: Coca Cola Zero 2L",
+    "draft": {
+      "operaciones": [
+        {"operacion": "agregar_stock", "producto": "Coca Cola Zero 2L", "cantidad": 3}
+      ]
+    },
+    "contract": {
+      "contract_version": "1",
+      "operations": [
+        {
+          "operation": "add_stock",
+          "product": {"name": "Coca Cola Zero 2L", "brand": null, "variant": null, "presentation": null},
+          "quantity": 3,
+          "unit": "unit"
+        }
+      ]
+    }
+  },
+  {
+    "case": "single_add_with_accented_name",
+    "source": "precision benchmark catalog: Leche La Serenísima 1L",
+    "draft": {
+      "operaciones": [
+        {"operacion": "agregar_stock", "producto": "Leche La Serenísima 1L", "cantidad": 1}
+      ]
+    },
+    "contract": {
+      "contract_version": "1",
+      "operations": [
+        {
+          "operation": "add_stock",
+          "product": {"name": "Leche La Serenísima 1L", "brand": null, "variant": null, "presentation": null},
+          "quantity": 1,
+          "unit": "unit"
+        }
+      ]
+    }
+  },
+  {
+    "case": "two_operations",
+    "source": "precision benchmark: restar_ambos",
+    "draft": {
+      "operaciones": [
+        {"operacion": "restar_stock", "producto": "Coca Cola Zero 2L", "cantidad": 2},
+        {"operacion": "restar_stock", "producto": "Detergente Magistral 750ml", "cantidad": 4}
+      ]
+    },
+    "contract": {
+      "contract_version": "1",
+      "operations": [
+        {
+          "operation": "remove_stock",
+          "product": {"name": "Coca Cola Zero 2L", "brand": null, "variant": null, "presentation": null},
+          "quantity": 2,
+          "unit": "unit"
+        },
+        {
+          "operation": "remove_stock",
+          "product": {"name": "Detergente Magistral 750ml", "brand": null, "variant": null, "presentation": null},
+          "quantity": 4,
+          "unit": "unit"
+        }
+      ]
+    }
+  },
+  {
+    "case": "everything_cancelled",
+    "source": "precision benchmark: negar_agregacion",
+    "draft": {"operaciones": []},
+    "contract": {"contract_version": "1", "operations": []}
+  }
+]

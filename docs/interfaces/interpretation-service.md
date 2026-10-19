@@ -80,16 +80,18 @@ PendingOperation  (waits for operator confirmation) PendingOperationFlow
 | Type | Owner | Runs on | Meaning | Specification |
 |---|---|---|---|---|
 | `InterpretationDraft` | StructuredCommandInterpretation | PC | Fields the model extracted from the text: operation, product attributes, quantity, unit. Tentative, internal and without a contract version. | Pending: [StructuredCommandInterpretation-04](https://app.clickup.com/t/86e3ev4cx) |
-| `ContractPayload` | OperationContractValidation | PC → Raspberry Pi | The versioned operation contract. The mapper on the PC is the only producer; the Raspberry Pi validates it. | Pending: [OperationContractValidation-02](https://app.clickup.com/t/86e3ev5y6) (schema), [OperationContractValidation-04](https://app.clickup.com/t/86e3ev6j4) (mapper) |
+| `ContractPayload` | OperationContractValidation | PC → Raspberry Pi | The versioned operation contract. The mapper on the PC is the only producer; the Raspberry Pi validates it. | [Operation contract](operation-contract.md) |
 | `ServiceResult` | InterpretationService | PC → Raspberry Pi | Could the text be interpreted? | [This document](#serviceresult) |
 | `TransportEnvelope` | RaspberryPiPCCommunication | PC → Raspberry Pi | Did the message travel? | [Raspberry Pi–PC communication](pc-communication.md#responsibilities-by-layer) |
-| `ValidatedOperation` / `ValidationRejection` | OperationContractValidation | Raspberry Pi | A contract that identifies exactly one product and satisfies the domain rules, or a rejection with its reason. | Pending: [OperationContractValidation-01](https://app.clickup.com/t/86e3ev5pm) (identification policy), [OperationContractValidation-03](https://app.clickup.com/t/86e3ev69h) |
+| `ValidatedOperation` / `ValidationRejection` | OperationContractValidation | Raspberry Pi | A contract that identifies exactly one product and satisfies the domain rules, or a rejection with its reason. | [Operation contract](operation-contract.md#validating-a-payload-on-the-raspberry-pi); policy in [ADR-0006](../decisions/0006-identify-products-by-unique-attribute-match.md) |
 | `PendingOperation` | PendingOperationFlow | Raspberry Pi | A validated operation with its own identifier, waiting for confirmation. It does not modify inventory. | Pending: [PendingOperationFlow-01](https://app.clickup.com/t/86e3ev7md); web boundary in [the flow contract](../research/pending-operation-web-flow-contract.md) |
 
-Until the contract mapper and a real provider exist, the `payload` of a
-successful `ServiceResult` is the raw output of the active provider (the stub's
-`{"recognized_text": ...}`). That payload is not a `ContractPayload` and the
-Raspberry Pi must not treat it as an operation.
+The contract mapper exists (`pc.operation_contract.map_draft`) but is not yet
+wired into the service, because the only registered provider is the stub.
+Until a real provider is connected through the mapper, the `payload` of a
+successful `ServiceResult` is the raw output of the stub
+(`{"recognized_text": ...}`). That payload is not a `ContractPayload`, and the
+Raspberry Pi validator rejects it as `invalid_structure`.
 
 ## ServiceResult
 

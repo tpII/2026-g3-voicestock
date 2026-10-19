@@ -1,0 +1,111 @@
+{
+  "$defs": {
+    "OperationItem": {
+      "additionalProperties": false,
+      "description": "One requested inventory operation over one described product.",
+      "properties": {
+        "operation": {
+          "enum": [
+            "add_stock",
+            "remove_stock"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "product": {
+          "$ref": "#/$defs/ProductDescription"
+        },
+        "quantity": {
+          "title": "Quantity",
+          "type": "integer"
+        },
+        "unit": {
+          "const": "unit",
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "operation",
+        "product",
+        "quantity",
+        "unit"
+      ],
+      "title": "OperationItem",
+      "type": "object"
+    },
+    "ProductDescription": {
+      "additionalProperties": false,
+      "description": "Attributes that describe a product, as defined by ADR-0006.\n\nThey describe the product; they do not identify it. Only the Raspberry Pi\nassigns a product identity, so the contract has no product identifier.",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "brand": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Brand"
+        },
+        "variant": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Variant"
+        },
+        "presentation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Presentation"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "ProductDescription",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Version 1 of the operation contract.\n\nUnknown fields are rejected at every level. ``operations`` is a list so a\nlater version can carry several operations without changing its shape;\nwhich counts are accepted is decided by the validator, not by the schema.",
+  "properties": {
+    "contract_version": {
+      "const": "1",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "operations": {
+      "items": {
+        "$ref": "#/$defs/OperationItem"
+      },
+      "title": "Operations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "contract_version",
+    "operations"
+  ],
+  "title": "ContractPayload",
+  "type": "object"
+}

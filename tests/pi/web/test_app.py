@@ -67,6 +67,7 @@ async def test_root_serves_the_operator_page(client: httpx.AsyncClient) -> None:
     assert 'id="cancel-button"' in body
     assert "Operación pendiente" in body
     assert "Texto reconocido" in body
+    assert 'id="recognized-section"' in body
     assert 'href="/static/styles.css"' in body
     assert 'src="/static/app.js"' in body
     assert "VoiceStock Web está funcionando." not in body
@@ -90,6 +91,8 @@ async def test_static_assets_are_served_from_the_application(
     assert "/api/v1/pending-operation" in page_script
     assert "/api/v1/system-status" in page_script
     assert "textContent" in page_script
+    assert "recognizedSection.hidden" in page_script
+    assert "recognizedText.textContent" in page_script
     assert "setTimeout" in page_script
     assert "setInterval" not in page_script
     assert "innerHTML" not in page_script

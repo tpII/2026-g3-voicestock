@@ -19,6 +19,7 @@ const fieldProduct = document.querySelector("#field-product");
 const fieldOperation = document.querySelector("#field-operation");
 const fieldQuantity = document.querySelector("#field-quantity");
 const fieldUnit = document.querySelector("#field-unit");
+const recognizedSection = document.querySelector("#recognized-section");
 const recognizedText = document.querySelector("#recognized-text");
 const cancelButton = document.querySelector("#cancel-button");
 const confirmButton = document.querySelector("#confirm-button");
@@ -170,6 +171,12 @@ function renderDisconnected() {
   state.pollDelayMs = RETRY_INTERVAL_MS;
 }
 
+function renderRecognizedText(text) {
+  const value = typeof text === "string" ? text.trim() : "";
+  recognizedText.textContent = value;
+  recognizedSection.hidden = value === "";
+}
+
 function sameSnapshot(operation) {
   const current = state.snapshot;
   if (!current) {
@@ -213,7 +220,7 @@ function renderPending(operation) {
       ? ""
       : String(operation.quantity);
   fieldUnit.textContent = operation.unit ?? "";
-  recognizedText.textContent = operation.recognized_text ?? "";
+  renderRecognizedText(operation.recognized_text);
   state.operation = { operation_id: operation.operation_id };
   state.snapshot = operation;
   if (!state.resolving) {

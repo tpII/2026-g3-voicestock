@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import pytest
+
 from pi.operation_contract import (
     InMemoryProductResolver,
     OperationValidator,
@@ -65,6 +67,22 @@ def test_a_valid_contract_is_accepted_and_keeps_recognized_text() -> None:
     assert outcome.validated_operation is not None
     assert outcome.validated_operation.product_id == "coca-cola-zero-2l"
     assert validator.calls == 1
+
+
+@pytest.mark.parametrize("recognized_text", [None, "", "   "])
+def test_missing_recognized_text_does_not_change_validation(
+    recognized_text: str | None,
+) -> None:
+    validator = CountingValidator()
+    interpreter = PcResponseInterpreter(validator)
+    with_text = interpreter.interpret(_service_success(_contract("sumá dos coca zero")))
+
+    outcome = interpreter.interpret(_service_success(_contract(recognized_text)))
+
+    assert outcome.kind is OutcomeKind.ACCEPTED
+    assert outcome.recognized_text == ""
+    assert outcome.validated_operation == with_text.validated_operation
+    assert validator.calls == 2
 
 
 def test_a_transport_failure_is_not_validated() -> None:

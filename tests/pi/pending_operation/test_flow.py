@@ -1,5 +1,6 @@
 """Operation cycle: one pending operation, then back to idle."""
 
+import logging
 import threading
 import wave
 from pathlib import Path
@@ -30,6 +31,7 @@ from pi.pending_operation.response import OutcomeKind
 from pi.push_to_talk import (
     AudioCaptureResult,
     PushToTalkController,
+    PushToTalkState,
     TerminationReason,
 )
 from pi.push_to_talk.result import CAPTURED_AUDIO_FORMAT
@@ -246,6 +248,59 @@ def test_failed_responses_return_to_idle_without_a_pending_operation(
         flow.close()
 
 
+def test_an_unexpected_start_error_does_not_leave_the_cycle_recording(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    artifact = _wav(tmp_path / "take.wav").artifact
+
+    class UnstableStart:
+        def __init__(self) -> None:
+            self.starts = 0
+
+        def start(self) -> None:
+            self.starts += 1
+            if self.starts == 1:
+                raise RuntimeError("portaudio exploded")
+
+        def stop(self) -> AudioArtifact:
+            return artifact
+
+    errors: list[BaseException] = []
+    flow = _flow(EnvelopeClient(_success()))
+
+    def report(error: AudioStreamError) -> None:
+        errors.append(error)
+        flow.on_capture_error(error)
+
+    controller = PushToTalkController(
+        UnstableStart(),  # type: ignore[arg-type]
+        on_capture_completed=flow.on_capture_completed,
+        on_capture_error=report,
+        timer=_IdleTimer(),  # type: ignore[arg-type]
+        can_start_capture=flow.try_begin_recording,
+    )
+    controller.start()
+    try:
+        with caplog.at_level(logging.ERROR):
+            controller.notify_pressed()
+            controller.wait_until_caught_up()
+
+        assert flow.get_status().phase is OperationPhase.IDLE
+        assert flow.get_status().operator_message == CAPTURE_FAILED
+        assert isinstance(errors[0], AudioStreamError)
+        assert "portaudio exploded" in caplog.text
+        assert controller.state is PushToTalkState.IDLE
+
+        controller.notify_pressed()
+        controller.wait_until_caught_up()
+        assert flow.get_status().phase is OperationPhase.RECORDING
+        assert controller.state is PushToTalkState.RECORDING
+    finally:
+        controller.close()
+        flow.close()
+
+
 def test_a_failed_capture_returns_to_idle(tmp_path: Path) -> None:
     del tmp_path
     flow = _flow(EnvelopeClient())
@@ -274,6 +329,26 @@ def test_an_unexpected_send_error_does_not_stick_in_processing(
         assert status.operator_message == UNEXPECTED
         assert status.pending_operation is None
         assert flow.try_begin_recording() is True
+    finally:
+        flow.close()
+
+
+def test_a_valid_operation_without_recognized_text_can_be_confirmed(
+    tmp_path: Path,
+) -> None:
+    flow = _flow(EnvelopeClient(_success(_contract(None))))
+    try:
+        _finish(flow, _wav(tmp_path / "take.wav"))
+        current = flow.query_port.get_current()
+
+        assert flow.get_status().phase is OperationPhase.WAIT_CONFIRMATION
+        assert current is not None
+        assert current.recognized_text == ""
+        assert current.product == "Coca Cola Zero 2L"
+        assert current.confirmation_message == "Agregar 2 unidades de Coca Cola Zero 2L"
+        result = flow.resolution_port.confirm(current.operation_id)
+        assert result.status is ResolutionStatus.SUCCESS
+        assert flow.get_status().phase is OperationPhase.IDLE
     finally:
         flow.close()
 

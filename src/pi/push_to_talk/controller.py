@@ -9,7 +9,7 @@ from enum import Enum
 from typing import Protocol
 
 from pi.audio.capture import AudioCapture
-from pi.audio.errors import AudioCaptureError
+from pi.audio.errors import AudioCaptureError, AudioStreamError
 from pi.push_to_talk.result import (
     CAPTURED_AUDIO_FORMAT,
     AudioCaptureResult,
@@ -215,6 +215,13 @@ class PushToTalkController:
         except AudioCaptureError as exc:
             self._state = PushToTalkState.IDLE
             self._emit_error(exc)
+            return
+        except Exception:
+            # The application may already be in RECORDING. Leaving this
+            # uncaught kills the worker and the cycle cannot return to idle.
+            logger.exception("push-to-talk capture failed to start")
+            self._state = PushToTalkState.IDLE
+            self._emit_error(AudioStreamError("audio capture failed to start"))
             return
         self._generation += 1
         self._state = PushToTalkState.RECORDING

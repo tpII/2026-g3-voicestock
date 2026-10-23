@@ -154,6 +154,7 @@ y validación del flujo físico. Ver [evaluación y pendientes](docs/research/sp
 - [Comunicación Raspberry Pi–PC](docs/interfaces/pc-communication.md)
 - [Servicio de interpretación](docs/interfaces/interpretation-service.md)
 - [ADR-0006: Identificación de productos por coincidencia única de atributos](docs/decisions/0006-identify-products-by-unique-attribute-match.md)
+- [ADR-0007: Envío del audio push-to-talk como WAV crudo por HTTP](docs/decisions/0007-send-push-to-talk-audio-as-raw-wav-over-http.md)
 - [Contrato de operación (JSON versionado y validación)](docs/interfaces/operation-contract.md)
 - [Captura push-to-talk](docs/interfaces/push-to-talk-capture.md)
 - [Prueba manual de push-to-talk](docs/setup/push-to-talk.md)

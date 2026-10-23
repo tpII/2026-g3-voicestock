@@ -4,6 +4,11 @@ from typing import Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, StrictStr, field_validator, model_validator
 
+# Audio requests carry the WAV file itself as the body (ADR-0007).
+WAV_MEDIA_TYPE = "audio/wav"
+# About two minutes of PCM16 mono 16 kHz audio; a 60 s recording is ~1.9 MB.
+MAX_AUDIO_BYTES = 4 * 1024 * 1024
+
 
 class InterpretationRequest(BaseModel):
     """Recognized text sent by the Raspberry Pi for interpretation."""

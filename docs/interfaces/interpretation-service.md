@@ -84,7 +84,7 @@ PendingOperation  (waits for operator confirmation) PendingOperationFlow
 | `ServiceResult` | InterpretationService | PC → Raspberry Pi | Could the text be interpreted? | [This document](#serviceresult) |
 | `TransportEnvelope` | RaspberryPiPCCommunication | PC → Raspberry Pi | Did the message travel? | [Raspberry Pi–PC communication](pc-communication.md#responsibilities-by-layer) |
 | `ValidatedOperation` / `ValidationRejection` | OperationContractValidation | Raspberry Pi | A contract that identifies exactly one product and satisfies the domain rules, or a rejection with its reason. | [Operation contract](operation-contract.md#validating-a-payload-on-the-raspberry-pi); policy in [ADR-0006](../decisions/0006-identify-products-by-unique-attribute-match.md) |
-| `PendingOperation` | PendingOperationFlow | Raspberry Pi | A validated operation with its own identifier, waiting for confirmation. It does not modify inventory. | Pending: [PendingOperationFlow-01](https://app.clickup.com/t/86e3ev7md); web boundary in [the flow contract](../research/pending-operation-web-flow-contract.md) |
+| `PendingOperation` | PendingOperationFlow | Raspberry Pi | A validated operation with its own identifier, waiting for confirmation. It does not modify inventory. | [Operation workflow](../architecture/pending-operation-flow.md#pending-operation) |
 
 The contract mapper exists (`pc.operation_contract.map_draft`) but is not yet
 wired into the service, because the only registered provider is the stub.
@@ -229,8 +229,9 @@ The service only reports failures; it does not recover from them.
 - `detail` is diagnostic. Callers branch on `code`.
 - On the Raspberry Pi, a transport error, a typed service error or a
   `ValidationRejection` ends the attempt without creating a pending operation.
-  That minimal return to idle belongs to PendingOperationFlow; retries,
-  operator notification and recovery policy belong to FaultHandlingRecovery.
+  `PendingOperationFlow` returns to `IDLE` and shows a fixed operator message.
+  Retries and recovery beyond that message are not implemented. See
+  [the operation workflow](../architecture/pending-operation-flow.md#errors).
 
 ## Automated verification
 

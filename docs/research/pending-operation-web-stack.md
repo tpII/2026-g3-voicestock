@@ -13,7 +13,7 @@ or the page.
 | --- | --- |
 | HTTP server | Decided: FastAPI served by Uvicorn. Implemented later in `pi.web`. This note is the comparison. |
 | Frontend | Decided: vanilla HTML, CSS, and JavaScript, served as static files by the same application. The page now exists. Its behavior is the [pending operation page](../interfaces/pending-operation-web-ui.md). |
-| Process topology | Decided: one Python process owns the orchestrator, the FSM, and `PendingOperation`. HTTP is an input adapter in that process. The standalone command is still only for development. |
+| Process topology | Decided: one Python process owns the orchestrator, the FSM, and `PendingOperation`. HTTP is an input adapter in that process. That process is `voicestock-pi`. `voicestock-pi-web` remains a standalone page without the cycle. |
 
 ## Problem
 
@@ -284,15 +284,15 @@ directly would violate this decision even if it lives in the same process.
 - **PendingOperationWeb-02** defines the application ports used to query the
   current pending operation and to resolve it (`confirm` / `cancel`). Those
   ports are the only write path the HTTP adapter may call. The types and the
-  hand-off to `PendingOperationFlow` are in the
-  [flow contract](pending-operation-web-flow-contract.md).
+  hand-off to `PendingOperationFlow` was drafted in the
+  [flow contract](pending-operation-web-flow-contract.md). The implemented
+  cycle is
+  [the operation workflow](../architecture/pending-operation-flow.md).
 - **PendingOperationWeb-03** creates the FastAPI application, runs it with
   Uvicorn, and mounts the static files. HTTP frameworks stay in `pi/web` and
-  in the PC server. The command `voicestock-pi-web` is a temporary way to
-  start that app before the orchestrator exists. It is not a second
-  production process. How the app and the orchestrator share one process is
-  still open. The
-  [web setup guide](../setup/pi-web.md) is the run procedure.
+  in the PC server. The command `voicestock-pi-web` starts that app without
+  the cycle. `voicestock-pi` is the shared process. The
+  [runtime guide](../setup/pi-runtime.md) is the run procedure.
 - **PendingOperationWeb-04** implements the versioned HTTP API. Schemas
   belong to `pi.web`, not to the FSM. The contract is the
   [pending-operation web API](../interfaces/pending-operation-web-api.md).

@@ -56,6 +56,8 @@ production operation contract.
 | PC HTTP | `src/pc/communication/server.py` | `POST /api/v1/interpret` and `POST /api/v1/interpret-audio`, injected handlers |
 | Received audio | `src/pc/communication/audio.py` | `ReceivedAudio` and the `AudioHandler` contract |
 | PC composition | `src/pc/main.py` | Connects `InterpretationService.interpret` and the audio handler to HTTP |
+| Pi operation cycle | `src/pi/pending_operation/flow.py` | Owns the phase and the pending operation after a capture is sent. See [the operation workflow](pending-operation-flow.md). |
+| Pi process | `src/pi/runtime.py` | `voicestock-pi`: capture, client, cycle, and web UI. See [the runtime guide](../setup/pi-runtime.md). |
 | Interpreter port | `src/pc/interpretation/providers.py` | `InterpretationProvider.interpret(text)`, `ProviderRegistry`, `ProviderError` |
 | Service result | `src/pc/interpretation/results.py` | `ServiceResult` and typed errors |
 

@@ -100,13 +100,14 @@ and Docker as the way to publish this UI.
 
 - FastAPI and Uvicorn may be imported from the PC server and from `pi/web`.
   The rest of `pi`, including pending operations, still must not import them.
-  `voicestock-pi-web` only starts that app for development and validation
-  until the orchestrator exists. It is not a second production process.
+  `voicestock-pi-web` starts that app without the cycle, for development and
+  validation. `voicestock-pi` is the process that starts the orchestrator and
+  the page together. Neither command is a second production process.
 - Handlers share a process with the FSM. They must call ports and must not
   mutate orchestrator state, including under concurrent requests.
   `PendingOperationWeb-02` serializes resolution with one lock on the
-  application gateway. See the
-  [flow contract](../research/pending-operation-web-flow-contract.md).
+  application gateway. The cycle owner is
+  [ADR-0008](0008-use-a-single-raspberry-pi-operation-workflow.md).
 - In-memory pending state dies with the process. This ADR does not add a
   recovery store.
 - Uvicorn is the process that accepts browser connections. Putting nginx or
@@ -114,19 +115,20 @@ and Docker as the way to publish this UI.
 
 ### Follow-up
 
-- `PendingOperationWeb-02` defined the query and resolution ports. The
-  integration contract for `PendingOperationFlow` is the
-  [flow contract](../research/pending-operation-web-flow-contract.md).
-- `PendingOperationWeb-03` added the FastAPI application and the temporary
+- `PendingOperationWeb-02` defined the query and resolution ports. The cycle
+  that uses them is
+  [the operation workflow](../architecture/pending-operation-flow.md).
+- `PendingOperationWeb-03` added the FastAPI application and the standalone
   Uvicorn command. `PendingOperationWeb-05` replaced the first static page
-  with the operator UI. How that app shares the process with the orchestrator
-  is still open. See the
-  [web setup guide](../setup/pi-web.md).
+  with the operator UI. `voicestock-pi` is the process that shares the app
+  with the orchestrator. See the
+  [integrated runtime](../setup/pi-runtime.md).
 - `PendingOperationWeb-04` implemented the versioned HTTP API. The status
   map is the
   [pending-operation web API](../interfaces/pending-operation-web-api.md).
 - `PendingOperationWeb-05` consumes that API from vanilla JavaScript. See the
   [pending operation page](../interfaces/pending-operation-web-ui.md).
 - `PendingOperationWeb-06` records which document is the source of truth.
-  Open work with `PendingOperationFlow` stays in the
-  [flow contract](../research/pending-operation-web-flow-contract.md).
+  The cycle is
+  [ADR-0008](0008-use-a-single-raspberry-pi-operation-workflow.md) and
+  [the operation workflow](../architecture/pending-operation-flow.md).

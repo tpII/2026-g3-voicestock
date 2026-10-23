@@ -5,11 +5,11 @@
 The browser on the PC reads and resolves the current pending operation
 through this HTTP API. The server runs on the Raspberry Pi.
 
-FastAPI is an adapter. A route calls `PendingOperationQueryPort` or
-`PendingOperationResolutionPort` and maps the result. It does not own the
-pending operation, clear it, change the FSM, or execute inventory. Those
-rules live in `pi.pending_operation`, described in the
-[flow contract](../research/pending-operation-web-flow-contract.md).
+FastAPI is an adapter. A route calls `PendingOperationQueryPort`,
+`PendingOperationResolutionPort`, or `OperationCycleQueryPort` and maps the
+result. It does not own the pending operation, clear it, change the FSM, or
+execute inventory. Those rules live in `pi.pending_operation`, described in
+[the operation workflow](../architecture/pending-operation-flow.md).
 
 The page that calls this API is described in the
 [pending operation page](pending-operation-web-ui.md). This document is only
@@ -26,6 +26,7 @@ no collection and no alternate route.
 
 | Method | Path | Port |
 | --- | --- | --- |
+| `GET` | `/api/v1/system-status` | `get_status()` |
 | `GET` | `/api/v1/pending-operation` | `get_current()` |
 | `POST` | `/api/v1/pending-operation/{operation_id}/confirm` | `confirm(operation_id)` |
 | `POST` | `/api/v1/pending-operation/{operation_id}/cancel` | `cancel(operation_id)` |
@@ -34,8 +35,59 @@ Confirm and cancel have no request body. The id is the path segment.
 `Content-Type` is not required.
 
 The standalone `voicestock-pi-web` command does not receive ports. `/health`,
-`/`, and `/static/*` still answer. The three routes above then return
+`/`, and `/static/*` still answer. The four routes above then return
 `503` with `application_not_ready`. `/health` does not check the ports.
+`voicestock-pi` passes all three ports. See the
+[integrated runtime](../setup/pi-runtime.md).
+
+## Read the cycle
+
+`GET /api/v1/system-status`
+
+Returns `200` and the public `OperationCycleStatus`. The route does not
+change the phase. `Cache-Control` is `no-store`.
+
+```json
+{
+  "phase": "wait_confirmation",
+  "headline": "Operación pendiente de confirmación",
+  "detail": "",
+  "operator_message": null,
+  "pending_operation": {
+    "operation_id": "op-aaa",
+    "recognized_text": "agregar diez unidades de coca cola",
+    "product": "Coca-Cola",
+    "operation": "agregar",
+    "quantity": 10,
+    "unit": "unidad",
+    "confirmation_message": "Agregar 10 unidades de Coca-Cola"
+  }
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `phase` | `idle`, `recording`, `processing`, or `wait_confirmation`. |
+| `headline` | Primary line for that phase. |
+| `detail` | Secondary line. Empty for `processing` and `wait_confirmation`. |
+| `operator_message` | Why the previous attempt returned to `idle`, or `null`. |
+| `pending_operation` | The same object as `GET /api/v1/pending-operation`, or `null`. Present only while `phase` is `wait_confirmation`. |
+
+`recognized_text` may be `""`. The page decides whether to show it. This
+endpoint does not fill in a sentence the PC did not send.
+
+The phrases for each phase are fixed in `describe_phase`:
+
+| `phase` | `headline` | `detail` |
+| --- | --- | --- |
+| `idle` | `Listo para escuchar` | `Presioná el botón para hablar` |
+| `recording` | `Escuchando...` | `Soltá el botón para terminar` |
+| `processing` | `Procesando solicitud...` | `""` |
+| `wait_confirmation` | `Operación pendiente de confirmación` | `""` |
+
+What the operator sees for each phase is the
+[pending operation page](pending-operation-web-ui.md). What each phase allows
+is [the operation workflow](../architecture/pending-operation-flow.md).
 
 ## Get the current operation
 
@@ -112,7 +164,8 @@ is still current.
 
 `already_resolved` is `200`, not `409`. A retry of the same action did not
 run the operation again, and the client's intent already holds. That memory
-is the in-process `last_resolution` from the flow contract. It is not
+is the in-process `last_resolution` from the
+[operation workflow](../architecture/pending-operation-flow.md). It is not
 durable idempotency. After a restart the same retry is not remembered.
 
 `execution_failed` stays `503`. The route does not clear the pending
@@ -126,7 +179,7 @@ would still get `503`.
 ## Scenarios
 
 The application rule for each row is the
-[flow contract](../research/pending-operation-web-flow-contract.md). This
+[operation workflow](../architecture/pending-operation-flow.md). This
 table is only the HTTP result.
 
 | Situation | HTTP |
@@ -150,8 +203,10 @@ failed execution stays pending so the client can retry.
 reports success and does not change inventory. A `200` `success` from confirm
 does not mean stock was updated. `OperationConfirmationExecution` replaces
 that executor later. If a future real execution succeeds and the slot or FSM
-resolution then fails, a retry could run the effect again. That risk is
-recorded in the flow contract. This API does not solve it.
+resolution then fails, a retry could run the effect again. That limit is
+recorded in the
+[operation workflow](../architecture/pending-operation-flow.md#concurrency).
+This API does not solve it.
 
 A blank or whitespace `operation_id` is `422`:
 
@@ -178,8 +233,10 @@ When the route's port was not passed to `create_app`:
 }
 ```
 
-Status `503`. Query checks the query port. Confirm and cancel check the
-resolution port. This is a different `503` body from `execution_failed`.
+Status `503`. `GET /api/v1/system-status` checks the status port.
+`GET /api/v1/pending-operation` checks the query port. Confirm and cancel
+check the resolution port. This is a different `503` body from
+`execution_failed`.
 
 ## What this API does not do
 

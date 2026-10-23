@@ -12,10 +12,15 @@ from pi.web.dependencies import (
     APIError,
     QueryPortDep,
     ResolutionPortDep,
+    StatusPortDep,
     call_resolution,
     validated_operation_id,
 )
-from pi.web.schemas import PendingOperationResponse, ResolutionResponse
+from pi.web.schemas import (
+    PendingOperationResponse,
+    ResolutionResponse,
+    SystemStatusResponse,
+)
 
 router = APIRouter(prefix="/api/v1")
 
@@ -52,6 +57,13 @@ def resolution_http_response(result: ResolutionResult) -> JSONResponse:
         status_code=_HTTP_STATUS[result.status],
         content=body.model_dump(mode="json"),
     )
+
+
+@router.get("/system-status")
+def read_system_status(status_port: StatusPortDep) -> JSONResponse:
+    """Return the public phase. The route does not change the cycle."""
+    body = SystemStatusResponse.from_status(status_port.get_status())
+    return JSONResponse(content=body.model_dump(mode="json"), headers=NO_STORE)
 
 
 @router.get("/pending-operation")

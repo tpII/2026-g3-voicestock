@@ -444,3 +444,36 @@ def test_close_stops_an_active_recording_and_joins_the_worker(
     controller.notify_pressed()
     assert capture.start_count == 1
     controller.close()
+
+
+def test_press_is_ignored_when_the_application_refuses_a_new_capture(
+    artifact: AudioArtifact,
+    timer: ManualTimer,
+) -> None:
+    capture = FakeCapture(artifact)
+    allowed = False
+
+    def can_start() -> bool:
+        return allowed
+
+    controller = PushToTalkController(
+        capture,  # type: ignore[arg-type]
+        on_capture_completed=lambda result: None,
+        on_capture_error=lambda error: None,
+        timer=timer,
+        can_start_capture=can_start,
+    )
+    controller.start()
+    try:
+        controller.notify_pressed()
+        controller.wait_until_caught_up()
+        assert capture.start_count == 0
+        assert controller.state is PushToTalkState.IDLE
+
+        allowed = True
+        controller.notify_pressed()
+        controller.wait_until_caught_up()
+        assert capture.start_count == 1
+        assert controller.state is PushToTalkState.RECORDING
+    finally:
+        controller.close()

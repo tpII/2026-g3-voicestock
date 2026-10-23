@@ -1,7 +1,8 @@
-"""Application boundary for reading and resolving a pending operation.
+"""Application boundary for the single pending operation and its cycle.
 
-The future web adapter depends on the ports. ``PendingOperationFlow`` will own
-the pending operation and pass a slot into ``PendingOperationGateway``.
+The web adapter depends on the ports. ``PendingOperationFlow`` owns the
+pending operation and the FSM, and passes itself to ``PendingOperationGateway``
+as the slot.
 """
 
 from pi.pending_operation.executor import (
@@ -10,7 +11,9 @@ from pi.pending_operation.executor import (
     OperationExecutor,
     ProvisionalOperationExecutor,
 )
+from pi.pending_operation.flow import PendingOperationFlow
 from pi.pending_operation.gateway import PendingOperationGateway
+from pi.pending_operation.operation import PendingOperation
 from pi.pending_operation.ports import (
     PendingOperationQueryPort,
     PendingOperationResolutionPort,
@@ -21,12 +24,22 @@ from pi.pending_operation.resolution import (
     ResolvedAction,
 )
 from pi.pending_operation.slot import PendingOperationSlot
+from pi.pending_operation.status import (
+    OperationCycleQueryPort,
+    OperationCycleStatus,
+    OperationPhase,
+)
 from pi.pending_operation.view import PendingOperationView
 
 __all__ = [
     "ExecutionResult",
     "ExecutionStatus",
+    "OperationCycleQueryPort",
+    "OperationCycleStatus",
     "OperationExecutor",
+    "OperationPhase",
+    "PendingOperation",
+    "PendingOperationFlow",
     "PendingOperationGateway",
     "PendingOperationQueryPort",
     "PendingOperationResolutionPort",

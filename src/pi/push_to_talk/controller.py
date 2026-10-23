@@ -97,6 +97,7 @@ class PushToTalkController:
         on_capture_error: Callable[[AudioCaptureError], None],
         max_duration: float = DEFAULT_MAX_DURATION_SECONDS,
         timer: RecordingTimer | None = None,
+        can_start_capture: Callable[[], bool] | None = None,
     ) -> None:
         if max_duration <= 0:
             raise ValueError("max_duration must be positive")
@@ -105,6 +106,9 @@ class PushToTalkController:
         self._on_capture_error = on_capture_error
         self._max_duration = max_duration
         self._timer = timer if timer is not None else ThreadingRecordingTimer()
+        # The application cycle decides when a new capture may start. None
+        # keeps the controller's original behavior for the standalone command.
+        self._can_start_capture = can_start_capture
         self._state = PushToTalkState.IDLE
         self._generation = 0
         self._closed = False
@@ -200,6 +204,11 @@ class PushToTalkController:
 
     def _handle_pressed(self) -> None:
         if self._state is not PushToTalkState.IDLE:
+            return
+        # Checked on the worker, after this press is the next event, so the
+        # application transition and the start of capture cannot interleave
+        # with another button event.
+        if self._can_start_capture is not None and not self._can_start_capture():
             return
         try:
             self._capture.start()

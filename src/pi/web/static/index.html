@@ -25,8 +25,13 @@
             <path d="M18 32c1.8 2 4 3 6 3s4.2-1 6-3"></path>
             <circle cx="24" cy="22" r="2"></circle>
           </svg>
-          <h1>Listo para escuchar</h1>
-          <p>Presioná el botón físico y hablá para registrar una operación.</p>
+          <h1 id="idle-headline">Listo para escuchar</h1>
+          <p id="idle-detail">Presioná el botón para hablar</p>
+          <p id="operator-message" class="operator-message" hidden></p>
+        </section>
+        <section id="activity-state" class="empty-state" hidden>
+          <h1 id="activity-headline"></h1>
+          <p id="activity-detail" hidden></p>
         </section>
         <section id="pending-card" class="operation-card" hidden aria-labelledby="confirmation-message">
           <p id="operation-notice" class="operation-notice" hidden></p>

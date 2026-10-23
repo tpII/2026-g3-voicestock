@@ -11,6 +11,7 @@ from pi.push_to_talk.result import (
     AudioFormat,
     TerminationReason,
 )
+from pi.push_to_talk.sender import RecordingSender, SentRecordingHandler
 
 __all__ = [
     "CAPTURED_AUDIO_FORMAT",
@@ -19,5 +20,7 @@ __all__ = [
     "AudioFormat",
     "PushToTalkController",
     "PushToTalkState",
+    "RecordingSender",
+    "SentRecordingHandler",
     "TerminationReason",
 ]

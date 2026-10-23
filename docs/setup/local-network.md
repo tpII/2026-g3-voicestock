@@ -6,7 +6,7 @@ mistakes.
 
 Why this topology was chosen, including the earlier Ethernet plan, is the
 [local network strategy](../research/local-network-strategy.md). The decision
-record is [ADR-0004](../decisions/0004-use-isolated-raspberry-pi-wifi-access-point.md).
+record is [ADR-0010](../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md).
 This page is the procedure.
 
 Application traffic is a separate feature, `RaspberryPiPCCommunication`.
@@ -16,6 +16,12 @@ the
 [Raspberry Pi–PC communication interface](../interfaces/pc-communication.md).
 The operator page that the PC browser opens on the Pi is the
 [web setup guide](pi-web.md).
+
+On 22 October 2026 the team also reached the Raspberry Pi through Tailscale
+and a reverse SSH tunnel. That session is recorded in
+[testing remotely over Tailscale](../interfaces/pc-audio-communication.md#testing-remotely-over-tailscale).
+It is a development path. It does not replace this cell, and it does not
+close the hardware checks at the end of this page.
 
 The setup scripts check the machine they run on. They do not ping the other
 host, and they do not test Internet access. That physical check belongs to

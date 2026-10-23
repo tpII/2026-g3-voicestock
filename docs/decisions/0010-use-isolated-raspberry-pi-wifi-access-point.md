@@ -1,8 +1,9 @@
-# ADR-0004: Use an isolated Raspberry Pi Wi-Fi access point
+# ADR-0010: Use an isolated Raspberry Pi Wi-Fi access point
 
 ## Status
 
-Accepted
+Accepted. Renumbered from ADR-0004 on 23 October 2026. That number is kept by
+the interpretation-provider decision. The network decision itself is unchanged.
 
 ## Context
 

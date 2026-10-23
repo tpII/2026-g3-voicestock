@@ -1,8 +1,9 @@
-# ADR-0004: Use in-process FastAPI and a static web UI for pending operations
+# ADR-0009: Use in-process FastAPI and a static web UI for pending operations
 
 ## Status
 
-Accepted
+Accepted. Renumbered from ADR-0004 on 23 October 2026. That number is kept by
+the interpretation-provider decision. The web decision itself is unchanged.
 
 ## Context
 
@@ -12,6 +13,12 @@ The Pi has 1 GB of RAM, does not use Internet while the system is running,
 and reaches the PC through the direct Ethernet link from `LocalNetworkInfra`
 (`192.168.50.1` on the Pi, `192.168.50.2` on the PC). A Wi-Fi access point is
 not the network topology.
+
+Those two sentences describe the network as it stood when this ADR was
+written. On 11 October 2026 the project replaced that cable with the isolated
+Wi-Fi access point recorded in
+[ADR-0010](0010-use-isolated-raspberry-pi-wifi-access-point.md). The addresses
+stayed the same. This ADR does not choose the medium.
 
 The orchestrator, the finite-state machine, and `PendingOperation` already
 belong to the Python process on the Pi. The web stack has to expose that
@@ -87,8 +94,10 @@ and Docker as the way to publish this UI.
 
 ### Positive
 
-- The browser talks to the Pi over the existing Ethernet segment. No access
-  point and no Internet path are required at runtime.
+- The browser talks to the Pi on the VoiceStock addresses. No Internet path
+  is required at runtime. The medium is
+  [ADR-0010](0010-use-isolated-raspberry-pi-wifi-access-point.md). The
+  original wording of this bullet assumed the Ethernet plan above.
 - One process starts the orchestrator and the UI. There is no second service
   to supervise.
 - The HTTP contract can grow in later tasks while the static page remains a

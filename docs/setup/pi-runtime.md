@@ -61,7 +61,11 @@ reads. Product identity follows
 index. `USB Audio` below is a placeholder; use a name from the capture
 device list in the push-to-talk guide.
 
-On the Raspberry Pi, with the PC server reachable on the Ethernet link:
+On the Raspberry Pi the PC server has to be reachable on the VoiceStock Wi-Fi
+cell. That cell is the
+[local network setup](local-network.md). `192.168.50.2` is the PC address
+defined there. Port `8000` in the example is the PC server default, not a
+second network setting:
 
 ```bash
 mkdir -p recordings

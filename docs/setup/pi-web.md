@@ -5,7 +5,7 @@ pending-operation page. What it does with each HTTP result is the
 [pending operation page](../interfaces/pending-operation-web-ui.md).
 
 Why this stack exists is
-[ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md).
+[ADR-0009](../decisions/0009-use-in-process-fastapi-and-static-web-ui.md).
 The cycle that owns the pending operation is
 [the operation workflow](../architecture/pending-operation-flow.md). The
 process that starts the page together with that cycle is the
@@ -25,19 +25,22 @@ to another process. It also does not start capture, the PC client, or
 ## Network
 
 The browser runs on the PC. The server runs on the Raspberry Pi. They meet
-on the Ethernet link from the
-[Ethernet setup guide](local-network.md):
+on the isolated VoiceStock Wi-Fi cell. How to bring that cell up is the
+[local network setup](local-network.md). This page does not repeat that
+procedure. The physical checks of the cell are still open; see that guide.
 
 ```text
-Raspberry Pi  192.168.50.1
-        |
-     Ethernet
-        |
-PC            192.168.50.2
-        |
-      Wi-Fi
-        |
-     Internet
+Internet
+   |
+PC Wi-Fi #1
+   |
+  PC            192.168.50.2
+   |
+PC Wi-Fi #2
+   |
+VoiceStock Wi-Fi
+   |
+Raspberry Pi    192.168.50.1   access point, no Internet
 ```
 
 The web server binds to `192.168.50.1` port `8000` unless the environment
@@ -48,7 +51,7 @@ on `8000`, or set `VOICESTOCK_WEB_PORT` / `VOICESTOCK_PC_PORT`.
 The page, its files, and the API are the same origin:
 `http://192.168.50.1:8000`. This increment has no HTTPS, no login, and no
 CORS. Those limits are
-[ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md).
+[ADR-0009](../decisions/0009-use-in-process-fastapi-and-static-web-ui.md).
 
 ## Install
 
@@ -65,7 +68,8 @@ dependencies. The page does not use a CDN, npm, or Node.js.
 
 ## Run on the Raspberry Pi
 
-The Ethernet address has to be configured first. Then:
+The VoiceStock address has to be configured first, as in the
+[local network setup](local-network.md). Then:
 
 ```bash
 voicestock-pi-web

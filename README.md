@@ -153,6 +153,9 @@ VOICESTOCK_WEB_PORT=8123 \
 
 Con `voicestock-pi`, la página queda en el mismo proceso. En la Raspberry Pi
 escucha en `192.168.50.1:8000`. Desde la PC: `http://192.168.50.1:8000/`.
+Esas direcciones son las de la red Wi-Fi aislada; el procedimiento está en
+la [guía de red local](docs/setup/local-network.md). La validación física de
+esa red sigue pendiente.
 
 `voicestock-pi-web` sigue disponible para abrir la página sin el ciclo. En
 ese caso `GET /health` responde y el API dice que la aplicación no está

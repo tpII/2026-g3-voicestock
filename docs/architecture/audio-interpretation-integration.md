@@ -1,6 +1,30 @@
 # Audio and interpretation integration
 
-## Current implementation and proposed connection
+## Transcription moved to the PC (October 2026)
+
+Running STT on the Raspberry Pi 3 proved too slow, so transcription moves to an
+API called from the PC. The Raspberry Pi now sends the push-to-talk WAV
+instead of recognized text:
+
+```mermaid
+flowchart LR
+    A[Pi PushToTalk WAV] --> B[RecordingSender]
+    B --> C[HttpInterpretationClient.interpret_audio]
+    C --> D[PC HTTP server: POST /api/v1/interpret-audio]
+    D --> E[Audio handler: stub today]
+    E --> F[Transcription API: pending]
+    F --> G[InterpretationService]
+```
+
+The transport is implemented
+([ADR-0007](../decisions/0007-send-push-to-talk-audio-as-raw-wav-over-http.md),
+[audio interface](../interfaces/pc-audio-communication.md)). The audio handler
+is still the stub `describe_received_audio` in `src/pc/main.py`. Replacing it
+with transcription through the API plus `InterpretationService.interpret` is
+the pending step. The sections below describe the earlier plan with STT on the
+Raspberry Pi and the SSH benchmark tooling. They are kept as a record.
+
+## Earlier plan: STT on the Raspberry Pi
 
 The PC benchmark already executes WAV → Whisper → interpreter → experimental
 JSON. It uses recorded fixtures and calls models directly. It does not exercise
@@ -26,10 +50,12 @@ production operation contract.
 | --- | --- | --- |
 | Capture completion | `src/pi/push_to_talk/controller.py` | `on_capture_completed(AudioCaptureResult)` |
 | Captured audio | `src/pi/push_to_talk/result.py` | WAV path in `result.artifact.path` |
-| Pi transport | `src/pi/communication/client.py` | `HttpInterpretationClient.interpret(text)` |
-| Shared request | `src/shared/communication/contracts.py` | `InterpretationRequest(text=...)` and `TransportEnvelope` |
-| PC HTTP | `src/pc/communication/server.py` | `POST /api/v1/interpret`, injected handler |
-| PC composition | `src/pc/main.py` | Connects `InterpretationService.interpret` to HTTP |
+| Recording upload | `src/pi/push_to_talk/sender.py` | `RecordingSender`, a capture consumer |
+| Pi transport | `src/pi/communication/client.py` | `HttpInterpretationClient.interpret(text)` and `interpret_audio(wav_path)` |
+| Shared request | `src/shared/communication/contracts.py` | `InterpretationRequest(text=...)`, `WAV_MEDIA_TYPE`, `MAX_AUDIO_BYTES` and `TransportEnvelope` |
+| PC HTTP | `src/pc/communication/server.py` | `POST /api/v1/interpret` and `POST /api/v1/interpret-audio`, injected handlers |
+| Received audio | `src/pc/communication/audio.py` | `ReceivedAudio` and the `AudioHandler` contract |
+| PC composition | `src/pc/main.py` | Connects `InterpretationService.interpret` and the audio handler to HTTP |
 | Interpreter port | `src/pc/interpretation/providers.py` | `InterpretationProvider.interpret(text)`, `ProviderRegistry`, `ProviderError` |
 | Service result | `src/pc/interpretation/results.py` | `ServiceResult` and typed errors |
 

@@ -16,6 +16,10 @@ framing, encoding, status and errors would become project-owned work. The full
 comparison is in
 [ADR-0001](../decisions/0001-use-http-json-for-pi-pc-communication.md).
 
+The same server also receives push-to-talk recordings as WAV files, through
+`POST /api/v1/interpret-audio`. That endpoint is documented in the
+[audio interface](pc-audio-communication.md).
+
 ## Responsibilities by layer
 
 ```text
@@ -386,6 +390,10 @@ and should not raise: an exception becomes `handler_failure`, and a
 non-serializable value becomes `serialization_failure`. In production the
 handler is `InterpretationService.interpret`, which always returns a
 `ServiceResult`; tests may pass any callable.
+
+`create_app` also accepts an optional `audio_handler`, which receives the WAV
+recordings. Its contract is in the
+[audio interface](pc-audio-communication.md#pc-audio-handler-connecting-the-transcription-api).
 
 ## Automated verification
 

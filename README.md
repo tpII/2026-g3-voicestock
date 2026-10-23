@@ -2,7 +2,7 @@
 
 Sistema de gestión de inventario asistido por voz, pensado para ejecutarse en una Raspberry Pi.
 
-La Raspberry Pi capturará audio, hará Speech-to-Text, se comunicará con un modelo de lenguaje a través de una interfaz independiente del proveedor, validará respuestas estructuradas, administrará el inventario, persistirá datos en SQLite y expondrá una interfaz web.
+La Raspberry Pi capturará audio y lo enviará a la PC, que hará Speech-to-Text por API y se comunicará con un modelo de lenguaje a través de una interfaz independiente del proveedor. La Raspberry Pi validará las respuestas estructuradas, administrará el inventario, persistirá datos en SQLite y expondrá una interfaz web.
 
 El proyecto está en una etapa inicial. Ya incluye la captura push-to-talk en la
 Raspberry Pi, el servidor de comunicación de la PC (conectado a un servicio de
@@ -66,8 +66,10 @@ pytest
 
 ### Servidor de comunicación de la PC
 
-El servidor recibe texto por HTTP y lo pasa al servicio de interpretación. Por
-defecto usa el proveedor `stub` y escucha solamente en localhost:
+El servidor recibe por HTTP texto, que pasa al servicio de interpretación, y
+grabaciones WAV del push-to-talk, que pasa a un handler de audio sustituible
+(hoy un stub, después la transcripción por API). Por defecto usa el proveedor
+`stub` y escucha solamente en localhost:
 
 ```bash
 voicestock-pc-server
@@ -96,9 +98,17 @@ VOICESTOCK_PC_URL=http://<ip-de-la-pc>:8123 VOICESTOCK_PC_TIMEOUT=10 \
   voicestock-pi-client "agregá dos paquetes de arroz"
 ```
 
+Para enviar una grabación en lugar de texto:
+
+```bash
+voicestock-pi-client --audio grabacion.wav
+```
+
 El contrato, la puesta en marcha en la red local y el catálogo de errores con
 ejemplos están en la
-[interfaz de comunicación Raspberry Pi–PC](docs/interfaces/pc-communication.md).
+[interfaz de comunicación Raspberry Pi–PC](docs/interfaces/pc-communication.md)
+y, para el audio, en la
+[interfaz de audio Raspberry Pi–PC](docs/interfaces/pc-audio-communication.md).
 
 ### Push-to-talk
 
@@ -108,6 +118,10 @@ el contrato de audio y la prueba en la placa están separados:
 - [Decisión de arquitectura](docs/decisions/0003-use-event-driven-gpio-and-sounddevice-for-ptt-capture.md)
 - [Interfaz de captura](docs/interfaces/push-to-talk-capture.md)
 - [Conexión, configuración y prueba manual](docs/setup/push-to-talk.md)
+
+Con `--send-to-pc`, `voicestock-pi-ptt` envía cada grabación a la PC y muestra
+la respuesta
+([interfaz de audio](docs/interfaces/pc-audio-communication.md#sending-push-to-talk-recordings)).
 
 ### Web en la Raspberry Pi
 
@@ -152,6 +166,7 @@ y validación del flujo físico. Ver [evaluación y pendientes](docs/research/sp
 - [Investigación: estrategia y evaluación de interpretación](docs/research/stock-interpretation-strategy-and-evaluation.md)
 - [Flujo de trabajo de desarrollo](docs/guides/development-workflow.md)
 - [Comunicación Raspberry Pi–PC](docs/interfaces/pc-communication.md)
+- [Envío de audio Raspberry Pi–PC](docs/interfaces/pc-audio-communication.md)
 - [Servicio de interpretación](docs/interfaces/interpretation-service.md)
 - [ADR-0006: Identificación de productos por coincidencia única de atributos](docs/decisions/0006-identify-products-by-unique-attribute-match.md)
 - [ADR-0007: Envío del audio push-to-talk como WAV crudo por HTTP](docs/decisions/0007-send-push-to-talk-audio-as-raw-wav-over-http.md)

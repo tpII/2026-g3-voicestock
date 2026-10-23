@@ -2,15 +2,17 @@
 
 Sistema de gestión de inventario asistido por voz, pensado para ejecutarse en una Raspberry Pi.
 
-La Raspberry Pi capturará audio y lo enviará a la PC, que hará Speech-to-Text por API y se comunicará con un modelo de lenguaje a través de una interfaz independiente del proveedor. La Raspberry Pi validará las respuestas estructuradas, administrará el inventario, persistirá datos en SQLite y expondrá una interfaz web.
+La Raspberry Pi captura audio y lo envía a la PC. El reconocimiento de voz y
+la interpretación con un modelo de lenguaje corren, conceptualmente, en la PC.
+La Raspberry Pi valida el contrato, mantiene una sola operación pendiente en
+memoria y muestra la página para confirmarla o cancelarla. El inventario en
+SQLite todavía no se modifica.
 
-El proyecto está en una etapa inicial. Ya incluye la captura push-to-talk en la
-Raspberry Pi, el servidor de comunicación de la PC (conectado a un servicio de
-interpretación con proveedor intercambiable, por ahora un stub) y la página
-web para confirmar o cancelar la operación pendiente. STT, el modelo de
-lenguaje e inventario continúan en desarrollo. Confirmar en la página todavía
-no modifica el inventario. La prueba física del pulsador y del micrófono USB
-todavía no se hizo.
+El proyecto ya incluye la captura push-to-talk, el cliente HTTP, el ciclo
+`PendingOperationFlow`, el comando `voicestock-pi` y la página de
+confirmación. El servidor de la PC sigue usando un handler de audio
+provisional. Confirmar en la página no modifica el inventario. El recorrido
+completo de voz, desde el micrófono hasta un contrato real, no está cerrado.
 
 ## Requisitos
 
@@ -123,31 +125,57 @@ Con `--send-to-pc`, `voicestock-pi-ptt` envía cada grabación a la PC y muestra
 la respuesta
 ([interfaz de audio](docs/interfaces/pc-audio-communication.md#sending-push-to-talk-recordings)).
 
+### Ciclo de operación en la Raspberry Pi
+
+`voicestock-pi` es el proceso que junta el botón, el micrófono, el cliente
+hacia la PC, la validación del contrato y la página. El pin, el micrófono, el
+directorio de grabaciones y el catálogo JSON son obligatorios. En desarrollo:
+
+```bash
+VOICESTOCK_PC_URL=http://127.0.0.1:8000 \
+VOICESTOCK_WEB_HOST=127.0.0.1 \
+VOICESTOCK_WEB_PORT=8123 \
+  voicestock-pi \
+  --pin 17 \
+  --bounce-time 0.05 \
+  --input-device "USB Audio" \
+  --output-directory recordings \
+  --catalog path/to/catalog.json
+```
+
+`USB Audio` es un ejemplo de nombre de dispositivo, no un valor fijo.
+
+- [Arquitectura del ciclo](docs/architecture/pending-operation-flow.md)
+- [Cómo ejecutarlo](docs/setup/pi-runtime.md)
+- [ADR-0008: un solo orquestador](docs/decisions/0008-use-a-single-raspberry-pi-operation-workflow.md)
+
 ### Web en la Raspberry Pi
 
-`voicestock-pi-web` sirve la página de la operación pendiente. En la
-Raspberry Pi escucha en `192.168.50.1:8000`. Desde la PC:
-`http://192.168.50.1:8000/`. En una máquina de desarrollo:
+Con `voicestock-pi`, la página queda en el mismo proceso. En la Raspberry Pi
+escucha en `192.168.50.1:8000`. Desde la PC: `http://192.168.50.1:8000/`.
+
+`voicestock-pi-web` sigue disponible para abrir la página sin el ciclo. En
+ese caso `GET /health` responde y el API dice que la aplicación no está
+lista. `GET /health` solo indica que el servidor HTTP está vivo.
 
 ```bash
 VOICESTOCK_WEB_HOST=127.0.0.1 VOICESTOCK_WEB_PORT=8123 voicestock-pi-web
 ```
 
-El comando es temporal, para desarrollo y validación, hasta que el orquestador
-exista. Sin ese runtime `GET /health` sigue respondiendo y el API dice que la
-aplicación no está lista. `GET /health` solo indica que el servidor HTTP está
-vivo.
-
-- [Cómo instalarlo, arrancarlo y abrirlo](docs/setup/pi-web.md)
+- [Cómo instalar y abrir solo la página](docs/setup/pi-web.md)
 - [Contrato HTTP](docs/interfaces/pending-operation-web-api.md)
 - [Qué muestra la página](docs/interfaces/pending-operation-web-ui.md)
+
 ## Estado de la evaluación de voz
 
-La elección para la próxima integración es **Whisper Small Q5_1 mediante
-whisper.cpp** como STT offline en Raspberry Pi y **GPT OSS 20B vía Groq** como
-LLM principal en la PC. Qwen local queda como segunda opción. La exploración
-en PC está registrada; faltan pruebas en la Pi 3, adaptadores de producción
-y validación del flujo físico. Ver [evaluación y pendientes](docs/research/speech-to-text-engine-evaluation.md).
+El ciclo implementado envía el WAV a la PC. El reconocimiento corre,
+conceptualmente, en la PC; el servidor todavía usa el handler provisional.
+La evaluación de Whisper en la Raspberry Pi y de los modelos de lenguaje queda
+como registro:
+
+- [Integración de captura e interpretación](docs/architecture/audio-interpretation-integration.md)
+- [Evaluación de Speech-to-Text](docs/research/speech-to-text-engine-evaluation.md)
+- [ADR-0005](docs/decisions/0005-use-whisper-small-q5-for-offline-stt.md)
 
 ## Documentación
 
@@ -159,6 +187,9 @@ y validación del flujo físico. Ver [evaluación y pendientes](docs/research/sp
 - [Interfaz pública de Speech-to-Text](docs/interfaces/speech-to-text.md)
 - [ADR-0005: Whisper Small Q5 pendiente de validación en Pi](docs/decisions/0005-use-whisper-small-q5-for-offline-stt.md)
 - [Integración de captura, STT e interpretación](docs/architecture/audio-interpretation-integration.md)
+- [Ciclo de operación en la Raspberry Pi](docs/architecture/pending-operation-flow.md)
+- [ADR-0008: un solo orquestador del ciclo](docs/decisions/0008-use-a-single-raspberry-pi-operation-workflow.md)
+- [Runtime integrado de la Raspberry Pi](docs/setup/pi-runtime.md)
 
 - [Guía de contribución](CONTRIBUTING.md)
 - [Guía de documentación](docs/guides/documentation-guide.md)

@@ -1,11 +1,18 @@
 # Pending operation web flow contract
 
-Hand-off between the web adapter and the future `PendingOperationFlow`.
+**Status: historical.** This note was the hand-off written before
+`PendingOperationFlow` existed. The flow now exists. Current behavior is
+[the operation workflow](../architecture/pending-operation-flow.md). The HTTP
+contract is the
+[pending-operation web API](../interfaces/pending-operation-web-api.md). The
+page is the
+[pending operation page](../interfaces/pending-operation-web-ui.md). How the
+single process starts is the
+[integrated runtime](../setup/pi-runtime.md).
 
-**Status:** the ports, the gateway, the provisional executor, the HTTP API,
-and the operator page exist. `PendingOperationFlow` does not. This document
-is the source of truth for that boundary. It is not the FSM design. When Flow
-exists, its own design can absorb this note.
+The sections below are kept as the record of that hand-off. Where they say
+the flow, the slot, or the runtime are still missing, that statement is out
+of date. Do not use this file as the source of truth for the cycle.
 
 The stable stack decision is
 [ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md).
@@ -44,21 +51,23 @@ install and open the server is the
                                     |
                                     v
                     PendingOperationFlow / FSM
-                    not implemented yet
+                    implemented; see the architecture document
 ```
 
-Today:
+At the time of this note:
 
-- `PendingOperationFlow` does not exist, and there is no production slot.
+- `PendingOperationFlow` did not exist, and there was no production slot.
+  Both now exist. The flow implements the slot.
 - `voicestock-pi-web` can start without the ports. `/health` still answers.
   The pending-operation routes then return `application_not_ready`.
+  `voicestock-pi` is the process that passes the ports.
 - The production shape is still one Python process. The standalone command
   is for development and validation. It is not a second service.
 - FastAPI calls the ports. It does not own the pending operation.
 
 ## Ownership
 
-`PendingOperationFlow` will own:
+`PendingOperationFlow` now owns:
 
 - `PendingOperation`;
 - the FSM;
@@ -68,19 +77,19 @@ Today:
 - the transition after cancellation;
 - the real integration with the Pi runtime.
 
-Those states are not defined here. The web only consumes
-`PendingOperationQueryPort` and `PendingOperationResolutionPort`. FastAPI
-does not own the pending operation, does not clear it, and does not modify
-the FSM. The shape is the diagram above.
+Those states are defined in the architecture document, not here. The web consumes
+`PendingOperationQueryPort`, `PendingOperationResolutionPort`, and
+`OperationCycleQueryPort`. FastAPI does not own the pending operation, does
+not clear it, and does not modify the FSM. The shape is the diagram above.
 
 Flow should compose `PendingOperationGateway` and pass its slot and the
 executor in. It should not reimplement confirm and cancel in the HTTP layer,
 and it should not keep a second copy of the resolution rules.
 
-`pi.web` stores the two ports and, when they are present, the versioned
-routes call them. Without ports the API returns `application_not_ready` and
-`/health` stays a liveness check. What `/health` does and does not mean is
-the [web setup guide](../setup/pi-web.md).
+`pi.web` stores the query, resolution, and status ports. A route whose port
+was not passed in returns `application_not_ready`. `/health` stays a liveness
+check. What `/health` does and does not mean is the
+[web setup guide](../setup/pi-web.md).
 
 The code lives in `pi.pending_operation`, because the page and the
 orchestrator run on the Raspberry Pi. It is not in `shared`: the PC does not
@@ -302,16 +311,16 @@ replacement, confirming an operation does not modify real inventory.
 
 ## Slot
 
-`PendingOperationSlot` is a protocol. This package has no production slot,
-because the slot belongs to `PendingOperationFlow`.
+`PendingOperationSlot` is a protocol. `PendingOperationFlow` is the production
+slot. This section describes the protocol as it was specified for that owner.
 
 `current()` exposes the snapshot the gateway may show. `clear(operation_id)`
 returns whether that id was still current. The gateway treats `False` as
 `stale_operation` and does not remember a success.
 
-When Flow implements the slot, `clear` will probably have to perform the FSM
-transition out of confirmation, not only `pending = None`. That decision is
-not taken here.
+`clear` on the flow drops the pending operation and returns the phase to
+`IDLE` when the id still matches. That behavior is the architecture document,
+not an open choice.
 
 ## Execution succeeds, resolution fails
 
@@ -334,19 +343,13 @@ does not decide that. This note only keeps the risk and names its owner.
 
 ## Still open
 
-- Integrating this gateway into the real `PendingOperationFlow`.
-- The final lifecycle of the web app inside the single Pi process.
-  `voicestock-pi-web` is not that lifecycle.
-- The FSM after a successful confirm and after a cancel.
-- How a pending operation is created, and the domain type behind the view.
-- How `operation_id` values are generated, provided they stay unique while
-  remembered.
-- When the slot starts and stops exposing the current view, and what `clear`
-  means as an FSM transition.
-- The product, unit, and operation vocabulary, with the inventory feature.
+The cycle, the slot, `operation_id` generation, and the single-process
+lifecycle are implemented. See the architecture document and the runtime
+guide. These items remain outside that implementation:
+
 - The real inventory executor, and what a failed execution means for stock.
 - Durable idempotency after a process restart.
-- Recovery when execution succeeds and slot or FSM resolution then fails.
+- Recovery when execution succeeds and slot resolution then fails.
 - Persistence and operation history.
 - Authentication or TLS, if a later increment requires them. They are not
   part of this web increment. See
@@ -356,7 +359,6 @@ does not decide that. This note only keeps the risk and names its owner.
 
 PendingOperationWeb-02 did not implement FastAPI, HTML, inventory, history,
 resolution persistence, the FSM, `PendingOperationFlow`, or
-`OperationConfirmationExecution`. The HTTP API and the page now exist; their
-contracts are the interface documents linked above. The slot still has no
-production class. Test doubles live under `tests/pi/pending_operation/` and
-are not a second pending-operation model.
+`OperationConfirmationExecution`. The HTTP API, the page, and the flow now
+exist. The flow is the production slot. Test doubles live under
+`tests/pi/pending_operation/` and are not a second pending-operation model.

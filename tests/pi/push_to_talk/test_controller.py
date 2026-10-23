@@ -444,3 +444,83 @@ def test_close_stops_an_active_recording_and_joins_the_worker(
     controller.notify_pressed()
     assert capture.start_count == 1
     controller.close()
+
+
+def test_press_is_ignored_when_the_application_refuses_a_new_capture(
+    artifact: AudioArtifact,
+    timer: ManualTimer,
+) -> None:
+    capture = FakeCapture(artifact)
+    allowed = False
+
+    def can_start() -> bool:
+        return allowed
+
+    controller = PushToTalkController(
+        capture,  # type: ignore[arg-type]
+        on_capture_completed=lambda result: None,
+        on_capture_error=lambda error: None,
+        timer=timer,
+        can_start_capture=can_start,
+    )
+    controller.start()
+    try:
+        controller.notify_pressed()
+        controller.wait_until_caught_up()
+        assert capture.start_count == 0
+        assert controller.state is PushToTalkState.IDLE
+
+        allowed = True
+        controller.notify_pressed()
+        controller.wait_until_caught_up()
+        assert capture.start_count == 1
+        assert controller.state is PushToTalkState.RECORDING
+    finally:
+        controller.close()
+
+
+def test_unexpected_start_error_is_reported_and_the_worker_continues(
+    artifact: AudioArtifact,
+    timer: ManualTimer,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    class UnstableStart:
+        def __init__(self) -> None:
+            self.starts = 0
+
+        def start(self) -> None:
+            self.starts += 1
+            if self.starts == 1:
+                raise RuntimeError("portaudio exploded")
+
+        def stop(self) -> AudioArtifact:
+            return artifact
+
+    capture = UnstableStart()
+    errors: list[Exception] = []
+    controller = PushToTalkController(
+        capture,  # type: ignore[arg-type]
+        on_capture_completed=lambda result: None,
+        on_capture_error=errors.append,
+        timer=timer,
+        can_start_capture=lambda: True,
+    )
+    controller.start()
+    try:
+        with caplog.at_level("ERROR"):
+            controller.notify_pressed()
+            controller.wait_until_caught_up()
+
+        assert controller.state is PushToTalkState.IDLE
+        assert len(errors) == 1
+        assert isinstance(errors[0], AudioStreamError)
+        assert "portaudio exploded" in caplog.text
+        assert _workers()
+
+        controller.notify_pressed()
+        controller.wait_until_caught_up()
+        assert capture.starts == 2
+        assert controller.state is PushToTalkState.RECORDING
+        assert len(errors) == 1
+    finally:
+        controller.close()

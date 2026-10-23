@@ -32,6 +32,7 @@ def test_create_app_returns_a_fastapi_app() -> None:
     assert isinstance(app, FastAPI)
     assert app.state.query_port is None
     assert app.state.resolution_port is None
+    assert app.state.status_port is None
 
 
 def test_create_app_keeps_ports_for_a_later_api() -> None:
@@ -60,10 +61,13 @@ async def test_root_serves_the_operator_page(client: httpx.AsyncClient) -> None:
     assert "<header" in body
     assert 'id="connection-label"' in body
     assert "Listo para escuchar" in body
+    assert "Presioná el botón para hablar" in body
+    assert 'id="activity-state"' in body
     assert 'id="confirm-button"' in body
     assert 'id="cancel-button"' in body
     assert "Operación pendiente" in body
     assert "Texto reconocido" in body
+    assert 'id="recognized-section"' in body
     assert 'href="/static/styles.css"' in body
     assert 'src="/static/app.js"' in body
     assert "VoiceStock Web está funcionando." not in body
@@ -85,7 +89,10 @@ async def test_static_assets_are_served_from_the_application(
     assert "javascript" in script.headers["content-type"]
     page_script = script.text
     assert "/api/v1/pending-operation" in page_script
+    assert "/api/v1/system-status" in page_script
     assert "textContent" in page_script
+    assert "recognizedSection.hidden" in page_script
+    assert "recognizedText.textContent" in page_script
     assert "setTimeout" in page_script
     assert "setInterval" not in page_script
     assert "innerHTML" not in page_script

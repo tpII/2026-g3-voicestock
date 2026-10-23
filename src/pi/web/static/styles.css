@@ -110,6 +110,16 @@ body {
   margin: 8px 0 0;
 }
 
+.operator-message {
+  margin: 20px auto 0;
+  max-width: 24rem;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--notice-bg);
+  color: var(--notice-text);
+  text-align: center;
+}
+
 .empty-icon {
   width: 48px;
   height: 48px;

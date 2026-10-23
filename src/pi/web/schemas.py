@@ -5,7 +5,12 @@ These models are the web contract. They are not the application dataclasses.
 
 from pydantic import BaseModel, ConfigDict
 
-from pi.pending_operation import PendingOperationView, ResolutionResult
+from pi.pending_operation import (
+    OperationCycleStatus,
+    OperationPhase,
+    PendingOperationView,
+    ResolutionResult,
+)
 from pi.pending_operation.resolution import ResolutionStatus, ResolvedAction
 
 
@@ -52,6 +57,32 @@ class ResolutionResponse(BaseModel):
             status=result.status,
             operation_id=result.operation_id,
             resolved_action=result.resolved_action,
+        )
+
+
+class SystemStatusResponse(BaseModel):
+    """Public phase of the Raspberry Pi operation cycle."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    phase: OperationPhase
+    headline: str
+    detail: str
+    operator_message: str | None = None
+    pending_operation: PendingOperationResponse | None = None
+
+    @classmethod
+    def from_status(cls, status: OperationCycleStatus) -> "SystemStatusResponse":
+        """Copy the cycle snapshot. The pending view stays the existing contract."""
+        pending = status.pending_operation
+        return cls(
+            phase=status.phase,
+            headline=status.headline,
+            detail=status.detail,
+            operator_message=status.operator_message,
+            pending_operation=(
+                None if pending is None else PendingOperationResponse.from_view(pending)
+            ),
         )
 
 

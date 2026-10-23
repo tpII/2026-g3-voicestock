@@ -12,6 +12,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from pi.pending_operation import (
+    OperationCycleQueryPort,
     PendingOperationQueryPort,
     PendingOperationResolutionPort,
 )
@@ -24,6 +25,7 @@ INDEX_FILE = STATIC_DIR / "index.html"
 def create_app(
     query_port: PendingOperationQueryPort | None = None,
     resolution_port: PendingOperationResolutionPort | None = None,
+    status_port: OperationCycleQueryPort | None = None,
 ) -> FastAPI:
     """Build the web app and keep the ports for the versioned API."""
     if not INDEX_FILE.is_file():
@@ -32,6 +34,7 @@ def create_app(
     app = FastAPI(title="VoiceStock Web", version="0.1.0")
     app.state.query_port = query_port
     app.state.resolution_port = resolution_port
+    app.state.status_port = status_port
     register_exception_handlers(app)
     app.include_router(router)
 

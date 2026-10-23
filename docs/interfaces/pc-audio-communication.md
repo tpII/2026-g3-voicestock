@@ -229,7 +229,7 @@ controller = PushToTalkController(
   With `True` the WAV is deleted after the send, whatever the answer; with
   `False` it stays where `AudioCapture` published it.
 - It does not read the payload or create pending operations. That is
-  PendingOperationFlow's job.
+  [PendingOperationFlow](../architecture/pending-operation-flow.md).
 
 ## Error catalogue
 

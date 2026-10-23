@@ -6,6 +6,7 @@ from typing import Annotated
 from fastapi import Depends, Request
 
 from pi.pending_operation import (
+    OperationCycleQueryPort,
     PendingOperationQueryPort,
     PendingOperationResolutionPort,
 )
@@ -45,6 +46,14 @@ def get_resolution_port(request: Request) -> PendingOperationResolutionPort:
     return port
 
 
+def get_status_port(request: Request) -> OperationCycleQueryPort:
+    """Return the cycle status port, or fail when the runtime has not provided one."""
+    port = request.app.state.status_port
+    if port is None:
+        raise APIError(503, NOT_READY_CODE, NOT_READY_DETAIL)
+    return port
+
+
 def validated_operation_id(operation_id: str) -> str:
     """Reject a blank path id before the application port is called."""
     if not operation_id.strip():
@@ -71,3 +80,4 @@ QueryPortDep = Annotated[PendingOperationQueryPort, Depends(get_query_port)]
 ResolutionPortDep = Annotated[
     PendingOperationResolutionPort, Depends(get_resolution_port)
 ]
+StatusPortDep = Annotated[OperationCycleQueryPort, Depends(get_status_port)]

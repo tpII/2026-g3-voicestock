@@ -46,7 +46,7 @@ PC
 | OperationContractValidation, PC side | `pc.operation_contract.map_draft` is the only producer of `ContractPayload`. |
 | OperationContractValidation, Raspberry Pi side | `pi.operation_contract.OperationValidator` produces `ValidatedOperation` or `ValidationRejection`. It is the authority on the validity of a payload and on product identity. |
 | ProductCatalog | Will implement the `ProductResolver` port on top of persistence. |
-| PendingOperationFlow | Consumes only `ValidatedOperation`. A rejection ends the attempt without creating a pending operation. |
+| PendingOperationFlow | Consumes only `ValidatedOperation`. A rejection ends the attempt without creating a pending operation. The cycle is [the operation workflow](../architecture/pending-operation-flow.md). |
 
 The canonical definition is the pydantic model `shared.operation_contract.ContractPayload`,
 which both sides import, so the producer and the validator cannot keep diverging

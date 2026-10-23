@@ -1,7 +1,6 @@
-"""Seam the future pending-operation owner uses to hold the current item.
+"""Seam the pending-operation owner uses to hold the current item.
 
-There is no production implementation in this package. ``PendingOperationFlow``
-owns the FSM and the real pending operation, and will provide the slot.
+``PendingOperationFlow`` owns the FSM and implements this protocol.
 This protocol is not a second domain model.
 """
 

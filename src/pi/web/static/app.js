@@ -6,6 +6,12 @@ const connectionLabel = document.querySelector("#connection-label");
 const loadingMessage = document.querySelector("#loading-message");
 const systemMessage = document.querySelector("#system-message");
 const emptyState = document.querySelector("#empty-state");
+const idleHeadline = document.querySelector("#idle-headline");
+const idleDetail = document.querySelector("#idle-detail");
+const operatorMessage = document.querySelector("#operator-message");
+const activityState = document.querySelector("#activity-state");
+const activityHeadline = document.querySelector("#activity-headline");
+const activityDetail = document.querySelector("#activity-detail");
 const pendingCard = document.querySelector("#pending-card");
 const operationNotice = document.querySelector("#operation-notice");
 const confirmationMessage = document.querySelector("#confirmation-message");
@@ -13,6 +19,7 @@ const fieldProduct = document.querySelector("#field-product");
 const fieldOperation = document.querySelector("#field-operation");
 const fieldQuantity = document.querySelector("#field-quantity");
 const fieldUnit = document.querySelector("#field-unit");
+const recognizedSection = document.querySelector("#recognized-section");
 const recognizedText = document.querySelector("#recognized-text");
 const cancelButton = document.querySelector("#cancel-button");
 const confirmButton = document.querySelector("#confirm-button");
@@ -29,6 +36,7 @@ const state = {
 let queue = Promise.resolve();
 let pollTimer = 0;
 let feedbackTimer = 0;
+let renderedSignature = "";
 
 function enqueue(task) {
   const run = queue.then(task, task);
@@ -54,6 +62,7 @@ function hidePanels() {
   loadingMessage.hidden = true;
   systemMessage.hidden = true;
   emptyState.hidden = true;
+  activityState.hidden = true;
   pendingCard.hidden = true;
 }
 
@@ -98,15 +107,39 @@ function setIdleButtons() {
 }
 
 function renderLoading() {
+  renderedSignature = "";
   hidePanels();
   loadingMessage.hidden = false;
   setConnection("connecting", "Conectando");
 }
 
-function renderEmpty() {
+function renderIdle(status) {
   hidePanels();
   clearFailure();
   emptyState.hidden = false;
+  idleHeadline.textContent = status.headline || "";
+  idleDetail.textContent = status.detail || "";
+  idleDetail.hidden = !status.detail;
+  if (status.operator_message) {
+    operatorMessage.hidden = false;
+    operatorMessage.textContent = status.operator_message;
+  } else {
+    operatorMessage.hidden = true;
+    operatorMessage.textContent = "";
+  }
+  state.operation = null;
+  state.snapshot = null;
+  setConnection("ready", "Listo");
+  state.pollDelayMs = POLL_INTERVAL_MS;
+}
+
+function renderActivity(status) {
+  hidePanels();
+  clearFailure();
+  activityState.hidden = false;
+  activityHeadline.textContent = status.headline || "";
+  activityDetail.textContent = status.detail || "";
+  activityDetail.hidden = !status.detail;
   state.operation = null;
   state.snapshot = null;
   setConnection("ready", "Listo");
@@ -114,6 +147,7 @@ function renderEmpty() {
 }
 
 function renderNotReady() {
+  renderedSignature = "";
   hidePanels();
   clearFailure();
   systemMessage.hidden = false;
@@ -126,6 +160,7 @@ function renderNotReady() {
 }
 
 function renderDisconnected() {
+  renderedSignature = "";
   hidePanels();
   clearFailure();
   systemMessage.hidden = false;
@@ -134,6 +169,12 @@ function renderDisconnected() {
   state.snapshot = null;
   setConnection("unavailable", "No disponible");
   state.pollDelayMs = RETRY_INTERVAL_MS;
+}
+
+function renderRecognizedText(text) {
+  const value = typeof text === "string" ? text.trim() : "";
+  recognizedText.textContent = value;
+  recognizedSection.hidden = value === "";
 }
 
 function sameSnapshot(operation) {
@@ -179,7 +220,7 @@ function renderPending(operation) {
       ? ""
       : String(operation.quantity);
   fieldUnit.textContent = operation.unit ?? "";
-  recognizedText.textContent = operation.recognized_text ?? "";
+  renderRecognizedText(operation.recognized_text);
   state.operation = { operation_id: operation.operation_id };
   state.snapshot = operation;
   if (!state.resolving) {
@@ -200,12 +241,53 @@ async function readJson(response) {
   return JSON.parse(text);
 }
 
-async function fetchPendingOperation() {
+function cycleSignature(status) {
+  return JSON.stringify({
+    phase: status.phase,
+    headline: status.headline,
+    detail: status.detail,
+    operator_message: status.operator_message || "",
+    pending: status.pending_operation || null,
+    failure: state.failureOperationId,
+  });
+}
+
+function renderStatus(status) {
+  const pending = status.pending_operation;
+  const pendingId = pending && pending.operation_id;
+  if (state.failureOperationId !== null && state.failureOperationId !== pendingId) {
+    clearFailure();
+  }
+  const signature = cycleSignature(status);
+  if (signature === renderedSignature) {
+    return;
+  }
+  renderedSignature = signature;
+  if (
+    status.phase === "wait_confirmation" &&
+    status.pending_operation &&
+    status.pending_operation.operation_id
+  ) {
+    renderPending(status.pending_operation);
+    return;
+  }
+  if (status.phase === "recording" || status.phase === "processing") {
+    renderActivity(status);
+    return;
+  }
+  if (status.phase === "idle") {
+    renderIdle(status);
+    return;
+  }
+  renderDisconnected();
+}
+
+async function fetchCycleStatus() {
   if (state.resolving) {
     return;
   }
   try {
-    const response = await fetch("/api/v1/pending-operation", {
+    const response = await fetch("/api/v1/system-status", {
       headers: { Accept: "application/json" },
       cache: "no-store",
     });
@@ -214,14 +296,10 @@ async function fetchPendingOperation() {
     }
     if (response.status === 200) {
       const body = await readJson(response);
-      if (body && body.operation_id) {
-        renderPending(body);
+      if (body && body.phase) {
+        renderStatus(body);
         return;
       }
-    }
-    if (response.status === 204) {
-      renderEmpty();
-      return;
     }
     if (response.status === 503) {
       const body = await readJson(response);
@@ -284,7 +362,7 @@ async function resolveOperation(action) {
       renderDisconnected();
     } finally {
       state.resolving = false;
-      await fetchPendingOperation();
+      await fetchCycleStatus();
     }
   });
 }
@@ -294,7 +372,7 @@ function scheduleNextPoll() {
   pollTimer = window.setTimeout(() => {
     enqueue(async () => {
       try {
-        await fetchPendingOperation();
+        await fetchCycleStatus();
       } finally {
         scheduleNextPoll();
       }
@@ -312,6 +390,6 @@ cancelButton.addEventListener("click", () => {
 
 renderLoading();
 enqueue(async () => {
-  await fetchPendingOperation();
+  await fetchCycleStatus();
   scheduleNextPoll();
 });

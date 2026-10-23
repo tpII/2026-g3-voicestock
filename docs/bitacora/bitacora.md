@@ -1034,3 +1034,107 @@ Las cinco tareas están integradas en `develop`. Quedan pendientes:
 - ejecutar la validación semántica en la Raspberry;
 - probar el viaje Raspberry → PC → Raspberry entre las dos máquinas físicas;
 - la revisión del ADR-0006 por el equipo.
+
+---
+
+## 22/10/2026
+
+### Prueba en la Raspberry reinstalada
+
+Se reinstaló la imagen de la Raspberry Pi 3: ahora corre Raspbian 13 (trixie)
+de 32 bits con Python 3.13, y en Tailscale aparece como un nodo nuevo. Se
+instalaron `git` y `libportaudio2`, se clonó el repositorio y se creó el
+entorno con `scripts/setup.sh`. Las dependencias se instalaron desde piwheels
+sin compilar nada.
+
+La suite completa pasó en la placa: **369 tests aprobados** en unos 12
+segundos. Con eso queda probada en hardware la validación semántica
+(`OperationContractValidation-03`), que el 19/10 no se pudo ejecutar porque la
+Raspberry no estaba en línea.
+
+### Primer viaje Raspberry → PC entre las dos máquinas
+
+Por primera vez el cliente de la Raspberry habló con el servidor corriendo en
+la PC. El camino directo no funcionó: la Raspberry está compartida desde otra
+tailnet, y ese share deja que la PC se conecte a la Raspberry pero no al
+revés. `tailscale ping` respondía, pero las conexiones TCP desde la Raspberry
+vencían por timeout. Se resolvió con un túnel SSH inverso abierto desde la PC,
+que lleva el puerto 8123 de la Raspberry hasta el servidor de la PC.
+
+Resultados:
+
+- un texto normal volvió como `success` en unos 3,2 segundos, casi todo el
+  arranque de Python en la Pi 3;
+- un texto vacío volvió como `invalid_request`;
+- el payload del stub fue rechazado por el validador como
+  `invalid_structure`, como se esperaba: el stub todavía no produce el
+  contrato;
+- un contrato v1 de ejemplo se validó como la `ValidatedOperation` de
+  `coca-cola-zero-2l`.
+
+Por ahora no se prueba el viaje por la red Wi-Fi aislada de
+LocalNetworkInfra.
+
+### STT pasa a la PC: transferencia de audio (`RaspberryPiPCAudioTransfer`)
+
+El compañero a cargo de SpeechToText informó que transcribir en la Raspberry
+era demasiado lento y que conviene hacerlo por API desde la PC. Eso cambia lo
+que viaja por la red: la Raspberry ya no envía texto reconocido sino el WAV que
+graba el push-to-talk. Como la tarea no existía, se creó en ClickUp la feature
+RaspberryPiPCAudioTransfer, con cinco tareas. El llamado a la API de
+transcripción queda a cargo de otro integrante; esta feature le deja preparado
+el punto donde conectarlo.
+
+- **01, decisión ([ADR-0007](../decisions/0007-send-push-to-talk-audio-as-raw-wav-over-http.md)):**
+  el WAV viaja tal cual como cuerpo de un `POST /api/v1/interpret-audio` con
+  `Content-Type: audio/wav`, y la respuesta es el mismo `TransportEnvelope` que
+  para texto. Se descartaron `multipart/form-data`, porque FastAPI necesita
+  una dependencia más para leerlo; JSON con base64, porque agranda el audio un
+  33 %; y el streaming, porque la API recibe el archivo completo. El límite es
+  de 4 MiB: una grabación de 60 segundos pesa unos 1,9 MB.
+- **02, servidor de la PC:** el endpoint lee el cuerpo con ese límite, verifica
+  que sea un WAV legible y se lo pasa a un handler de audio sustituible junto
+  con los datos del header. Los cuerpos vacíos, demasiado grandes, que no son
+  WAV o con otro media type tienen códigos de error distintos. Hoy el handler
+  es un stub que responde un `ServiceResult` con lo que llegó; la integración
+  real solo reemplaza esa función en `src/pc/main.py`.
+- **03, cliente de la Raspberry:** `interpret_audio(ruta)` envía el archivo y
+  devuelve un `TransportEnvelope` con los mismos códigos de error que el
+  cliente de texto, más `audio_read_failure` si el archivo no se puede leer.
+  Para probarlo desde la terminal está `voicestock-pi-client --audio x.wav`.
+- **04, push-to-talk → PC:** `RecordingSender` envía cada grabación terminada
+  y entrega la respuesta. Un error de comunicación no detiene el push-to-talk.
+  Si el WAV se conserva o se borra después del envío se decide explícitamente.
+  `voicestock-pi-ptt --send-to-pc` lo expone para la prueba manual.
+- **05, documentación:** la
+  [interfaz de audio Raspberry Pi–PC](../interfaces/pc-audio-communication.md)
+  explica el endpoint, los errores y cómo reproducirlos, cómo probar desde la
+  Raspberry y cómo conectar la transcripción por API sin tocar la
+  comunicación.
+
+La suite quedó en **418 tests aprobados**. Con el código del cliente, la suite
+también pasó en la Raspberry (412 tests). Por el mismo túnel se enviaron desde
+la placa dos grabaciones de prueba, de 8,6 y 51 segundos (1,6 MB): las dos
+llegaron completas en unos 3,5 segundos. Un archivo que no es WAV volvió como
+`invalid_audio`, uno inexistente como `audio_read_failure` y uno de 5 MB como
+`audio_too_large`.
+
+### Problemas encontrados
+
+- Los Pull Requests 2 a 4 de la feature dependían cada uno del anterior y se
+  abrieron apilados. Después de cada merge con squash hubo que rebasear el
+  siguiente sobre `develop`. Cambiar la base de un Pull Request no dispara el
+  CI, que corre con los push y los Pull Requests hacia `develop`, así que hubo
+  que volver a subir el commit para que corrieran los checks.
+- Instalar paquetes del sistema en la Raspberry requiere la contraseña de
+  `sudo`; esas instalaciones las hizo un integrante desde su terminal.
+
+### Estado de RaspberryPiPCAudioTransfer
+
+Las cinco tareas están integradas en `develop`. Quedan pendientes:
+
+- probar en la placa el recorrido botón → grabación → PC: la Raspberry no tenía
+  micrófono USB conectado;
+- conectar la transcripción por API como handler de audio en la PC;
+- revisar el timeout de la Raspberry (10 segundos por defecto) cuando la
+  respuesta incluya transcripción e interpretación.

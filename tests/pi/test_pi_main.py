@@ -1,7 +1,8 @@
-"""Tests for the voicestock-pi-client command."""
+"""Tests for the voicestock-pi-client command, with text and with audio."""
 
 import json
 import socket
+from pathlib import Path
 
 import pytest
 
@@ -49,3 +50,38 @@ def test_missing_text_prints_usage_and_exits_two(
 ) -> None:
     assert main([]) == 2
     assert "usage" in capsys.readouterr().err
+
+
+def test_audio_option_sends_the_wav_file(
+    pc_server_url: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setenv("VOICESTOCK_PC_URL", pc_server_url)
+    wav = Path(__file__).parents[1] / "fixtures/speech_to_text/wav/basico"
+    wav = wav / "solo_restar.wav"
+
+    exit_code = main(["--audio", str(wav)])
+
+    assert exit_code == 0
+    received = json.loads(capsys.readouterr().out)["payload"]["payload"]
+    assert received["received_audio"]["size_bytes"] == wav.stat().st_size
+
+
+def test_missing_audio_file_exits_one(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    exit_code = main(["--audio", str(tmp_path / "missing.wav")])
+
+    assert exit_code == 1
+    assert json.loads(capsys.readouterr().out)["error"]["code"] == (
+        "audio_read_failure"
+    )
+
+
+@pytest.mark.parametrize("args", [["--audio"], ["--audio", "a.wav", "b.wav"]])
+def test_audio_option_needs_exactly_one_path(
+    args: list[str], capsys: pytest.CaptureFixture[str]
+) -> None:
+    assert main(args) == 2
+    assert "--audio" in capsys.readouterr().err

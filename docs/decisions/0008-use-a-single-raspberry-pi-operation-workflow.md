@@ -51,7 +51,7 @@ process is composed is the
   and stop the cycle, so a missing browser poll or a refresh could change
   the device phase. The physical button would no longer be the start of a
   capture. This also conflicts with
-  [ADR-0004](0004-use-in-process-fastapi-and-static-web-ui.md), which keeps
+  [ADR-0009](0009-use-in-process-fastapi-and-static-web-ui.md), which keeps
   FastAPI as an adapter.
 
 ## Consequences

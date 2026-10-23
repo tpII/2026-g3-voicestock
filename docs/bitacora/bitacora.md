@@ -1138,3 +1138,114 @@ Las cinco tareas están integradas en `develop`. Quedan pendientes:
 - conectar la transcripción por API como handler de audio en la PC;
 - revisar el timeout de la Raspberry (10 segundos por defecto) cuando la
   respuesta incluya transcripción e interpretación.
+
+---
+
+## 23/10/2026
+
+### PendingOperationFlow: alcance en la Raspberry Pi
+
+Se revisó `develop` con el reconocimiento de voz ya trasladado a la PC. Lo
+que viaja desde la placa es el WAV del push-to-talk. El servidor de la PC
+sigue entregando ese audio a un handler provisional. La feature quedó en la
+orquestación de la Raspberry Pi: cuándo se puede grabar, qué hacer con la
+respuesta y cuándo volver a estar libre. No implementa captura, transcripción,
+el modelo de lenguaje, las reglas del contrato ni la base de inventario.
+
+### Implementación
+
+El ciclo entró en `8b817fa`, `feat(pending-operation): integrate Raspberry Pi
+operation workflow`.
+
+- `PendingOperation` guarda el `operation_id` generado en la Raspberry Pi, el
+  `recognized_text` que haya mandado la PC y la `ValidatedOperation`.
+- La máquina de estados de la aplicación tiene `IDLE`, `RECORDING`,
+  `PROCESSING` y `WAIT_CONFIRMATION`. Hay como máximo una operación pendiente,
+  y solo existe en `WAIT_CONFIRMATION`.
+- Una captura nueva solo arranca desde `IDLE`. Mientras el ciclo está abierto,
+  el botón no inicia otra.
+- Push-to-talk sigue grabando. El envío a la PC y la lectura de la respuesta
+  corren fuera del hilo del botón.
+- `PcResponseInterpreter` separa un fallo de transporte, un fallo del servicio
+  y el contrato. `OperationValidator` es el que acepta o rechaza ese contrato.
+- Confirmar y cancelar pasan por `PendingOperationGateway`, que ya tenía la
+  política de identificadores viejos y de resoluciones concurrentes.
+- El ejecutor es `ProvisionalOperationExecutor`: responde éxito y no modifica
+  inventario ni escribe historial. La operación vive solo en memoria.
+- `voicestock-pi` es el proceso que junta el botón, el micrófono, el cliente
+  HTTP, el validador, el flujo y la página. Los comandos `voicestock-pi-client`,
+  `voicestock-pi-ptt` y `voicestock-pi-web` siguen para diagnóstico.
+
+### Interfaz web
+
+La página dejó de adivinar el estado solo con la operación pendiente.
+
+- `GET /api/v1/system-status` publica la fase, los textos de esa fase y, si
+  corresponde, la operación.
+- En `idle` la pantalla queda lista para escuchar. En `recording` muestra que
+  está escuchando. En `processing`, que está procesando. En
+  `wait_confirmation` muestra la tarjeta.
+- Confirmar y cancelar siguen siendo los POST que ya existían. La página no
+  cambia la máquina de estados por su cuenta.
+
+El contrato está en la
+[API de la operación pendiente](../interfaces/pending-operation-web-api.md) y
+lo que se ve, en la
+[página de la operación pendiente](../interfaces/pending-operation-web-ui.md).
+
+### Correcciones
+
+`7b9d097`, `fix(pending-operation): handle unexpected capture errors and
+missing transcription`.
+
+- Si `AudioCapture.start()` lanza una excepción que no es `AudioCaptureError`,
+  el controlador la registra, avisa el fallo y vuelve a `IDLE`. El worker
+  sigue vivo. Antes, esa excepción podía dejar la máquina de estados en
+  `RECORDING`.
+- Si la PC no manda `recognized_text`, o viene vacío, la tarjeta no muestra
+  comillas vacías. Los datos validados y los botones siguen.
+
+### Documentación del flujo
+
+`9161fd6`, `docs(pending-operation): document Raspberry Pi operation workflow`.
+
+- [Arquitectura del ciclo](../architecture/pending-operation-flow.md), con el
+  diagrama de estados.
+- [Runtime integrado](../setup/pi-runtime.md).
+- Contratos de la API y de la página, enlazados arriba.
+- [ADR-0008](../decisions/0008-use-a-single-raspberry-pi-operation-workflow.md):
+  un solo orquestador en el proceso de la Raspberry Pi es el dueño del ciclo
+  y de la operación pendiente.
+
+El mismo día el trabajo entró a `develop` en `59c888a`, merge del pull
+request 32.
+
+### Estado
+
+El workflow está integrado en `develop`. Sigue pendiente una prueba física
+del recorrido completo. La PC todavía usa el handler provisional de audio.
+La operación pendiente no se persiste. Confirmar no modifica el inventario.
+La persistencia y una recuperación que sobreviva al reinicio del proceso
+quedan para otra feature.
+
+### Numeración de los ADR y red
+
+Tres decisiones distintas estaban archivadas como ADR-0004: el proveedor de
+interpretación (9 de octubre), FastAPI en el mismo proceso (6 de octubre) y
+el punto de acceso Wi-Fi (11 de octubre). Los ADR 0005 a 0008 no se
+renumeraron. El 0004 quedó en la decisión de interpretación, que ya se citaba
+así desde el README. FastAPI pasó a
+[ADR-0009](../decisions/0009-use-in-process-fastapi-and-static-web-ui.md). El
+punto de acceso pasó a
+[ADR-0010](../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md).
+
+Las entradas anteriores que dicen «ADR-0004» hablan del tema de esa fecha.
+No se reescribieron.
+
+Varias guías de la web y del runtime seguían dibujando un cable Ethernet
+como red vigente. La decisión actual de `LocalNetworkInfra` es el punto de
+acceso Wi-Fi aislado de la
+[guía de red local](../setup/local-network.md). Las direcciones
+`192.168.50.1` y `192.168.50.2` no cambian. Tailscale y el túnel SSH inverso
+del 22/10 quedan como camino de prueba, no como reemplazo de esa red. La
+validación física del punto de acceso sigue sin hacerse.

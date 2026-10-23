@@ -13,7 +13,7 @@ shapes are the
 
 Why the page is static files in the same process, with no CDN, no Node.js,
 no separate frontend server, no WebSocket, and no SSE, is
-[ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md).
+[ADR-0009](../decisions/0009-use-in-process-fastapi-and-static-web-ui.md).
 The page and the API share one origin, so this increment does not add CORS.
 HTTPS and login are also out of this increment; the ADR records that.
 

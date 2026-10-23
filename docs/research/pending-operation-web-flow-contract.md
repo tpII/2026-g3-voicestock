@@ -15,7 +15,7 @@ the flow, the slot, or the runtime are still missing, that statement is out
 of date. Do not use this file as the source of truth for the cycle.
 
 The stable stack decision is
-[ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md).
+[ADR-0009](../decisions/0009-use-in-process-fastapi-and-static-web-ui.md).
 The comparison that led there is the
 [web stack research](pending-operation-web-stack.md). The HTTP map is the
 [pending-operation web API](../interfaces/pending-operation-web-api.md). The
@@ -29,7 +29,7 @@ install and open the server is the
 ```text
                     PC browser
                         |
-                     Ethernet
+                  VoiceStock network
                         |
                  HTML / CSS / JS
                         |
@@ -53,6 +53,10 @@ install and open the server is the
                     PendingOperationFlow / FSM
                     implemented; see the architecture document
 ```
+
+The link in that diagram was first drawn as a direct Ethernet cable. The
+current medium is the isolated Wi-Fi cell in the
+[local network setup](../setup/local-network.md).
 
 At the time of this note:
 
@@ -353,7 +357,7 @@ guide. These items remain outside that implementation:
 - Persistence and operation history.
 - Authentication or TLS, if a later increment requires them. They are not
   part of this web increment. See
-  [ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md).
+  [ADR-0009](../decisions/0009-use-in-process-fastapi-and-static-web-ui.md).
 
 ## Out of scope for the original contract task
 

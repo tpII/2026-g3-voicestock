@@ -2,7 +2,7 @@
 
 Research record for the local network between the Raspberry Pi 3 and the PC.
 It keeps the evidence and the evolution of the choice. The decision now in
-force is [ADR-0004](../decisions/0004-use-isolated-raspberry-pi-wifi-access-point.md).
+force is [ADR-0010](../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md).
 
 The operational procedure is the
 [local network setup guide](../setup/local-network.md). Application features
@@ -300,5 +300,5 @@ the Raspberry Pi an Internet path.
 
 - [RFC 1918: Address Allocation for Private Internets](https://www.rfc-editor.org/rfc/rfc1918.html).
   `192.168.50.0/24` sits inside the private `192.168.0.0/16` block defined there.
-- [ADR-0004](../decisions/0004-use-isolated-raspberry-pi-wifi-access-point.md),
+- [ADR-0010](../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md),
   the decision record for this revision.

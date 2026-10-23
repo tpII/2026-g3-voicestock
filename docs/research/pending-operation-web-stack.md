@@ -5,7 +5,7 @@ the initial web interface, and the process topology that exposes the current
 pending operation.
 
 **Status:** research closed. The decision is recorded in
-[ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md).
+[ADR-0009](../decisions/0009-use-in-process-fastapi-and-static-web-ui.md).
 This document keeps the comparison. It does not implement the server, the API,
 or the page.
 
@@ -44,8 +44,13 @@ may be installed earlier, while a network is available. At runtime the page
 and the API must be served from the Pi itself. The browser must not depend
 on a CDN, an npm registry, or any other remote asset.
 
-The operator opens the page from a browser on the PC. Connectivity is the
-direct Ethernet link already chosen by `LocalNetworkInfra`:
+The operator opens the page from a browser on the PC. When this comparison
+was written, connectivity was described as the direct Ethernet link then
+planned by `LocalNetworkInfra`. The current medium is the isolated Wi-Fi
+access point in the
+[local network setup](../setup/local-network.md) and
+[ADR-0010](../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md).
+The addresses did not change. The diagram below is the earlier plan:
 
 ```text
                     Internet
@@ -60,11 +65,11 @@ direct Ethernet link already chosen by `LocalNetworkInfra`:
 ```
 
 The Raspberry Pi is `192.168.50.1` and the PC is `192.168.50.2` on
-`192.168.50.0/24`. That plan, and the rejection of a Raspberry Pi Wi-Fi
-access point, are recorded in the
-[local network strategy](local-network-strategy.md) and applied by the
-[Ethernet setup guide](../setup/local-network.md). This feature uses that
-link. It does not choose another one.
+`192.168.50.0/24`. The research record of both the Ethernet plan and the
+later access point is the
+[local network strategy](local-network-strategy.md). The procedure is the
+[local network setup](../setup/local-network.md). This feature uses those
+addresses. It does not choose the medium.
 
 The October delivery needs a small page that can show the current pending
 operation. November may grow the interface. The HTTP contract should be able
@@ -176,7 +181,7 @@ Application ports
     |
 FastAPI
     |
-Ethernet
+VoiceStock network
     |
 Browser on PC
 ```
@@ -243,7 +248,7 @@ WebSockets were not selected. The interaction is request/response: read the
 current pending operation, then confirm or cancel it. A push channel can be
 reconsidered only if a later task shows that polling cannot meet a concrete
 requirement. nginx is not required to serve one application and its static
-files on a two-host Ethernet segment. Docker is not part of this feature;
+files on the two-host VoiceStock network. Docker is not part of this feature;
 the [development workflow](../guides/development-workflow.md) already keeps
 containers out of the current Raspberry Pi path.
 
@@ -271,7 +276,7 @@ state and avoids IPC and distributed failure modes that this increment does
 not need.
 
 The listen address will be the Raspberry Pi address on the VoiceStock
-Ethernet segment, `192.168.50.1`. The port is not chosen here.
+VoiceStock network, `192.168.50.1`. The port is not chosen here.
 
 FastAPI routes, and the page they serve, are not the owner of
 `PendingOperation`. They do not delete a pending operation, they do not
@@ -313,18 +318,18 @@ query port, a resolution port, confirmation, cancellation, FSM changes, or
 inventory updates. It did not change `pyproject.toml`: FastAPI and Uvicorn
 were already declared. Later tasks implemented the server, the API, and the
 page. Those live in the documents linked from the status table and from
-[ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md).
+[ADR-0009](../decisions/0009-use-in-process-fastapi-and-static-web-ui.md).
 
 ## References
 
-- [ADR-0004](../decisions/0004-use-in-process-fastapi-and-static-web-ui.md),
+- [ADR-0009](../decisions/0009-use-in-process-fastapi-and-static-web-ui.md),
   the decision that implementation follows.
 - [ADR-0001](../decisions/0001-use-http-json-for-pi-pc-communication.md),
   the Pi-to-PC interpretation transport. A different HTTP server, on the PC.
 - [ADR-0002](../decisions/0002-split-source-by-runtime-pc-pi-shared.md),
   package split. The operator UI belongs in `pi`.
 - [Local network strategy](local-network-strategy.md) and the
-  [Ethernet setup guide](../setup/local-network.md).
+  [local network setup](../setup/local-network.md).
 - FastAPI, first steps (path operations, Pydantic models, and OpenAPI):
   <https://fastapi.tiangolo.com/tutorial/first-steps/>.
 - Uvicorn, an ASGI server used to run FastAPI:

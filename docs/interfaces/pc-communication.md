@@ -92,11 +92,11 @@ rest of the Raspberry system uses the client class directly
 
 ## Running on the local network
 
-On the real setup the server runs on the PC and the client on the Raspberry Pi,
-connected through the isolated local network provided by `LocalNetworkInfra`.
-This interface only consumes that network: it does not configure addresses,
-choose Ethernet or Wi-Fi, or change the firewall. How to prepare the link is
-the [local network setup guide](../setup/local-network.md).
+On the real setup the server runs on the PC and the client on the Raspberry Pi.
+The intended link is the isolated Wi-Fi cell from `LocalNetworkInfra`. This
+interface only consumes that network: it does not configure addresses or the
+firewall. How to prepare the link is the
+[local network setup guide](../setup/local-network.md).
 
 1. **PC: start the server listening on the network.** The default
    `127.0.0.1` only accepts local connections:
@@ -421,9 +421,15 @@ pytest tests/pc/communication tests/pc/test_pc_main.py tests/pi \
   never import each other, `shared` imports neither, `pc.communication` does
   not know `pc.interpretation` and no second HTTP server exists.
 
-## Pending physical verification
+## Physical verification
 
-The roundtrip has not yet been run between the physical PC and Raspberry Pi.
-The PC address on the VoiceStock network is `192.168.50.2`. The Raspberry Pi
-address is `192.168.50.1`. Evidence of that physical roundtrip is still
-pending.
+The addresses on the VoiceStock network are `192.168.50.1` for the Raspberry
+Pi and `192.168.50.2` for the PC. The intended medium is the isolated Wi-Fi
+cell in the [local network setup](../setup/local-network.md). The hardware
+checks of that cell are still open.
+
+On 22 October 2026 a text exchange and two WAV uploads did run between the
+physical Raspberry Pi and the PC. The path was Tailscale plus a reverse SSH
+tunnel, not the VoiceStock Wi-Fi cell. The commands are in
+[testing remotely over Tailscale](pc-audio-communication.md#testing-remotely-over-tailscale).
+That session does not validate `LocalNetworkInfra`.

@@ -8,6 +8,11 @@ The working strategy and operational limits were defined on 9 October 2026.
 The initial API/model preference was narrowed on 10 October 2026.
 Team review remains pending. The benchmarks do not implement the production adapter.
 
+On 23 October 2026 this file kept the identifier ADR-0004. The FastAPI
+decision and the Wi-Fi access-point decision, which had reused 0004, moved to
+[ADR-0009](0009-use-in-process-fastapi-and-static-web-ui.md) and
+[ADR-0010](0010-use-isolated-raspberry-pi-wifi-access-point.md).
+
 ## Context
 
 VoiceStock interprets Spanish commands on the PC. The Raspberry Pi is not the

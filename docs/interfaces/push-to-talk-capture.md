@@ -173,7 +173,9 @@ The controller wraps that artifact in `AudioCaptureResult` and calls
 `cleanup()`.
 
 The consumer decides whether to keep the file, pass it on, or delete it.
-Speech-to-text is not that owner until a later feature says so.
+`RecordingSender` is one such consumer: it sends the WAV to the PC and keeps
+or deletes it as configured (see the
+[audio interface](pc-audio-communication.md#push-to-talk-consumer)).
 
 If `on_capture_completed` raises, the worker logs the exception and keeps
 running. The artifact is not deleted. The controller state has already moved

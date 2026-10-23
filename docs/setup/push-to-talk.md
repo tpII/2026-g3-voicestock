@@ -110,6 +110,26 @@ Termination: RELEASED
 Format: WAV / 16 kHz / mono / 16-bit
 ```
 
+## Send the recordings to the PC
+
+With the PC server running and `VOICESTOCK_PC_URL` pointing at it, add
+`--send-to-pc`. After each capture the command prints the PC answer below the
+capture data:
+
+```bash
+VOICESTOCK_PC_URL=http://192.168.50.2:8123 voicestock-pi-ptt \
+  --pin 17 \
+  --bounce-time 0.05 \
+  --input-device "USB Audio" \
+  --output-directory recordings \
+  --send-to-pc
+```
+
+The WAV files stay in `recordings` unless you add `--delete-after-send`. A PC
+that is down or slow prints an error envelope, and the next press records and
+sends again. The endpoint, the errors and the server setup are in the
+[audio interface](../interfaces/pc-audio-communication.md).
+
 ## Check the WAV
 
 The module is valid when that file exists and the header matches the contract.
@@ -215,7 +235,7 @@ the button has been released.
 This procedure does not cover speech-to-text, a language model, inventory,
 confirmation audio, LEDs, a buzzer, a web page for choosing the microphone,
 automatic deletion after transcription, or resampling. None of that is
-implemented on this path.
+implemented on this path. `--send-to-pc` only delivers the WAV to the PC.
 
 Still pending on the physical Pi: GPIO press and release, USB microphone
 detection, a real 16 kHz mono 16-bit open, one press-talk-release, one

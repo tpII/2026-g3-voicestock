@@ -155,7 +155,8 @@ Con `voicestock-pi`, la página queda en el mismo proceso. En la Raspberry Pi
 escucha en `192.168.50.1:8000`. Desde la PC: `http://192.168.50.1:8000/`.
 Esas direcciones son las de la red Wi-Fi aislada; el procedimiento está en
 la [guía de red local](docs/setup/local-network.md). La validación física de
-esa red sigue pendiente.
+esa red sigue pendiente. El plan para hacerla, todavía sin ejecuciones, está
+en la [campaña de validación de la Raspberry Pi](docs/testing/raspberry-validation/README.md).
 
 `voicestock-pi-web` sigue disponible para abrir la página sin el ciclo. En
 ese caso `GET /health` responde y el API dice que la aplicación no está
@@ -212,6 +213,7 @@ como registro:
 - [API de la operación pendiente](docs/interfaces/pending-operation-web-api.md)
 - [Página de la operación pendiente](docs/interfaces/pending-operation-web-ui.md)
 - [Bitácora](docs/bitacora/bitacora.md)
+- [Campaña de validación de la Raspberry Pi](docs/testing/raspberry-validation/README.md)
 
 ## Licencia
 

@@ -1,0 +1,18 @@
+[
+  {
+    "product_id": "arroz-marolio-1kg",
+    "name": "Arroz",
+    "brand": "Marolio",
+    "variant": null,
+    "presentation": "1 kg",
+    "units": ["unit"]
+  },
+  {
+    "product_id": "arroz-marolio-500g",
+    "name": "Arroz",
+    "brand": "Marolio",
+    "variant": null,
+    "presentation": "500 g",
+    "units": ["unit"]
+  }
+]

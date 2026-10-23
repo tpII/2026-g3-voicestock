@@ -1,0 +1,16 @@
+{
+  "contract_version": "1",
+  "operations": [
+    {
+      "operation": "add_stock",
+      "product": {
+        "name": "Arroz",
+        "brand": "Marolio",
+        "variant": null,
+        "presentation": "1 kg"
+      },
+      "quantity": 2,
+      "unit": "unit"
+    }
+  ]
+}

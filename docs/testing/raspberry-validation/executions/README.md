@@ -1,0 +1,21 @@
+# Execution records
+
+No execution has been filed.
+
+Add one Markdown file per run:
+
+```text
+EX-<TEST-ID>-<YYYYMMDD>-<NN>.md
+```
+
+Copy [../templates/execution-template.md](../templates/execution-template.md).
+Use the next `<NN>` for that test id and calendar date. A retest is a new
+file. Do not replace the previous one.
+
+Incident files for that run may sit next to it:
+
+```text
+INC-EX-<TEST-ID>-<YYYYMMDD>-<NN>-<MM>.md
+```
+
+Copy [../templates/incident-template.md](../templates/incident-template.md).

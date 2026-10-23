@@ -45,7 +45,7 @@ when their dependencies are already satisfied.
 
 | Step | Case | What it unlocks | Why it is next |
 | --- | --- | --- | --- |
-| 1 | [TC-ENV-001](test-cases/TC-ENV-001.md) | A recorded baseline of hardware, OS, Python, and the network as found | Later changes are deviations from this record. No setup script runs in this step. |
+| 1 | [TC-ENV-001](test-cases/TC-ENV-001.md) | A recorded Pi baseline of hardware, OS, Python, power diagnostics, and the network as found. PC facts are included when the PC is present. | Later Pi changes are deviations from this record. No setup script runs in this step. The Pi record can close without the PC. |
 | 2 | [TC-GPIO-001](test-cases/TC-GPIO-001.md) | The button can notify press and release | Audio capture does not need the button. Push-to-talk does. |
 | 3 | [TC-AUD-001](test-cases/TC-AUD-001.md) | A PortAudio name for the USB microphone | Capture needs that name. It does not need the button or the network. |
 | 4 | [TC-AUD-002](test-cases/TC-AUD-002.md) | A WAV produced by `AudioCapture` | Push-to-talk and the audio client need a file that already matches the contract. |
@@ -66,6 +66,20 @@ when their dependencies are already satisfied.
 TC-CON-001 may run any time after TC-ENV-001. It is placed late so the
 hardware work is not blocked on a software check. TC-GPIO-001 and
 TC-AUD-001 do not depend on each other.
+
+TC-ENV-001 may close with the PC marked `NOT COLLECTED — PC NOT AVAILABLE`.
+That line is not a connectivity result. TC-NET-001 and every later case
+that uses the PC must record the PC operating system, the checkout
+revision, and the interface names in its own execution before the first
+measured sample, if the baseline did not already record them. Those cases
+stay **BLOCKED** until that PC inventory exists. Collecting it still does
+not pass TC-NET-002.
+
+The project bitácora is not part of this order. Execution records, the
+summary, and this campaign's traceability are updated as each case
+finishes. [The bitácora](README.md#bitácora) is appended once at the end of
+the testing day. The planned days, 23 and 24 October 2026, are not
+results. Unfinished cases stay pending or blocked if those days end first.
 
 ## Simulated end-to-end
 

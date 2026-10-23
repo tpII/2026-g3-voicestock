@@ -24,6 +24,13 @@
 
 ## Hardware inventory
 
+The machine under test. For TC-ENV-001 this is the Raspberry Pi. A later
+case that uses the PC fills the PC block as well. If the PC was not
+available for a Pi-only case, write `NOT COLLECTED — PC NOT AVAILABLE` in
+the PC block. That token does not document connectivity. A case whose
+procedure needs the PC cannot leave the token in place: collect the PC
+facts before the first measured sample.
+
 - Model:
 - Board revision, if printed:
 - Power supply: or UNKNOWN
@@ -31,6 +38,13 @@
 - Microphone and USB port: or not used
 - Cables and hubs:
 - Other devices attached:
+
+## PC inventory
+
+- Status: collected in this execution, copied from a TC-ENV-001 record, or
+  `NOT COLLECTED — PC NOT AVAILABLE`
+- OS, kernel, Python, git SHA, and worktree:
+- VoiceStock interface name, when this case uses the cell:
 
 ## Operating system and runtime
 
@@ -121,3 +135,8 @@ video use an external URI. Secrets are redacted.
 
 A review that requests changes does not delete this file. The next attempt
 is a new execution id.
+
+Finishing this record does not by itself update
+`docs/bitacora/bitacora.md`. The bitácora gets one consolidated entry at
+the end of the testing day, linking every execution from that day. See the
+[campaign README](../README.md#bitácora).

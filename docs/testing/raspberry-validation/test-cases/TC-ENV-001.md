@@ -2,12 +2,15 @@
 
 - Status: DESIGNED
 - Executions: none
-- Procedure version: 1
+- Procedure version: 2
 
 ## Objective
 
-Record the Raspberry Pi, the PC, and the network as they are before this
-campaign changes anything. Later cases cite this record.
+Record the Raspberry Pi hardware, operating system, Python, Git revision,
+power diagnostics, and the network configuration already present, before
+this campaign changes anything. Collect the same class of facts for the PC
+when the PC is available. A missing PC does not withhold closure of the Pi
+baseline and does not show that the PC can be reached.
 
 ## Test level and type
 
@@ -19,8 +22,9 @@ complete enough to reproduce the session".
 ## Requirements and ClickUp traceability
 
 - ClickUp: none. Supporting check.
-- Requirement: every later execution can name the hardware and software it
-  ran on.
+- Requirement: later Pi-only cases can name the board they ran on. A case
+  that uses the PC still has to record that PC before it measures anything.
+  An empty PC section is not a connectivity result.
 
 ## Source modules and documentation
 
@@ -33,12 +37,14 @@ complete enough to reproduce the session".
 ## Preconditions and dependencies
 
 - None. This case is first.
-- The operator can open a shell on the Raspberry Pi and on the PC.
+- The operator can open a shell on the Raspberry Pi.
+- A shell on the PC is optional for this case.
 
 ## Required hardware and software
 
 - The project Raspberry Pi 3, powered, with a shell.
-- The project PC.
+- The project PC, when it is on hand. Its absence does not stop the Pi
+  record.
 - The button and USB microphone may be unplugged. Record whether they are
   attached. Do not wire them in this case.
 - `git`, `python3`, and `ip`. `nmcli`, `iw`, and `vcgencmd` are recorded if
@@ -86,15 +92,28 @@ python -c "import sounddevice"
 If `import sounddevice` raises, copy the exception type and message. Do not
 install PortAudio in this execution.
 
-On the PC, run the same git, OS, `uname`, `python`, `ip`, and `nmcli`
-commands. Do not run `iw reg get` unless `iw` exists.
+Record the Pi power supply only from what is printed on it or visible to
+the operator. Otherwise write UNKNOWN. `vcgencmd get_throttled` is the
+power diagnostic. Copy the hex value. Do not treat it as a pass or a fail.
 
-Record the power supply only from what is printed on it or visible to the
-operator. Otherwise write UNKNOWN.
+On the PC, when a shell is available in this same execution, run the same
+git, OS, `uname`, `python`, `ip`, and `nmcli` commands. Do not run
+`iw reg get` unless `iw` exists. If the PC is not available, write this
+line and nothing else in the PC section:
+
+```text
+NOT COLLECTED — PC NOT AVAILABLE
+```
+
+Do not invent PC addresses, routes, or package versions. Do not ping the
+PC from the Pi in order to fill the gap. A later case that needs the PC
+collects those facts in its own execution before it starts. That later
+collection is still not a connectivity pass. Connectivity is TC-NET-002.
 
 ## Observations and evidence
 
-- One transcript per machine, redacted, referenced from the execution record.
+- One Pi transcript, redacted, referenced from the execution record.
+- One PC transcript, or the single line `NOT COLLECTED — PC NOT AVAILABLE`.
 - Whether `sounddevice` imports.
 - The regulatory-domain line if `iw reg get` ran. Do not change it here.
 - Interface names and addresses exactly as printed. Do not assume `wlan0`.
@@ -108,12 +127,15 @@ operator. Otherwise write UNKNOWN.
 ## Acceptance criteria
 
 1. The execution record contains the Pi model line, OS, kernel, Python
-   version, git SHA, and worktree status.
-2. The execution record contains the PC OS, kernel, git SHA, and worktree
-   status, or states that the PC was not available and the case is
-   **BLOCKED** rather than passed.
-3. IPv4 addresses and routes are copied from the commands, including "no
-   address" when that is what was printed.
+   version, git SHA, worktree status, and the `vcgencmd get_throttled`
+   value or the explicit note that the command is absent.
+2. The Pi IPv4 addresses and routes are copied from the commands, including
+   "no address" when that is what was printed.
+3. The PC section is either a transcript of the PC commands from this
+   execution or the exact line `NOT COLLECTED — PC NOT AVAILABLE`. The
+   second form still allows this case to close. It does not satisfy a
+   later case that needs the PC, and it is not evidence that the PC link
+   works.
 4. No setup script from this campaign was run during the execution.
 5. Package installation, if someone did it anyway, is a deviation and this
    criterion fails.
@@ -123,6 +145,8 @@ operator. Otherwise write UNKNOWN.
 - A required command could not be run and the gap is not written down:
   **FAILED**.
 - The Pi shell is unavailable: **BLOCKED**.
+- The PC is unavailable: not a failure and not a reason to block this
+  case. Record `NOT COLLECTED — PC NOT AVAILABLE`.
 - The worktree is dirty: the case can still pass criterion 1 only if the
   dirty status is copied verbatim. Hiding it fails the case.
 
@@ -136,4 +160,7 @@ a new execution if it happens.
 
 This record does not show that the button, the microphone, the access
 point, or the application work. A clean import of `sounddevice` does not
-show that a USB microphone is present.
+show that a USB microphone is present. A closed Pi baseline with the PC
+marked `NOT COLLECTED — PC NOT AVAILABLE` does not show that the PC is
+reachable, configured, or ready for TC-NET-001 and the cases that follow
+it.

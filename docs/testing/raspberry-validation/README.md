@@ -105,6 +105,9 @@ test ran.
 7. Update [summary.md](summary.md) and [traceability-matrix.md](traceability-matrix.md)
    only when an execution record exists. Until then the summary stays at
    "not executed".
+8. Continue with the next case. Do not append the project bitácora from
+   this step. The bitácora is written once, at the end of the testing day,
+   as described in [Bitácora](#bitácora).
 
 A case file is the specification. An execution file is one run of that
 specification.
@@ -124,21 +127,43 @@ specification.
 
 ## Bitácora
 
-Do not add a bitácora session for a test that has not been run, and do not
-backdate one. After a real session, append a dated section to
-[../../bitacora/bitacora.md](../../bitacora/bitacora.md) in Spanish, in the
-same shape as the existing entries. The session must include:
+The project bitácora is updated once at the end of each testing day, not
+after each test. During the day the operator does this for every case, in
+order:
 
-- the date of the work, not the date this campaign was written;
-- the participants who were actually present;
-- the test ids that were executed;
-- a short summary of observations;
-- incidents;
-- relative links to the complete execution records;
-- decisions and the next case.
+1. Execute the test.
+2. Capture the measurements and the evidence.
+3. Write that run's execution record.
+4. Compare the observations with the acceptance criteria.
+5. Update [summary.md](summary.md) and [traceability-matrix.md](traceability-matrix.md)
+   from that record.
+6. Continue with the next test.
 
-The bitácora entry points at the execution record. It does not replace it
-and it does not copy the measurements.
+At the end of the day, append one consolidated section to
+[../../bitacora/bitacora.md](../../bitacora/bitacora.md), in Spanish, in the
+same shape as the existing entries. The section uses the actual date and
+the people who were present. It includes:
+
+- the tests performed that day;
+- a summary of the outcomes;
+- the relevant measurements and findings, by link to the execution records
+  rather than by copying the raw tables;
+- incidents and blockers;
+- links to the complete execution records;
+- decisions and the next steps.
+
+The planned testing days are 23 October 2026 and 24 October 2026. Those
+dates are targets for scheduling. They are not evidence that a test ran,
+and they are not headings to add before the day has happened. Do not create
+a future bitácora entry. Do not backdate a result. Do not invent a
+measurement.
+
+If cases remain unfinished after 24 October 2026, leave them pending or
+blocked in the campaign summary. Do not mark them complete to match the
+planned days.
+
+One daily entry points at the execution records of that day. It does not
+replace them.
 
 ## Implementation notes that affect execution
 

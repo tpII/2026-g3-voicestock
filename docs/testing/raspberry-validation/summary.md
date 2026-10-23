@@ -44,7 +44,12 @@ Seventeen cases, TC-ENV-001 through TC-E2E-001, listed in the
 
 ## 5. Environment
 
-Fill this table from TC-ENV-001. Leave it blank until that execution exists.
+Leave this table blank until a TC-ENV-001 execution exists. Fill the
+Raspberry Pi column from that record. The PC column is filled only when
+that execution collected the PC. If it says
+`NOT COLLECTED — PC NOT AVAILABLE`, leave these PC cells empty and do not
+treat the baseline as proof of PC connectivity. A case that uses the PC
+records the PC facts in its own execution before measuring.
 
 | Item | Raspberry Pi | PC |
 | --- | --- | --- |
@@ -112,9 +117,16 @@ What can be said before any execution is only:
 
 ## 10. Bitácora pointer
 
-Future sessions are logged in [../../bitacora/bitacora.md](../../bitacora/bitacora.md)
-as described in the [campaign README](README.md#bitácora). This summary
-links to those sessions after they exist:
+The bitácora in [../../bitacora/bitacora.md](../../bitacora/bitacora.md) gets
+one entry per testing day, after the last execution of that day, as
+described in the [campaign README](README.md#bitácora). It is not updated
+after every case.
+
+The campaign is planned for 23 October 2026 and 24 October 2026. Those are
+scheduling targets. This table stays empty until a day has actually been
+worked. Do not add those dates in advance, and do not fill outcomes for
+cases that were not run. A case still unfinished after 24 October 2026
+stays pending or blocked in the results table above.
 
 | Date | Bitácora section | Executions |
 | --- | --- | --- |

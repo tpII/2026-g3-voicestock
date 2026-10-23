@@ -2,12 +2,14 @@
 
 - Status: DESIGNED
 - Executions: none
-- Procedure version: 1
+- Procedure version: 2
 
 ## Objective
 
 Show that a real button, wired to ground with the internal pull-up, produces
-one press callback and one release callback through `PushToTalkButton`.
+one press callback and one release callback through `PushToTalkButton` for
+each measured physical action. The measured set is three cycles of three
+actions, so nine press callbacks and nine release callbacks.
 
 ## Test level and type
 
@@ -93,36 +95,67 @@ except KeyboardInterrupt:
 PY
 ```
 
-Sequence, repeated for three measured cycles after the operator is ready.
-There is no discarded warm-up beyond a single practice press that is
-labeled `practice` and excluded:
+Wait for `ready` before touching the button.
 
-1. Wait for `ready`.
-2. Press and hold about one second, then release. Wait one second.
-3. Press and release quickly once.
-4. Press, release, and do not touch the button for two seconds.
+Practice, excluded from the counts below. Do this once, before cycle 1.
+Label every callback from it `practice` in the notes.
 
-Stop the process with Ctrl+C. Confirm it printed nothing further and the
-shell returned.
+- One physical action: press, hold about one second, release.
+- Those callbacks are not part of the nine.
 
-Missed or duplicate events are counted from the transcript against the
-operator's notes of how many presses were made. The operator notes are
-evidence. They are not a latency measurement.
+Measured set: 3 cycles. Each cycle has the same 3 physical actions, in
+this order. A physical action is one press followed by its release. A
+cycle is those three actions plus the idle wait that ends the cycle.
+
+1. Action A. Press and hold about one second, then release. Wait one
+   second. That wait is a pause, not another action.
+2. Action B. Press and release once, quickly.
+3. Action C. Press and release once, then do not touch the button for two
+   seconds. Those two seconds are the idle interval of the cycle.
+
+Do not add actions. Completing cycle 1, then cycle 2, then cycle 3
+produces:
+
+| Count | Value |
+| --- | --- |
+| Practice actions, excluded | 1 press and 1 release |
+| Measured cycles | 3 |
+| Physical actions in one measured cycle | 3 |
+| Physical actions in the measured set | 9 |
+| Expected `pressed` lines in the measured set | 9 |
+| Expected `released` lines in the measured set | 9 |
+| Idle intervals | 3, one at the end of each cycle |
+| Callbacks during those idle intervals | 0 |
+| Callbacks during the one-second pauses | 0 |
+
+Stop the process with Ctrl+C after cycle 3. Confirm it printed nothing
+further and the shell returned.
+
+Count `pressed` and `released` lines in the transcript. Practice lines are
+omitted from the nine. The operator's note of which lines are practice is
+evidence. The timestamps are not a latency measurement. Edge latency stays
+**NOT MEASURED** unless an external instrument is named.
 
 ## Observations and evidence
 
 - Transcript of the script.
 - Pin factory class name.
-- Count of press lines and release lines per scripted cycle.
+- A table with one row per physical action. Columns: cycle (`practice`,
+  `1`, `2`, or `3`), action (`practice`, `A`, `B`, or `C`), expected
+  `pressed` count (1), expected `released` count (1), observed counts.
+- Totals for the measured rows only: 9 observed `pressed` lines and 9
+  observed `released` lines.
+- A count of lines that appeared during the three idle intervals and
+  during the one-second pauses. The required count is zero.
 - Any exception from GPIO Zero, copied in full.
 
 ## Metrics
 
 | Metric | Unit | Rule |
 | --- | --- | --- |
-| Press callbacks | count | Must match the noted presses |
-| Release callbacks | count | Must match the noted releases |
-| Extra callbacks while idle | count | Must be zero during the two-second idle |
+| Measured `pressed` lines | count | 9, practice excluded |
+| Measured `released` lines | count | 9, practice excluded |
+| Unsolicited callbacks in pauses and idle intervals | count | 0 |
 | Edge latency | seconds | **NOT MEASURED** without an external instrument |
 
 Spacing between the Python timestamps is recorded and is not an acceptance
@@ -133,9 +166,12 @@ to chase a burst inside this execution.
 
 ## Acceptance criteria
 
-1. Each noted press produces one `pressed` line and the matching release
-   produces one `released` line, for all three measured cycles.
-2. The idle interval produces no additional line.
+1. The measured table has 9 actions (3 cycles × 3 actions). Each of those
+   rows has one observed `pressed` line and one observed `released` line.
+   The measured totals are 9 and 9. The practice action is present in the
+   notes and is not included in those totals.
+2. The three two-second idle intervals and the one-second pauses produce
+   no callback lines.
 3. The process exits on Ctrl+C after `close`, without a traceback.
 4. Polarity matches the adapter: the callback fires on the physical press,
    not on release only. If the names are swapped relative to the finger,
@@ -145,7 +181,8 @@ to chase a burst inside this execution.
 
 ## Failure conditions
 
-- A cycle with zero callbacks, or more callbacks than noted actions:
+- Any measured total other than 9 `pressed` lines and 9 `released`
+  lines, or any unsolicited line during a pause or an idle interval:
   **FAILED**.
 - `GPIO busy`, permission denied, or no pin factory: **BLOCKED** if the
   baseline did not already include a working GPIO library; **FAILED** if

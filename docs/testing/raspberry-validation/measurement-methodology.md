@@ -182,8 +182,10 @@ placeholders until the baseline replaces them.
 
 Each execution keeps a raw table of every sample and a summary computed
 from that table by the rules above. If a summary and the raw table
-disagree, the raw table wins and the summary is corrected. Summaries are
-not transcribed into the bitácora without a link to the execution.
+disagree, the raw table wins and the summary is corrected. The project
+bitácora receives one entry at the end of the testing day and links to
+that day's execution records. It does not gain a section per test, and it
+does not replace the raw tables.
 
 ## Metrics by area
 

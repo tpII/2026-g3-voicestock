@@ -9,11 +9,11 @@ those tasks.
 
 | Test | ClickUp | Requirement covered here | Result |
 | --- | --- | --- | --- |
-| [TC-ENV-001](test-cases/TC-ENV-001.md) | None. Supporting baseline. | Identify the board, OS, runtime, and network as found before any change. | not executed |
-| [TC-GPIO-001](test-cases/TC-GPIO-001.md) | [PushToTalk-06](https://app.clickup.com/t/86e3euv9u) | Physical press and release through `PushToTalkButton`. | not executed |
+| [TC-ENV-001](test-cases/TC-ENV-001.md) | None. Supporting baseline. | Identify the Pi board, OS, runtime, power diagnostic, and network as found. PC facts are optional here and are not a connectivity result. | not executed |
+| [TC-GPIO-001](test-cases/TC-GPIO-001.md) | [PushToTalk-06](https://app.clickup.com/t/86e3euv9u) | Nine measured press callbacks and nine release callbacks through `PushToTalkButton`, with no unsolicited idle callbacks. | not executed |
 | [TC-AUD-001](test-cases/TC-AUD-001.md) | [PushToTalk-06](https://app.clickup.com/t/86e3euv9u) | USB microphone visible to PortAudio and, if present, to `arecord`. | not executed |
 | [TC-AUD-002](test-cases/TC-AUD-002.md) | [PushToTalk-06](https://app.clickup.com/t/86e3euv9u) | `AudioCapture` publishes a 16 kHz mono 16-bit WAV. | not executed |
-| [TC-PTT-001](test-cases/TC-PTT-001.md) | [PushToTalk-06](https://app.clickup.com/t/86e3euv9u) | Button and microphone through `voicestock-pi-ptt` without the PC. | not executed |
+| [TC-PTT-001](test-cases/TC-PTT-001.md) | [PushToTalk-06](https://app.clickup.com/t/86e3euv9u) | Button and microphone through `voicestock-pi-ptt`, including a listening check of the predetermined phrases, without the PC. | not executed |
 | [TC-PTT-002](test-cases/TC-PTT-002.md) | [PushToTalk-06](https://app.clickup.com/t/86e3euv9u) | Max duration, ignored press while recording, and wait for release. | not executed |
 | [TC-NET-001](test-cases/TC-NET-001.md) | [LocalNetworkInfra-04](https://app.clickup.com/t/86e3jutyu) | Access-point and PC-client profiles match the documented cell. | not executed |
 | [TC-NET-002](test-cases/TC-NET-002.md) | [LocalNetworkInfra-04](https://app.clickup.com/t/86e3jutyu) | Bidirectional reachability and isolation from the Internet path. | not executed |

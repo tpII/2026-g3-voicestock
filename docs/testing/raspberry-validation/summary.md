@@ -1,8 +1,9 @@
 # Campaign summary
 
 This file is the outline of a later technical report. It is not the report
-of a finished experiment. One baseline execution is recorded.
-TC-ENV-001 is not closed. The other cases have no measurements.
+of a finished experiment. One baseline execution and two GPIO executions
+are recorded. TC-ENV-001 and TC-GPIO-001 are not closed. The other cases
+have no measurements.
 
 Campaign status: **IN_PROGRESS**.
 
@@ -27,8 +28,15 @@ with a deterministic contract. It is not a production end-to-end pass.
 - Traceability: [traceability-matrix.md](traceability-matrix.md).
 - Each run: one execution record under [executions/](executions/).
 
-[EX-TC-ENV-001-20261027-01](executions/EX-TC-ENV-001-20261027-01.md) is the
-only execution. Its status is **PASSED_PENDING_DOCUMENTATION**.
+Recorded executions:
+
+- [EX-TC-ENV-001-20261027-01](executions/EX-TC-ENV-001-20261027-01.md),
+  **PASSED_PENDING_DOCUMENTATION**.
+- [EX-TC-GPIO-001-20261027-01](executions/EX-TC-GPIO-001-20261027-01.md),
+  **BLOCKED**.
+- [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md),
+  **FAILED**. The failure is the omitted practice action. The supplied
+  extract still contains nine `PRESSED` lines and nine `RELEASED` lines.
 
 ## 3. Scope
 
@@ -62,7 +70,7 @@ documentation branch.
 | VoiceStock commit | `3aee132b4769f418bbe71efccaf8ed5f501e02c1` on `develop` | |
 | Worktree clean | yes | |
 | Microphone | no USB microphone reported in this baseline | |
-| Button pin (BCM) | NOT RECORDED | |
+| Button pin (BCM) | BCM 17, physical header pin 11, GND physical header pin 9. Recorded in the GPIO executions, not in the environment baseline. | |
 | Supply | model NOT RECORDED; GPIO header with Dupont cables; `vcgencmd get_throttled` `0x50000` (15 of 15). Under load: NOT TESTED | |
 | VoiceStock interface | not configured. Observed `wlan0` `192.168.1.38/24`, gateway `192.168.1.1` | |
 
@@ -71,7 +79,7 @@ documentation branch.
 | Test | Executions | Status | Measured success | Notes |
 | --- | --- | --- | --- | --- |
 | TC-ENV-001 | [EX-TC-ENV-001-20261027-01](executions/EX-TC-ENV-001-20261027-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–5 met. Not closed. | Pi baseline only. No raw transcript. Review NOT_REVIEWED. `get_throttled` `0x50000` on 15 readings. |
-| TC-GPIO-001 | none | DESIGNED | | |
+| TC-GPIO-001 | [EX-TC-GPIO-001-20261027-01](executions/EX-TC-GPIO-001-20261027-01.md); [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md) | BLOCKED, then FAILED | Attempt 02 extract: 9 `PRESSED` and 9 `RELEASED`, alternating, no missing pair. Not closed. | Attempt 01 stopped before `READY` (`OSError: [Errno 22] Invalid argument`). Attempt 02 omitted the practice action. Pause and idle intervals: not measured. Logs remain on the Pi. |
 | TC-AUD-001 | none | DESIGNED | | |
 | TC-AUD-002 | none | DESIGNED | | |
 | TC-PTT-001 | none | DESIGNED | | |
@@ -88,10 +96,18 @@ documentation branch.
 | TC-FLOW-001 | none | DESIGNED | | |
 | TC-E2E-001 | none | DESIGNED | | |
 
-Duration summaries are added as tables copied from execution records, with
-`n`, mean, median, standard deviation, minimum, and maximum, in
-milliseconds, and with a link to the raw samples. Do not add a row before
-the raw samples exist.
+Callback hold for
+[EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md).
+Each value is the printed release timestamp minus the printed press
+timestamp. It is not GPIO edge latency. Edge latency is **NOT MEASURED**.
+The source is the callback extract in that record. The raw log is not in
+Git. Display rounding is one decimal place, in milliseconds.
+
+| Metric | n | Unit | Mean | Median | Stdev | Min | Max |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Callback hold, attempt 02 | 9 | ms | 515.4 | 239.9 | 478.1 | 112.3 | 1361.8 |
+
+No hold limit is defined. This row is not an acceptance result.
 
 ## 7. Incidents
 
@@ -99,8 +115,16 @@ the raw samples exist.
 no incident. `vcgencmd get_throttled` was `0x50000` on 15 readings. The
 notes describe historical undervoltage and throttling flags, and no active
 undervoltage or throttling flags. That value is not classified here as a
-product failure. Power under load was not tested. The other cases have
-not been executed. This section does not mean the product has no defects.
+product failure. Power under load was not tested.
+
+[EX-TC-GPIO-001-20261027-01](executions/EX-TC-GPIO-001-20261027-01.md) is
+**BLOCKED**, not an incident of a button defect. Initialization failed in
+the native GPIO backend before any press. No incident file was opened.
+
+[EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md) is
+**FAILED** because the written practice action was omitted. No incident
+file was opened. The remaining cases have not been executed. This section
+does not mean the product has no defects.
 
 ## 8. Deviations from the specification
 
@@ -109,6 +133,16 @@ For EX-TC-ENV-001-20261027-01: the Pi checkout is `develop` at
 Session start, end, and operator were not recorded. The raw command
 transcript was not archived. The PC was not inspected. Details are in the
 execution record.
+
+For both GPIO executions: the Pi checkout is the same `develop` commit,
+`3aee132b4769f418bbe71efccaf8ed5f501e02c1`. Session start, end, operator,
+and timezone were not recorded. The raw logs were not copied into Git.
+Their SHA-256 values are operator-reported.
+
+After the blocked attempt, `lgpio` 0.2.2.0 was installed into the Pi
+`.venv`. That change is later than the environment baseline. No repository
+dependency manifest was modified. The install is not recorded here as a
+step that a fresh checkout reproduces.
 
 ## 9. Conclusions
 
@@ -121,6 +155,13 @@ What this summary can say now:
 
 - the procedures are specified;
 - TC-ENV-001 has one Pi baseline execution and is not closed;
+- TC-GPIO-001 attempt 01 did not initialize `PushToTalkButton`;
+- TC-GPIO-001 attempt 02 printed nine press callbacks and nine release
+  callbacks and did not meet the written procedure, because the practice
+  action was omitted and the pause and idle intervals were not measured;
+- whether `lgpio` belongs in the project dependency configuration is still
+  open. The Pi virtual environment was changed outside the repository
+  manifests;
 - that execution does not show a USB microphone, a VoiceStock access
   point, or PC connectivity;
 - the default PC audio stub cannot create a pending operation;
@@ -137,7 +178,8 @@ after every case.
 
 The campaign was planned for 23 October 2026 and 24 October 2026. Those
 dates were scheduling targets. They are not entries in the table below.
-EX-TC-ENV-001-20261027-01 was recorded on 27 October 2026. This change
+EX-TC-ENV-001-20261027-01, EX-TC-GPIO-001-20261027-01, and
+EX-TC-GPIO-001-20261027-02 were recorded on 27 October 2026. This change
 does not add a bitácora section for that day or for any other day. The
 table stays empty until a real daily bitácora section exists. Unfinished
 cases stay pending or blocked. They are not marked complete to match a

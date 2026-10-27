@@ -1,7 +1,7 @@
 # TC-GPIO-001 — Physical GPIO press and release
 
 - Status: DESIGNED
-- Executions: none
+- Executions: [EX-TC-GPIO-001-20261027-01](../executions/EX-TC-GPIO-001-20261027-01.md) (`BLOCKED`); [EX-TC-GPIO-001-20261027-02](../executions/EX-TC-GPIO-001-20261027-02.md) (`FAILED`, not closed)
 - Procedure version: 2
 
 ## Objective

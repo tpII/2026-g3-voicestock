@@ -1,6 +1,8 @@
 # Execution records
 
-No execution has been filed.
+Filed executions:
+
+- [EX-TC-ENV-001-20261027-01.md](EX-TC-ENV-001-20261027-01.md) — **PASSED_PENDING_DOCUMENTATION**. Not a closed pass.
 
 Add one Markdown file per run:
 

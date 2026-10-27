@@ -1,15 +1,17 @@
 # Traceability matrix
 
-Campaign status: **DESIGNED**. Every case is unexecuted. The result column
-stays `not executed` until an execution record is linked. Do not infer a
-pass from the existence of a unit test.
+Campaign status: **IN_PROGRESS**. TC-ENV-001 has one execution and is not
+closed. Every other case is unexecuted. The result column stays
+`not executed` until an execution record is linked. Do not infer a pass
+from the existence of a unit test. Do not treat
+**PASSED_PENDING_DOCUMENTATION** as **CLOSED_PASSED**.
 
 ClickUp task names are the anchors. This campaign does not create or edit
 those tasks.
 
 | Test | ClickUp | Requirement covered here | Result |
 | --- | --- | --- | --- |
-| [TC-ENV-001](test-cases/TC-ENV-001.md) | None. Supporting baseline. | Identify the Pi board, OS, runtime, power diagnostic, and network as found. PC facts are optional here and are not a connectivity result. | not executed |
+| [TC-ENV-001](test-cases/TC-ENV-001.md) | None. Supporting baseline. | Identify the Pi board, OS, runtime, power diagnostic, and network as found. PC facts are optional here and are not a connectivity result. | [EX-TC-ENV-001-20261027-01](executions/EX-TC-ENV-001-20261027-01.md): **PASSED_PENDING_DOCUMENTATION**. Not closed. Not a VoiceStock-cell or microphone result. |
 | [TC-GPIO-001](test-cases/TC-GPIO-001.md) | [PushToTalk-06](https://app.clickup.com/t/86e3euv9u) | Nine measured press callbacks and nine release callbacks through `PushToTalkButton`, with no unsolicited idle callbacks. | not executed |
 | [TC-AUD-001](test-cases/TC-AUD-001.md) | [PushToTalk-06](https://app.clickup.com/t/86e3euv9u) | USB microphone visible to PortAudio and, if present, to `arecord`. | not executed |
 | [TC-AUD-002](test-cases/TC-AUD-002.md) | [PushToTalk-06](https://app.clickup.com/t/86e3euv9u) | `AudioCapture` publishes a 16 kHz mono 16-bit WAV. | not executed |

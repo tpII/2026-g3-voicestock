@@ -58,8 +58,11 @@ it.
 
 Campaign status: **DESIGNED**.
 
-Every case is **DESIGNED** and unexecuted. Allowed statuses, and the rule
-that forbids `CLOSED_PASSED` without evidence, are in the
+The procedures are **DESIGNED**. [TC-ENV-001](test-cases/TC-ENV-001.md) has
+one execution, [EX-TC-ENV-001-20261027-01](executions/EX-TC-ENV-001-20261027-01.md),
+at **PASSED_PENDING_DOCUMENTATION**. It is not **CLOSED_PASSED**. The other
+cases are unexecuted. Allowed statuses, and the rule that forbids
+`CLOSED_PASSED` without evidence, are in the
 [test plan](test-plan.md#status-model).
 
 ## Layout

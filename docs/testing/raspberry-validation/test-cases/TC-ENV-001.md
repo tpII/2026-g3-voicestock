@@ -1,7 +1,7 @@
 # TC-ENV-001 — Raspberry Pi environment and hardware baseline
 
 - Status: DESIGNED
-- Executions: none
+- Executions: [EX-TC-ENV-001-20261027-01](../executions/EX-TC-ENV-001-20261027-01.md) (`PASSED_PENDING_DOCUMENTATION`, not closed)
 - Procedure version: 2
 
 ## Objective

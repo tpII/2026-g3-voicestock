@@ -5,6 +5,7 @@ Filed executions:
 - [EX-TC-ENV-001-20261027-01.md](EX-TC-ENV-001-20261027-01.md) — **PASSED_PENDING_DOCUMENTATION**. Not a closed pass.
 - [EX-TC-GPIO-001-20261027-01.md](EX-TC-GPIO-001-20261027-01.md) — **BLOCKED**. Constructor failed before any button action.
 - [EX-TC-GPIO-001-20261027-02.md](EX-TC-GPIO-001-20261027-02.md) — **FAILED**. Nine press and nine release callbacks in the supplied extract. Practice action omitted. Not a closed pass.
+- [EX-TC-AUD-001-20261027-01.md](EX-TC-AUD-001-20261027-01.md) — **PASSED_PENDING_DOCUMENTATION**. Logitech G435 seen in 3 of 3 plugged enumerations. Not a closed pass. Not a WAV result.
 
 Add one Markdown file per run:
 

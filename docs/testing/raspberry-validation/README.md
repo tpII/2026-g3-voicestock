@@ -64,8 +64,10 @@ at **PASSED_PENDING_DOCUMENTATION**. [TC-GPIO-001](test-cases/TC-GPIO-001.md)
 has [EX-TC-GPIO-001-20261027-01](executions/EX-TC-GPIO-001-20261027-01.md)
 (**BLOCKED**) and
 [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md)
-(**FAILED**). Neither case is **CLOSED_PASSED**. The other cases are
-unexecuted. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
+(**FAILED**). [TC-AUD-001](test-cases/TC-AUD-001.md) has
+[EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md)
+at **PASSED_PENDING_DOCUMENTATION**. None of these cases is
+**CLOSED_PASSED**. The other cases are unexecuted. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
 without evidence, are in the [test plan](test-plan.md#status-model).
 
 ## Layout

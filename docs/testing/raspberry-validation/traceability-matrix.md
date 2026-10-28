@@ -1,8 +1,8 @@
 # Traceability matrix
 
 Campaign status: **IN_PROGRESS**. TC-ENV-001 has one execution and is not
-closed. TC-GPIO-001 has two executions and is not closed. Every other case
-is unexecuted. The result column stays `not executed` until an execution
+closed. TC-GPIO-001 has two executions and is not closed. TC-AUD-001 has
+one execution and is not closed. Every other case is unexecuted. The result column stays `not executed` until an execution
 record is linked. Do not infer a pass from the existence of a unit test.
 Do not treat **PASSED_PENDING_DOCUMENTATION** or a callback count as
 **CLOSED_PASSED**.
@@ -14,7 +14,7 @@ those tasks.
 | --- | --- | --- | --- |
 | [TC-ENV-001](test-cases/TC-ENV-001.md) | None. Supporting baseline. | Identify the Pi board, OS, runtime, power diagnostic, and network as found. PC facts are optional here and are not a connectivity result. | [EX-TC-ENV-001-20261027-01](executions/EX-TC-ENV-001-20261027-01.md): **PASSED_PENDING_DOCUMENTATION**. Not closed. Not a VoiceStock-cell or microphone result. |
 | [TC-GPIO-001](test-cases/TC-GPIO-001.md) | [PushToTalk-06](https://app.clickup.com/t/86e3euv9u) | Nine measured press callbacks and nine release callbacks through `PushToTalkButton`, with no unsolicited idle callbacks. | [EX-TC-GPIO-001-20261027-01](executions/EX-TC-GPIO-001-20261027-01.md): **BLOCKED** before `READY`. [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md): **FAILED**. The supplied extract has 9 `PRESSED` and 9 `RELEASED`. The practice action was omitted and the pause and idle intervals were **not measured**. Not closed. |
-| [TC-AUD-001](test-cases/TC-AUD-001.md) | [PushToTalk-06](https://app.clickup.com/t/86e3euv9u) | USB microphone visible to PortAudio and, if present, to `arecord`. | not executed |
+| [TC-AUD-001](test-cases/TC-AUD-001.md) | [PushToTalk-06](https://app.clickup.com/t/86e3euv9u) | USB microphone visible to PortAudio and, if present, to `arecord`. | [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md): **PASSED_PENDING_DOCUMENTATION**. Logitech G435 in 3 of 3 plugged enumerations, absent while unplugged, negative probe `AudioDeviceNotFoundError`. Query recorded. Not closed. Not a 16 kHz or acoustic result. |
 | [TC-AUD-002](test-cases/TC-AUD-002.md) | [PushToTalk-06](https://app.clickup.com/t/86e3euv9u) | `AudioCapture` publishes a 16 kHz mono 16-bit WAV. | not executed |
 | [TC-PTT-001](test-cases/TC-PTT-001.md) | [PushToTalk-06](https://app.clickup.com/t/86e3euv9u) | Button and microphone through `voicestock-pi-ptt`, including a listening check of the predetermined phrases, without the PC. | not executed |
 | [TC-PTT-002](test-cases/TC-PTT-002.md) | [PushToTalk-06](https://app.clickup.com/t/86e3euv9u) | Max duration, ignored press while recording, and wait for release. | not executed |

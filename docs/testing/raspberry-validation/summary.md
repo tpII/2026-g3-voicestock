@@ -1,9 +1,9 @@
 # Campaign summary
 
 This file is the outline of a later technical report. It is not the report
-of a finished experiment. One baseline execution and two GPIO executions
-are recorded. TC-ENV-001 and TC-GPIO-001 are not closed. The other cases
-have no measurements.
+of a finished experiment. One baseline execution, two GPIO executions, and
+one microphone-enumeration execution are recorded. TC-ENV-001, TC-GPIO-001,
+and TC-AUD-001 are not closed. The other cases have no measurements.
 
 Campaign status: **IN_PROGRESS**.
 
@@ -37,6 +37,8 @@ Recorded executions:
 - [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md),
   **FAILED**. The failure is the omitted practice action. The supplied
   extract still contains nine `PRESSED` lines and nine `RELEASED` lines.
+- [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md),
+  **PASSED_PENDING_DOCUMENTATION**. Enumeration only. Not a WAV result.
 
 ## 3. Scope
 
@@ -69,7 +71,7 @@ documentation branch.
 | Python | 3.13.5 | |
 | VoiceStock commit | `3aee132b4769f418bbe71efccaf8ed5f501e02c1` on `develop` | |
 | Worktree clean | yes | |
-| Microphone | no USB microphone reported in this baseline | |
+| Microphone | Baseline: no USB microphone reported. [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) later recorded a Logitech G435 Wireless Gaming Headset through its USB receiver. USB port and hub were not recorded in that execution. | |
 | Button pin (BCM) | BCM 17, physical header pin 11, GND physical header pin 9. Recorded in the GPIO executions, not in the environment baseline. | |
 | Supply | model NOT RECORDED; GPIO header with Dupont cables; `vcgencmd get_throttled` `0x50000` (15 of 15). Under load: NOT TESTED | |
 | VoiceStock interface | not configured. Observed `wlan0` `192.168.1.38/24`, gateway `192.168.1.1` | |
@@ -80,7 +82,7 @@ documentation branch.
 | --- | --- | --- | --- | --- |
 | TC-ENV-001 | [EX-TC-ENV-001-20261027-01](executions/EX-TC-ENV-001-20261027-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–5 met. Not closed. | Pi baseline only. No raw transcript. Review NOT_REVIEWED. `get_throttled` `0x50000` on 15 readings. |
 | TC-GPIO-001 | [EX-TC-GPIO-001-20261027-01](executions/EX-TC-GPIO-001-20261027-01.md); [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md) | BLOCKED, then FAILED | Attempt 02 extract: 9 `PRESSED` and 9 `RELEASED`, alternating, no missing pair. Not closed. | Attempt 01 stopped before `READY` (`OSError: [Errno 22] Invalid argument`). Attempt 02 omitted the practice action. Pause and idle intervals: not measured. Logs remain on the Pi. |
-| TC-AUD-001 | none | DESIGNED | | |
+| TC-AUD-001 | [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–4 met. Not closed. | G435 in 3 of 3 plugged lists, absent while unplugged. Query: `G435 Wireless Gaming Headset: USB Audio (hw:2,0)`. Default rate 48000 Hz. Detection latency NOT MEASURED. Logs remain on the Pi. |
 | TC-AUD-002 | none | DESIGNED | | |
 | TC-PTT-001 | none | DESIGNED | | |
 | TC-PTT-002 | none | DESIGNED | | |
@@ -123,7 +125,10 @@ the native GPIO backend before any press. No incident file was opened.
 
 [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md) is
 **FAILED** because the written practice action was omitted. No incident
-file was opened. The remaining cases have not been executed. This section
+file was opened.
+
+[EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) opened
+no incident. The remaining cases have not been executed. This section
 does not mean the product has no defects.
 
 ## 8. Deviations from the specification
@@ -144,6 +149,11 @@ After the blocked attempt, `lgpio` 0.2.2.0 was installed into the Pi
 dependency manifest was modified. The install is not recorded here as a
 step that a fresh checkout reproduces.
 
+For EX-TC-AUD-001-20261027-01: the Pi checkout is the same `develop`
+commit. USB port, hub, operator, and worktree status were not recorded.
+The three raw logs were not copied into Git. Their SHA-256 values are
+operator-reported.
+
 ## 9. Conclusions
 
 Do not write a conclusion, a pass claim, or a recommendation that the
@@ -162,8 +172,12 @@ What this summary can say now:
 - whether `lgpio` belongs in the project dependency configuration is still
   open. The Pi virtual environment was changed outside the repository
   manifests;
-- that execution does not show a USB microphone, a VoiceStock access
-  point, or PC connectivity;
+- the environment baseline does not show a USB microphone, a VoiceStock
+  access point, or PC connectivity;
+- TC-AUD-001 later enumerated a Logitech G435 on the USB receiver in 3 of
+  3 plugged listings and recorded the name query
+  `G435 Wireless Gaming Headset: USB Audio (hw:2,0)`. That execution does
+  not record a WAV, a 16 kHz contract, or acoustic quality;
 - the default PC audio stub cannot create a pending operation;
 - simulated end-to-end execution is blocked on a fixture that is specified
   and not implemented;
@@ -178,12 +192,12 @@ after every case.
 
 The campaign was planned for 23 October 2026 and 24 October 2026. Those
 dates were scheduling targets. They are not entries in the table below.
-EX-TC-ENV-001-20261027-01, EX-TC-GPIO-001-20261027-01, and
-EX-TC-GPIO-001-20261027-02 were recorded on 27 October 2026. This change
-does not add a bitácora section for that day or for any other day. The
-table stays empty until a real daily bitácora section exists. Unfinished
-cases stay pending or blocked. They are not marked complete to match a
-planned date.
+EX-TC-ENV-001-20261027-01, EX-TC-GPIO-001-20261027-01,
+EX-TC-GPIO-001-20261027-02, and EX-TC-AUD-001-20261027-01 were recorded on
+27 October 2026. This change does not add a bitácora section for that day
+or for any other day. The table stays empty until a real daily bitácora
+section exists. Unfinished cases stay pending or blocked. They are not
+marked complete to match a planned date.
 
 | Date | Bitácora section | Executions |
 | --- | --- | --- |

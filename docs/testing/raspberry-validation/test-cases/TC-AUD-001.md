@@ -1,7 +1,7 @@
 # TC-AUD-001 — USB microphone detection
 
 - Status: DESIGNED
-- Executions: none
+- Executions: [EX-TC-AUD-001-20261027-01](../executions/EX-TC-AUD-001-20261027-01.md) (`PASSED_PENDING_DOCUMENTATION`, not closed)
 - Procedure version: 1
 
 ## Objective

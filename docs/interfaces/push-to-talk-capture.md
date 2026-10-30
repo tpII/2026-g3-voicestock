@@ -53,7 +53,14 @@ Those callbacks must only call `PushToTalkController.notify_pressed` and
 `AudioInputBackend`. Construction does not open hardware.
 `AudioCaptureConfig.input_device` is a descriptive query, not a PortAudio
 index. `output_directory` is where the temporary file and the WAV are written.
-`SoundDeviceBackend` is the backend that opens `sounddevice.RawInputStream`.
+`SoundDeviceBackend` opens `sounddevice.RawInputStream` with a callback and
+a bounded PCM queue. `read` waits on that queue. `stop` closes the queue so
+a blocked `read` returns, including when aborting the stream does not unblock
+a PortAudio read. The capture worker writes those blocks to the WAV. The
+callback does not. How the threads and the queue behave is
+[audio capture](../architecture/audio-capture.md). Why the callback replaced
+blocking `read` is
+[ADR-0011](../decisions/0011-use-callback-driven-audio-capture-with-a-bounded-pcm-queue.md).
 Importing `pi.audio` does not import `sounddevice`; that import happens when a
 device is listed or a stream is opened.
 
@@ -105,7 +112,11 @@ That is how one device is selected when a shorter query hits several names.
 `max_input_channels`, `default_samplerate`) and omits the PortAudio index.
 
 `check_input_settings` is the acceptance test. A device that fails it is not
-opened, and nothing in this interface resamples or downmixes.
+opened, and nothing in this interface resamples or downmixes. A `plug` device
+can still pass that check when ALSA has already converted the rate. The
+Logitech G435 profile that does so is
+[ALSA microphone setup](../setup/alsa-microphone.md). Other microphones are
+not redirected to it.
 
 ## Audio contract
 
@@ -146,6 +157,10 @@ AudioCapture.start()
 PCM appended as it arrives
       ↓
 AudioCapture.stop()
+      ↓
+read returns the blocks still queued, then empty bytes
+      ↓
+the worker exits before the file is published
       ↓
 WAV header closed
       ↓

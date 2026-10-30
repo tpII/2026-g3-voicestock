@@ -2,7 +2,12 @@
 
 ## Status
 
-Accepted
+Accepted. The blocking `RawInputStream.read()` path described in the audio
+section below is superseded by
+[ADR-0011](0011-use-callback-driven-audio-capture-with-a-bounded-pcm-queue.md).
+`sounddevice`, ALSA, the WAV contract, and rejection of a device that cannot
+supply 16000 Hz mono signed 16-bit PCM remain in force. The text below is the
+original decision.
 
 ## Context
 

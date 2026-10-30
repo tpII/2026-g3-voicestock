@@ -10,8 +10,10 @@ headset. It is not the only microphone VoiceStock can use, and the application
 does not install or rewrite `~/.asoundrc` when it starts.
 
 The capture contract and the device selector are described in the
-[push-to-talk capture interface](../interfaces/push-to-talk-capture.md). Button
-wiring and a capture run are in the
+[push-to-talk capture interface](../interfaces/push-to-talk-capture.md). How
+the process reads that device is
+[audio capture](../architecture/audio-capture.md). Button wiring and a capture
+run are in the
 [push-to-talk setup](push-to-talk.md).
 
 ## What ALSA is responsible for

@@ -118,6 +118,8 @@ La Raspberry Pi graba un WAV al pulsar y soltar un botón. La decisión de stack
 el contrato de audio y la prueba en la placa están separados:
 
 - [Decisión de arquitectura](docs/decisions/0003-use-event-driven-gpio-and-sounddevice-for-ptt-capture.md)
+- [ADR-0011: captura por callback y cola acotada](docs/decisions/0011-use-callback-driven-audio-capture-with-a-bounded-pcm-queue.md)
+- [Arquitectura de la captura](docs/architecture/audio-capture.md)
 - [Interfaz de captura](docs/interfaces/push-to-talk-capture.md)
 - [Conexión, configuración y prueba manual](docs/setup/push-to-talk.md)
 - [Perfil ALSA del Logitech G435](docs/setup/alsa-microphone.md)
@@ -207,7 +209,10 @@ como registro:
 - [ADR-0007: Envío del audio push-to-talk como WAV crudo por HTTP](docs/decisions/0007-send-push-to-talk-audio-as-raw-wav-over-http.md)
 - [Contrato de operación (JSON versionado y validación)](docs/interfaces/operation-contract.md)
 - [Captura push-to-talk](docs/interfaces/push-to-talk-capture.md)
+- [Arquitectura de la captura de audio](docs/architecture/audio-capture.md)
+- [ADR-0011: captura por callback y cola acotada](docs/decisions/0011-use-callback-driven-audio-capture-with-a-bounded-pcm-queue.md)
 - [Prueba manual de push-to-talk](docs/setup/push-to-talk.md)
+- [Perfil ALSA del Logitech G435](docs/setup/alsa-microphone.md)
 - [Red local VoiceStock](docs/setup/local-network.md)
 - [Servidor web de la Raspberry Pi](docs/setup/pi-web.md)
 - [API de la operación pendiente](docs/interfaces/pending-operation-web-api.md)

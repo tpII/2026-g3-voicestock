@@ -4,6 +4,8 @@ Research record for task **PushToTalk-01**: evaluate the PTT capture stack (GPIO
 
 **Status:** research closed. Physical validation on the project Raspberry Pi and USB microphone is still pending. This document is not an Architecture Decision Record. It keeps the evidence of the investigation. A later ADR is not required for these choices unless a future task changes them.
 
+The research left the choice between a blocking `RawInputStream.read()` and a callback plus a queue open. That choice is now [ADR-0011](../decisions/0011-use-callback-driven-audio-capture-with-a-bounded-pcm-queue.md). The current backend is described in [audio capture](../architecture/audio-capture.md). The comparison below is the original research.
+
 | Area | Status |
 | --- | --- |
 | GPIO (button input) | Decision recorded. Later implemented by `PushToTalkButton`. Hardware measurements pending. |

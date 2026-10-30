@@ -158,6 +158,84 @@ def test_start_failure_leaves_no_files_and_allows_retry(tmp_path: Path) -> None:
     assert artifact.path.is_file()
 
 
+def test_misaligned_pcm_publishes_nothing(tmp_path: Path) -> None:
+    backend = ScriptedPcmBackend([b"\x01"])
+    capture = _capture(tmp_path, backend)
+    capture.start()
+
+    with pytest.raises(AudioStreamError, match="not aligned"):
+        capture.stop()
+
+    assert list(tmp_path.iterdir()) == []
+    assert _capture_threads() == []
+
+
+def test_timed_out_worker_cannot_write_a_closed_recording(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    class StuckBackend:
+        def __init__(self) -> None:
+            self.entered = threading.Event()
+            self.release = threading.Event()
+            self._session = 0
+            self._passed_stuck = False
+            self._gave_pcm = False
+            self._stop = threading.Event()
+            self.drained = threading.Event()
+
+        def start(self) -> None:
+            self._session += 1
+            self._stop.clear()
+
+        def read(self) -> bytes:
+            if self._session == 1:
+                if not self._passed_stuck:
+                    self.entered.set()
+                    self.release.wait()
+                    self._passed_stuck = True
+                    return b"\x01\x00"
+                return b""
+            if not self._gave_pcm:
+                self._gave_pcm = True
+                return _PCM_A
+            self.drained.set()
+            self._stop.wait()
+            return b""
+
+        def stop(self) -> None:
+            if self._session == 1 and not self._passed_stuck:
+                return
+            self._stop.set()
+
+        def close(self) -> None:
+            self._stop.set()
+
+    backend = StuckBackend()
+    capture = _capture(tmp_path, backend)
+    capture.start()
+    assert backend.entered.wait(2)
+    stuck = _capture_threads()
+    assert len(stuck) == 1
+    monkeypatch.setattr("pi.audio.capture._WORKER_JOIN_TIMEOUT_SECONDS", 0.0)
+
+    with pytest.raises(AudioStreamError, match="did not stop"):
+        capture.stop()
+
+    assert list(tmp_path.iterdir()) == []
+    backend.release.set()
+    stuck[0].join(2)
+    assert not stuck[0].is_alive()
+    assert list(tmp_path.iterdir()) == []
+    monkeypatch.setattr("pi.audio.capture._WORKER_JOIN_TIMEOUT_SECONDS", 5.0)
+
+    capture.start()
+    assert backend.drained.wait(2)
+    artifact = capture.stop()
+    assert _wav_frames(artifact.path)[-1] == _PCM_A
+    assert _capture_threads() == []
+
+
 def test_importing_audio_package_does_not_load_sounddevice() -> None:
     import sys
 

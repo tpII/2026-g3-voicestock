@@ -33,9 +33,11 @@ class AudioCapture:
     """Start and stop one recording at a time.
 
     Construction does not open a device. ``start`` asks the backend for PCM
-    and a worker writes each chunk to a temporary ``.recording`` file. ``stop``
-    finalizes that file and, only when it is a valid WAV, renames it to
-    ``.wav`` and returns an ``AudioArtifact``. The caller then owns the file.
+    and a worker writes each chunk to a temporary ``.recording`` file. The
+    worker keeps reading until ``read`` returns empty bytes, so PCM already
+    queued when ``stop`` runs is still written. ``stop`` finalizes that file
+    and, only when it is a valid WAV, renames it to ``.wav`` and returns an
+    ``AudioArtifact``. The caller then owns the file.
     """
 
     def __init__(
@@ -54,6 +56,10 @@ class AudioCapture:
         self._startup_error: BaseException | None = None
         self._worker_error: BaseException | None = None
         self._wav: wave.Wave_write | None = None
+        self._file_lock = threading.Lock()
+        self._active_session = 0
+        self._recording_closed = False
+        self._orphaned_worker: threading.Thread | None = None
         self._artifact_id: str | None = None
         self._recording_path: Path | None = None
         self._final_path: Path | None = None
@@ -69,6 +75,9 @@ class AudioCapture:
                 raise AudioCaptureStateError(
                     "cannot start audio capture while it is already recording"
                 )
+            self._reap_orphaned_worker()
+            if self._orphaned_worker is not None:
+                raise AudioStreamError("audio capture worker did not stop")
             try:
                 self._open_temp_file()
             except Exception:
@@ -88,7 +97,7 @@ class AudioCapture:
 
         if not self._started_event.wait(_WORKER_JOIN_TIMEOUT_SECONDS):
             self._stop_event.set()
-            self._release_backend()
+            self._release_backend(self._active_session)
             worker.join(_WORKER_JOIN_TIMEOUT_SECONDS)
             self._fail(AudioStreamError("audio capture did not start"))
 
@@ -133,40 +142,49 @@ class AudioCapture:
         return artifact
 
     def _run(self) -> None:
+        session = self._active_session
         try:
             self._backend.start()
         except Exception as exc:
-            self._startup_error = exc
+            if session == self._active_session:
+                self._startup_error = exc
             self._started_event.set()
-            self._release_backend()
+            self._release_backend(session)
             return
 
         self._started_event.set()
         try:
-            while not self._stop_event.is_set():
+            while True:
                 chunk = self._backend.read()
-                if chunk:
-                    self._write_chunk(chunk)
+                if not chunk:
+                    break
+                self._write_chunk(chunk, session)
         except Exception as exc:
-            self._worker_error = exc
+            if session == self._active_session:
+                self._worker_error = exc
         finally:
-            self._release_backend()
+            self._release_backend(session)
 
-    def _write_chunk(self, chunk: bytes) -> None:
+    def _write_chunk(self, chunk: bytes, session: int) -> None:
         frame_bytes = SAMPLE_WIDTH_BYTES * CHANNELS
         if len(chunk) % frame_bytes != 0:
             raise AudioStreamError(
                 "PCM chunk is not aligned to signed 16-bit mono frames"
             )
-        if self._wav is None:
-            raise AudioStreamError("audio capture has no open recording")
-        self._wav.writeframes(chunk)
+        with self._file_lock:
+            if session != self._active_session or self._wav is None:
+                if self._recording_closed or session != self._active_session:
+                    return
+                raise AudioStreamError("audio capture has no open recording")
+            self._wav.writeframes(chunk)
 
     def _open_temp_file(self) -> None:
         directory = self._config.output_directory
         directory.mkdir(parents=True, exist_ok=True)
         artifact_id = str(uuid.uuid4())
         recording_path = directory / f"{artifact_id}.recording"
+        self._active_session += 1
+        self._recording_closed = False
         self._artifact_id = artifact_id
         self._recording_path = recording_path
         self._final_path = directory / f"{artifact_id}.wav"
@@ -203,14 +221,22 @@ class AudioCapture:
     def _fail(self, error: BaseException) -> None:
         self._discard_temp()
         with self._lock:
+            worker = self._worker
             self._state = _State.IDLE
             self._stop_in_progress = False
             self._worker = None
+            if worker is not None and worker.is_alive():
+                self._orphaned_worker = worker
             self._startup_error = None
             self._worker_error = None
         if isinstance(error, AudioCaptureError):
             raise error
         raise AudioStreamError("audio capture failed") from error
+
+    def _reap_orphaned_worker(self) -> None:
+        orphan = self._orphaned_worker
+        if orphan is not None and not orphan.is_alive():
+            self._orphaned_worker = None
 
     def _discard_temp(self) -> None:
         self._close_wav()
@@ -224,10 +250,12 @@ class AudioCapture:
                 path.unlink(missing_ok=True)
 
     def _close_wav(self) -> None:
-        wav = self._wav
-        self._wav = None
-        if wav is not None:
-            wav.close()
+        with self._file_lock:
+            wav = self._wav
+            self._wav = None
+            self._recording_closed = True
+            if wav is not None:
+                wav.close()
 
     def _unblock_backend(self) -> None:
         try:
@@ -236,7 +264,9 @@ class AudioCapture:
             if self._worker_error is None and self._startup_error is None:
                 self._worker_error = exc
 
-    def _release_backend(self) -> None:
+    def _release_backend(self, session: int) -> None:
+        if session != self._active_session:
+            return
         self._unblock_backend()
         try:
             self._backend.close()

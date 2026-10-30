@@ -130,9 +130,13 @@ def test_resolves_a_single_name_match(monkeypatch: pytest.MonkeyPatch) -> None:
     assert library.opened_kwargs["samplerate"] == 16000
     assert library.opened_kwargs["channels"] == 1
     assert library.opened_kwargs["dtype"] == "int16"
+    assert library.opened_kwargs["blocksize"] == 1024
+    assert callable(library.opened_kwargs["callback"])
     assert library.streams[0].started is True
+    block = b"\x00\x00" * library.opened_kwargs["blocksize"]
+    library.opened_kwargs["callback"](block, 1024, None, None)
     chunk = backend.read()
-    assert chunk == b"\x00\x00" * library.opened_kwargs["blocksize"]
+    assert chunk == block
     backend.stop()
     backend.close()
     assert library.streams[0].aborted is True

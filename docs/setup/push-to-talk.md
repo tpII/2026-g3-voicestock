@@ -68,6 +68,15 @@ python -c "from pi.audio.sounddevice_backend import list_input_devices; \
 Use one printed name, or a distinctive part of it, as `--input-device`.
 Do not save a PortAudio index. Indexes move when devices are replugged.
 
+A microphone that already accepts 16000 Hz mono signed 16-bit PCM is selected
+by that name. The Logitech G435 used in hardware validation does not accept
+16000 Hz on its raw hardware device. For that headset only, install the ALSA
+plug profile and then select `voicestock_mic`. The profile, the card id, and
+the rollback steps are in the
+[ALSA microphone profile](alsa-microphone.md). VoiceStock does not install
+that file when it starts, and it does not send other microphones through
+`voicestock_mic`.
+
 Optional ALSA check, if `arecord` is already installed. It is a diagnostic,
 not the VoiceStock recorder:
 
@@ -200,15 +209,20 @@ printed. A short word that appears in several names is not a stable selector.
 16-bit PCM.
 
 VoiceStock does not resample. Try the device name that PortAudio lists for the
-microphone rather than a raw hardware id you typed by hand. If
-`check_input_settings` still rejects it, the microphone needs a later capture
-change. Do not describe that as a working configuration.
+microphone rather than a raw hardware id you typed by hand. If the microphone
+is the Logitech G435, open the `voicestock_mic` plug device after installing
+its profile, instead of the raw `hw:` device. That procedure is the
+[ALSA microphone profile](alsa-microphone.md). Another microphone that still
+fails `check_input_settings` is unsupported until it has its own plug device
+or it accepts the contract directly. Do not describe that failure as a working
+configuration, and do not point it at `voicestock_mic` unless that PCM's slave
+is the card you mean to record.
 
 `arecord -D hw:<card>,<device> -f S16_LE -r 16000 -c 1 -d 2 /tmp/hw.wav` can
-show whether the card itself accepts the rate. That command is optional and
-was not run on the project microphone. A failure there, with success through
-the `default` device, means ALSA may be converting. The application still
-requires the PortAudio check to pass for the name you pass to `--input-device`.
+show whether the card itself accepts the rate. A failure there, with success
+through `plughw` or `voicestock_mic`, means ALSA is converting. The application
+still requires the PortAudio check to pass for the name you pass to
+`--input-device`.
 
 ### The button does nothing
 

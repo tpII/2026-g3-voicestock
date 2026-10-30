@@ -120,6 +120,7 @@ el contrato de audio y la prueba en la placa están separados:
 - [Decisión de arquitectura](docs/decisions/0003-use-event-driven-gpio-and-sounddevice-for-ptt-capture.md)
 - [Interfaz de captura](docs/interfaces/push-to-talk-capture.md)
 - [Conexión, configuración y prueba manual](docs/setup/push-to-talk.md)
+- [Perfil ALSA del Logitech G435](docs/setup/alsa-microphone.md)
 
 Con `--send-to-pc`, `voicestock-pi-ptt` envía cada grabación a la PC y muestra
 la respuesta

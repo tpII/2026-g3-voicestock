@@ -4,11 +4,20 @@ This mapper is the only producer of ``ContractPayload`` on the PC. The
 interpreter does not know the contract, and the contract does not know the
 interpreter's vocabulary: the translation between them lives here.
 
-Until StructuredCommandInterpretation defines a typed ``InterpretationDraft``,
-the draft is the decoded JSON the model returns::
+The draft is the decoded JSON the model returns. A product may be the legacy
+display string, which becomes ``ProductDescription.name`` only::
 
     {"operaciones": [{"operacion": "agregar_stock",
                       "producto": "Coca Cola Zero 2L",
+                      "cantidad": 2}]}
+
+The production pipeline asks for catalog attributes instead. A display name
+such as "Arroz Marolio 1 kg" is not the catalog name "Arroz" plus brand and
+presentation, and this mapper does not split one string into those fields::
+
+    {"operaciones": [{"operacion": "agregar_stock",
+                      "producto": {"nombre": "Arroz", "marca": "Marolio",
+                                   "variante": null, "presentacion": "1 kg"},
                       "cantidad": 2}]}
 
 The mapper does not validate the domain (it does not check products, the sign
@@ -37,6 +46,7 @@ CONTRACT_UNIT = "unit"
 
 _DRAFT_KEYS = {"operaciones"}
 _DRAFT_OPERATION_KEYS = {"operacion", "producto", "cantidad"}
+_PRODUCT_ATTRIBUTE_KEYS = {"nombre", "marca", "variante", "presentacion"}
 
 
 class DraftMappingError(ValueError):
@@ -76,20 +86,45 @@ def _map_operation(item: object, location: str) -> OperationItem:
     if not isinstance(operation, str) or operation not in DRAFT_OPERATIONS:
         raise DraftMappingError(f"{location}.operacion is not a known operation")
 
-    product = item["producto"]
-    if not isinstance(product, str) or not product.strip():
-        raise DraftMappingError(f"{location}.producto must be a non-blank string")
-
     quantity = item["cantidad"]
     if not isinstance(quantity, int) or isinstance(quantity, bool):
         raise DraftMappingError(f"{location}.cantidad must be an integer")
 
     return OperationItem(
         operation=DRAFT_OPERATIONS[operation],
-        product=ProductDescription(name=product),
+        product=_map_product(item["producto"], f"{location}.producto"),
         quantity=quantity,
         unit=CONTRACT_UNIT,
     )
+
+
+def _map_product(product: object, location: str) -> ProductDescription:
+    if isinstance(product, str):
+        if not product.strip():
+            raise DraftMappingError(f"{location} must be a non-blank string")
+        return ProductDescription(name=product)
+    if not isinstance(product, Mapping):
+        raise DraftMappingError(f"{location} must be a string or an attribute object")
+    _require_keys(product, _PRODUCT_ATTRIBUTE_KEYS, location)
+    name = product["nombre"]
+    if not isinstance(name, str) or not name.strip():
+        raise DraftMappingError(f"{location}.nombre must be a non-blank string")
+    return ProductDescription(
+        name=name,
+        brand=_optional_text(product["marca"], f"{location}.marca"),
+        variant=_optional_text(product["variante"], f"{location}.variante"),
+        presentation=_optional_text(
+            product["presentacion"], f"{location}.presentacion"
+        ),
+    )
+
+
+def _optional_text(value: object, location: str) -> str | None:
+    if value is None:
+        return None
+    if not isinstance(value, str) or not value.strip():
+        raise DraftMappingError(f"{location} must be a string or null")
+    return value
 
 
 def _require_keys(value: Mapping[str, Any], expected: set[str], location: str) -> None:

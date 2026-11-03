@@ -3,16 +3,22 @@
 This is the only module that knows both layers: the communication server stays
 unaware of interpretation, and the service stays unaware of HTTP.
 
-Audio requests go to ``describe_received_audio`` until transcription through
-an API exists. The real audio handler is passed to ``create_pc_app`` here; it
-is expected to transcribe ``audio.wav`` and return the ``ServiceResult`` of
-``InterpretationService.interpret`` for that text.
+``VOICESTOCK_AUDIO_PIPELINE=stub`` keeps ``describe_received_audio``.
+``groq`` transcribes the WAV, interprets the text and returns a version-1
+contract plus ``recognized_text``. The text route is unchanged.
 """
 
 import uvicorn
 from fastapi import FastAPI
 
-from pc.communication import AudioHandler, ReceivedAudio, ServerSettings, create_app
+from pc.audio.factory import audio_handler_for
+from pc.audio.settings import AudioPipelineSettings
+from pc.communication import (
+    AudioHandler,
+    ReceivedAudio,
+    ServerSettings,
+    create_app,
+)
 from pc.interpretation import (
     InterpretationService,
     InterpretationSettings,
@@ -56,7 +62,14 @@ def main() -> None:
     server_settings = ServerSettings.from_environment()
     interpretation_settings = InterpretationSettings.from_environment()
     uvicorn.run(
-        create_pc_app(default_registry(), interpretation_settings.provider),
+        create_pc_app(
+            default_registry(),
+            interpretation_settings.provider,
+            audio_handler_for(
+                AudioPipelineSettings.from_environment(),
+                describe_received_audio,
+            ),
+        ),
         host=server_settings.host,
         port=server_settings.port,
     )

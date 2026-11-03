@@ -65,8 +65,10 @@ def main():
 Ese import corresponde a scripts ubicados en `scripts/benchmarks/`. Para agregar
 otra variable, actualizá `ALLOWED_KEYS` en el cargador y la plantilla vacía.
 No guardes claves en logs, reportes, prompts ni volcados completos de variables.
-La lectura de este archivo es una ayuda local para benchmarks; no establece
-automáticamente un mecanismo de configuración de producción en `src/`.
+La lectura de este archivo es una ayuda local para benchmarks. El servidor de
+la PC no importa `load_api_keys`. Con `VOICESTOCK_AUDIO_PIPELINE=groq` lee
+`VOICESTOCK_GROQ_API_KEY` y, si no está, `GROQ_API_KEY`. El arranque está en
+[el pipeline de audio](pc-audio-pipeline.md). La Raspberry no recibe esa clave.
 
 ## Comandos que todavía no integran el cargador
 

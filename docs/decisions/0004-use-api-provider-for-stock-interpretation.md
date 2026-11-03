@@ -91,3 +91,14 @@ with the 3-GB limit: the latest observed Ollama RSS was approximately 3158 MiB
 and missed the first loading peak. Remote LLM RAM cannot be measured from the
 API client. Hardware STT, production adapters, units/attributes extraction,
 latency acceptance and team review remain pending.
+
+## Production adapter — 3 November 2026
+
+The PC can now select a Groq audio pipeline without changing the default stub.
+`GroqWhisperTranscriber` sends the WAV to Groq. `GroqDraftProvider` asks
+`openai/gpt-oss-20b` for the internal draft. `map_draft` builds the version-1
+contract from catalog attributes, not from a single display-name string.
+The Raspberry Pi remains the authority that assigns `product_id`. This note
+does not close team review, a live Groq acceptance run, or physical
+end-to-end validation. Inventory persistence stays out of scope. The offline
+candidate in ADR-0005 is unchanged.

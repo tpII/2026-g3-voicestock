@@ -11,18 +11,26 @@ flowchart LR
     A[Pi PushToTalk WAV] --> B[RecordingSender]
     B --> C[HttpInterpretationClient.interpret_audio]
     C --> D[PC HTTP server: POST /api/v1/interpret-audio]
-    D --> E[Audio handler: stub today]
-    E --> F[Transcription API: pending]
-    F --> G[InterpretationService]
+    D --> E{VOICESTOCK_AUDIO_PIPELINE}
+    E -->|stub| F[describe_received_audio]
+    E -->|groq| G[Groq Whisper]
+    G --> H[Groq draft provider]
+    H --> I[map_draft and catalog check]
+    I --> J[ContractPayload plus recognized_text]
 ```
 
 The transport is implemented
 ([ADR-0007](../decisions/0007-send-push-to-talk-audio-as-raw-wav-over-http.md),
-[audio interface](../interfaces/pc-audio-communication.md)). The audio handler
-is still the stub `describe_received_audio` in `src/pc/main.py`. Replacing it
-with transcription through the API plus `InterpretationService.interpret` is
-the pending step. The sections below describe the earlier plan with STT on the
-Raspberry Pi and the SSH benchmark tooling. They are kept as a record.
+[audio interface](../interfaces/pc-audio-communication.md)).
+`VOICESTOCK_AUDIO_PIPELINE=stub` keeps `describe_received_audio`.
+`groq` runs Groq Whisper, then `openai/gpt-oss-20b`, then `map_draft`.
+The setup is [the PC audio pipeline guide](../setup/pc-audio-pipeline.md).
+A successful response carries the version-1 contract and `recognized_text`.
+The Raspberry Pi validator still assigns `product_id`. An ambiguous catalog
+description is a service error, not a guessed product. Confirming the
+operation still uses `ProvisionalOperationExecutor` and does not persist
+inventory. Automated tests mock Groq; they are not a live API call and not
+the physical end-to-end run.
 
 ## Earlier plan: STT on the Raspberry Pi
 
@@ -57,6 +65,10 @@ production operation contract.
 | PC HTTP | `src/pc/communication/server.py` | `POST /api/v1/interpret` and `POST /api/v1/interpret-audio`, injected handlers |
 | Received audio | `src/pc/communication/audio.py` | `ReceivedAudio` and the `AudioHandler` contract |
 | PC composition | `src/pc/main.py` | Connects `InterpretationService.interpret` and the audio handler to HTTP |
+| PC speech-to-text | `src/pc/speech_to_text/` | `GroqWhisperTranscriber`; WAV bytes in, text or `TranscriptionError` out |
+| Groq chat call | `src/pc/audio/groq_chat.py` | HTTP for the draft provider. Failures become `ProviderError` |
+| Draft provider | `src/pc/interpretation/groq.py` | `GroqDraftProvider`; structured draft, no HTTP import |
+| Audio pipeline | `src/pc/audio/pipeline.py` | STT, one operation, `map_draft`, catalog match, `recognized_text` |
 | Pi operation cycle | `src/pi/pending_operation/flow.py` | Owns the phase and the pending operation after a capture is sent. See [the operation workflow](pending-operation-flow.md). |
 | Pi process | `src/pi/runtime.py` | `voicestock-pi`: capture, client, cycle, and web UI. See [the runtime guide](../setup/pi-runtime.md). |
 | Interpreter port | `src/pc/interpretation/providers.py` | `InterpretationProvider.interpret(text)`, `ProviderRegistry`, `ProviderError` |
@@ -65,7 +77,8 @@ production operation contract.
 Transport success is distinct from service success: callers must inspect both
 layers. PC address and timeout use `VOICESTOCK_PC_URL` and
 `VOICESTOCK_PC_TIMEOUT`; provider selection uses
-`VOICESTOCK_INTERPRETATION_PROVIDER`. Registering a real provider is still pending.
+`VOICESTOCK_INTERPRETATION_PROVIDER`. The text route still defaults to
+`stub`. The audio route selects Groq only when `VOICESTOCK_AUDIO_PIPELINE=groq`.
 
 ## Proposed module boundaries
 
@@ -75,18 +88,19 @@ and return text or a typed error. It does not capture, call an API or interpret
 inventory commands. Use a queued orchestration step rather than running costly
 inference inside GPIO callbacks; model loading should be reusable.
 
-The principal LLM provider belongs under `src/pc/interpretation/`, implements
-the existing provider port and encapsulates credentials, endpoint and failures.
-It produces the internal InterpretationDraft described by the interpretation
-workstream. The official contract mapper and downstream validation remain
-separate responsibilities; the benchmark schema does not implement them.
+The draft provider implements the existing port under `src/pc/interpretation/`
+and does not import an HTTP client. The Groq request lives in
+`src/pc/audio/groq_chat.py` and raises `ProviderError` without the API key or
+the response body. The provider returns the internal InterpretationDraft. The
+official contract mapper and the Raspberry Pi validator remain separate. The
+benchmark schema does not implement them.
 
 [SpeechToText-03](https://app.clickup.com/t/86e3euw78) and
 [SpeechToText-04](https://app.clickup.com/t/86e3euwhw) own the STT interface and
 adapter; [StructuredCommandInterpretation-04](https://app.clickup.com/t/86e3ev4cx)
-owns the real interpreter. The initial evaluation PR contributes exploration and documentation. The SSH
-follow-up below introduces the STT port/adapter; production LLM and physical
-application orchestration remain pending.
+owns the real interpreter. The PC audio path now has that provider behind
+`VOICESTOCK_AUDIO_PIPELINE=groq`. A live Groq acceptance run and the physical
+button-to-UI run remain pending.
 
 ## Tooling and operation
 
@@ -105,9 +119,8 @@ See [pipeline operation](../testing/audio-stt-llm-benchmark.md),
 [engine setup](../setup/speech-to-text-models.md),
 [API credentials](../setup/api-keys.md) and
 [the hardware validation plan](../research/speech-to-text-engine-evaluation.md#validation-still-required).
-The credential helper currently serves benchmark scripts; production configuration
-must be introduced with the real provider rather than importing benchmark code
-into `src/`.
+The credential helper serves benchmark scripts. Production reads
+`VOICESTOCK_GROQ_API_KEY` or `GROQ_API_KEY` and does not import that helper.
 
 ## SSH fixture integration increment
 
@@ -115,5 +128,6 @@ A sequential engine-independent `SpeechToText` port and `WhisperAdapter` now
 exist under `src/pi/speech_to_text/`. The new SSH coordinator transfers recorded
 WAVs and exercises that adapter remotely, then calls Groq from the PC. See
 [the preparation and execution guide](../testing/raspberry-stt-ssh.md). Hardware
-execution is pending. The earlier diagram describes the planned HTTP application
-flow: connecting physical capture and a production LLM provider remains pending.
+execution is pending. The earlier diagram is the original plan. The PC HTTP
+server can now run the Groq audio pipeline. Connecting that server to a
+physical capture and accepting it on hardware remains pending.

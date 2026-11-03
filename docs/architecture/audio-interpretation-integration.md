@@ -24,6 +24,9 @@ The transport is implemented
 [audio interface](../interfaces/pc-audio-communication.md)).
 `VOICESTOCK_AUDIO_PIPELINE=stub` keeps `describe_received_audio`.
 `groq` runs Groq Whisper, then `openai/gpt-oss-20b`, then `map_draft`.
+The Groq HTTP client opens with the server lifespan and closes once when the
+process stops. Stub mode does not create it. Blocking transcription and
+interpretation run outside the ASGI event loop.
 The setup is [the PC audio pipeline guide](../setup/pc-audio-pipeline.md).
 A successful response carries the version-1 contract and `recognized_text`.
 The Raspberry Pi validator still assigns `product_id`. An ambiguous catalog

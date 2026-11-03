@@ -44,19 +44,23 @@ class GroqChatPoster:
             )
             response.raise_for_status()
             body = response.json()
-        except httpx.TimeoutException as error:
+        except httpx.TimeoutException:
             logger.info("interpretation request timed out")
-            raise ProviderError("interpretation request timed out") from error
+            raise ProviderError("interpretation request timed out") from None
         except httpx.HTTPStatusError as error:
             logger.info("interpretation request failed")
             raise ProviderError(
                 f"interpretation request failed with HTTP {error.response.status_code}"
-            ) from error
-        except httpx.HTTPError as error:
+            ) from None
+        except httpx.HTTPError:
             logger.info("interpretation request failed")
-            raise ProviderError("interpretation request failed") from error
-        except ValueError as error:
-            raise ProviderError("interpretation response is not JSON") from error
+            raise ProviderError("interpretation request failed") from None
+        except ValueError:
+            logger.info("interpretation response was not accepted")
+            raise ProviderError("interpretation response is not JSON") from None
+        except Exception:
+            logger.info("interpretation request failed unexpectedly")
+            raise ProviderError("interpretation request failed") from None
         if not isinstance(body, dict):
             raise ProviderError("interpretation response is not an object")
         return body

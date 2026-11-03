@@ -178,6 +178,43 @@ def test_transcription_timeout_and_failure() -> None:
     assert broken.error.code is ServiceErrorCode.TRANSCRIPTION_FAILURE
 
 
+def test_unexpected_mapping_error_hides_the_cause(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def explode(draft: object) -> object:
+        raise RuntimeError("secret-mapper-body")
+
+    monkeypatch.setattr("pc.audio.pipeline.map_draft", explode)
+    result = _pipeline("agregá arroz", _draft("1 kg")).handle(_audio())
+    assert result.error is not None
+    assert result.error.code is ServiceErrorCode.CONTRACT_MAPPING_FAILURE
+    assert result.error.detail == "contract mapping failed"
+    assert "secret-mapper-body" not in (result.error.detail or "")
+
+
+def test_unexpected_provider_error_then_a_valid_contract() -> None:
+    class Once:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def interpret(self, text: str) -> object:
+            self.calls += 1
+            if self.calls == 1:
+                raise RuntimeError("secret-provider-body")
+            return _draft("1 kg")
+
+    text = "agregá dos paquetes de arroz marolio de un kilo"
+    pipeline = build_pipeline(lambda wav: text, Once(), CATALOG)
+    failed = pipeline.handle(_audio())
+    assert failed.error is not None
+    assert failed.error.code is ServiceErrorCode.PROVIDER_FAILURE
+    assert failed.error.detail == "the provider failed unexpectedly"
+    succeeded = pipeline.handle(_audio())
+    assert succeeded.payload is not None
+    assert succeeded.payload["recognized_text"] == text
+    assert "secret-provider-body" not in succeeded.model_dump_json()
+
+
 def test_provider_failure_does_not_create_a_contract() -> None:
     result = _pipeline(
         "texto", ProviderError("interpretation request timed out")

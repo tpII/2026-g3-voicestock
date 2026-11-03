@@ -57,6 +57,12 @@ VOICESTOCK_PC_PORT=8000 \
 voicestock-pc-server
 ```
 
+En modo `groq`, el proceso abre un solo cliente HTTP cuando el servidor
+arranca y lo cierra al terminar. Whisper y el modelo de interpretación lo
+comparten. El modo `stub` no lo crea. La transcripción y la interpretación
+corren fuera del bucle de eventos de HTTP: una llamada lenta no deja muda la
+otra ruta.
+
 ## Catálogo y contrato
 
 El modelo debe copiar `nombre`, `marca`, `variante` y `presentacion` del

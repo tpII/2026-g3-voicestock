@@ -8,10 +8,13 @@ unaware of interpretation, and the service stays unaware of HTTP.
 contract plus ``recognized_text``. The text route is unchanged.
 """
 
+from collections.abc import Callable
+from contextlib import AbstractAsyncContextManager
+
 import uvicorn
 from fastapi import FastAPI
 
-from pc.audio.factory import audio_handler_for
+from pc.audio.factory import audio_session_for
 from pc.audio.settings import AudioPipelineSettings
 from pc.communication import (
     AudioHandler,
@@ -51,24 +54,31 @@ def create_pc_app(
     registry: ProviderRegistry,
     provider_name: str | None,
     audio_handler: AudioHandler = describe_received_audio,
+    lifespan: Callable[[FastAPI], AbstractAsyncContextManager[None]] | None = None,
 ) -> FastAPI:
     """Build the HTTP app: text goes to InterpretationService.interpret."""
     service = InterpretationService(registry, provider_name)
-    return create_app(service.interpret, audio_handler=audio_handler)
+    return create_app(
+        service.interpret,
+        audio_handler=audio_handler,
+        lifespan=lifespan,
+    )
 
 
 def main() -> None:
     """Run the PC server with the provider selected in the environment."""
     server_settings = ServerSettings.from_environment()
     interpretation_settings = InterpretationSettings.from_environment()
+    session = audio_session_for(
+        AudioPipelineSettings.from_environment(),
+        describe_received_audio,
+    )
     uvicorn.run(
         create_pc_app(
             default_registry(),
             interpretation_settings.provider,
-            audio_handler_for(
-                AudioPipelineSettings.from_environment(),
-                describe_received_audio,
-            ),
+            session.handle,
+            session.lifespan,
         ),
         host=server_settings.host,
         port=server_settings.port,

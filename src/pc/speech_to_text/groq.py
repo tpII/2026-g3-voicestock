@@ -57,18 +57,18 @@ class GroqWhisperTranscriber:
                 timeout=self._timeout_seconds,
             )
             response.raise_for_status()
-        except httpx.TimeoutException as error:
+        except httpx.TimeoutException:
             logger.info("speech-to-text request timed out")
             raise TranscriptionError(
                 TranscriptionFailure.TIMEOUT,
                 "speech-to-text request timed out",
-            ) from error
+            ) from None
         except httpx.HTTPError as error:
             logger.info("speech-to-text request failed")
             raise TranscriptionError(
                 TranscriptionFailure.FAILED,
                 _http_detail(error),
-            ) from error
+            ) from None
 
         text = _read_text(response)
         if not text.strip():
@@ -86,11 +86,11 @@ class GroqWhisperTranscriber:
 def _read_text(response: httpx.Response) -> str:
     try:
         body = response.json()
-    except ValueError as error:
+    except ValueError:
         raise TranscriptionError(
             TranscriptionFailure.FAILED,
             "speech-to-text response is not JSON",
-        ) from error
+        ) from None
     if not isinstance(body, dict):
         raise TranscriptionError(
             TranscriptionFailure.FAILED,

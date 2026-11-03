@@ -70,6 +70,16 @@ class AudioInterpretationPipeline:
                 "speech-to-text failed unexpectedly",
             )
 
+        try:
+            return self._contract_for(recognized_text)
+        except Exception:
+            logger.info("audio interpretation failed unexpectedly")
+            return ServiceResult.failure(
+                ServiceErrorCode.PROVIDER_FAILURE,
+                "the provider failed unexpectedly",
+            )
+
+    def _contract_for(self, recognized_text: str) -> ServiceResult:
         interpreted = self._service.interpret(recognized_text)
         if interpreted.status != "success":
             return interpreted
@@ -83,12 +93,17 @@ class AudioInterpretationPipeline:
             )
         try:
             contract = map_draft(draft)
+            match = match_description(contract.operations[0].product, self._catalog)
         except DraftMappingError as error:
             return ServiceResult.failure(
-                ServiceErrorCode.CONTRACT_MAPPING_FAILURE, str(error)
+                ServiceErrorCode.CONTRACT_MAPPING_FAILURE, str(error) or None
             )
-
-        match = match_description(contract.operations[0].product, self._catalog)
+        except Exception:
+            logger.info("contract mapping failed unexpectedly")
+            return ServiceResult.failure(
+                ServiceErrorCode.CONTRACT_MAPPING_FAILURE,
+                "contract mapping failed",
+            )
         if match is not ProductMatch.IDENTIFIED:
             return ServiceResult.failure(_MATCH_CODES[match], _MATCH_DETAILS[match])
 

@@ -1,18 +1,19 @@
 # TC-NET-001 — Raspberry Pi access point configuration
 
 - Status: DESIGNED
-- Executions: [EX-TC-NET-001-20261103-01](../executions/EX-TC-NET-001-20261103-01.md) (`FAILED`, procedure version 1, not closed). Incident: [INC-EX-TC-NET-001-20261103-01-01](../executions/INC-EX-TC-NET-001-20261103-01-01.md) (`OPEN`). [EX-TC-NET-001-20261103-02](../executions/EX-TC-NET-001-20261103-02.md) (`FAILED`, procedure version 1, not closed). Incidents: [INC-EX-TC-NET-001-20261103-02-01](../executions/INC-EX-TC-NET-001-20261103-02-01.md) (`OPEN`), [INC-EX-TC-NET-001-20261103-02-02](../executions/INC-EX-TC-NET-001-20261103-02-02.md) (`OPEN`), [INC-EX-TC-NET-001-20261103-02-03](../executions/INC-EX-TC-NET-001-20261103-02-03.md) (`OPEN`). [EX-TC-NET-001-20261103-03](../executions/EX-TC-NET-001-20261103-03.md) (`PASSED_PENDING_DOCUMENTATION`, procedure version 2, review NOT_REVIEWED, not closed).
+- Executions: [EX-TC-NET-001-20261103-01](../executions/EX-TC-NET-001-20261103-01.md) (`FAILED`, procedure version 1, not closed). Incident: [INC-EX-TC-NET-001-20261103-01-01](../executions/INC-EX-TC-NET-001-20261103-01-01.md) (`OPEN`). [EX-TC-NET-001-20261103-02](../executions/EX-TC-NET-001-20261103-02.md) (`FAILED`, procedure version 1, not closed). Incidents: [INC-EX-TC-NET-001-20261103-02-01](../executions/INC-EX-TC-NET-001-20261103-02-01.md) (`OPEN`), [INC-EX-TC-NET-001-20261103-02-02](../executions/INC-EX-TC-NET-001-20261103-02-02.md) (`OPEN`), [INC-EX-TC-NET-001-20261103-02-03](../executions/INC-EX-TC-NET-001-20261103-02-03.md) (`OPEN`). [EX-TC-NET-001-20261103-03](../executions/EX-TC-NET-001-20261103-03.md) (`PASSED_PENDING_DOCUMENTATION`; technical configuration PASSED; evidence pending; procedure version 2; review NOT_REVIEWED; not `CLOSED_PASSED`).
 - Procedure version: 2
 
 Procedure version 2 below is the procedure in force. It configures the
 Raspberry Pi access point with the repository `hostapd` installer and the
 PC client with NetworkManager.
 
-[Procedure version 1](TC-NET-001-procedure-v1.md) is historical. Attempts
-01 and 02 ran that text and stay **FAILED**. This revision does not
-regrade them. The proposal that this version adopts is
-[TC-NET-001 procedure version 2 (proposal)](TC-NET-001-procedure-v2-PROPOSAL.md).
-That file is no longer the specification.
+Three texts are distinct. [Procedure version 1](TC-NET-001-procedure-v1.md)
+is historical. Attempts 01 and 02 ran that text and stay **FAILED**. This
+file is procedure version 2, and it is the procedure in force. The
+[proposal](TC-NET-001-procedure-v2-PROPOSAL.md) keeps its filename and is
+only the historical design artifact. It is not the specification. This
+revision does not regrade attempts 01 and 02.
 
 [ADR-0010](../../../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md)
 remains the topology. The campaign file
@@ -225,5 +226,7 @@ process closes them. A pass of this procedure does not close them.
 ## Limitations and exclusions
 
 Local profiles do not prove that the PC and the Pi can see each other.
-They do not prove Internet isolation, reboot persistence, or recovery
-after a failed unit. Those checks are TC-NET-002 and TC-NET-003.
+They do not prove Internet isolation, reboot persistence, recovery after
+a failed unit, or long-term connection reliability. Reachability and
+IPv4 isolation are TC-NET-002. Reboot is TC-NET-003. A technical pass of
+this case is not **CLOSED_PASSED** while evidence or review is still open.

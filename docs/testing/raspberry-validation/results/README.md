@@ -17,6 +17,10 @@ No results sheet has been filed.
 **FAILED** and not **CLOSED_FAILED**. The `hostapd` diagnostic in attempt
 02 is not a closed result.
 [EX-TC-NET-001-20261103-03](../executions/EX-TC-NET-001-20261103-03.md) is
+**PASSED_PENDING_DOCUMENTATION**. The technical configuration assessment
+is **PASSED**. The evidence archive is pending. Review is NOT_REVIEWED.
+It is not **CLOSED_PASSED**.
+[EX-TC-NET-002-20261103-01](../executions/EX-TC-NET-002-20261103-01.md) is
 **PASSED_PENDING_DOCUMENTATION** and not **CLOSED_PASSED**. Per-run numbers
 stay in the execution records.
 

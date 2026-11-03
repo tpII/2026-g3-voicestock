@@ -122,6 +122,8 @@ reconciled with any other ADR-0012.
 procedure version 2 is in force for new executions.
 [EX-TC-NET-001-20261103-03](../testing/raspberry-validation/executions/EX-TC-NET-001-20261103-03.md)
 is **PASSED_PENDING_DOCUMENTATION** for configuration only. Attempts 01 and
-02 stay **FAILED** on procedure version 1. TC-NET-002 and TC-NET-003 are
-unexecuted. The sentences under "What is true now" describe this file when
+02 stay **FAILED** on procedure version 1.
+[EX-TC-NET-002-20261103-01](../testing/raspberry-validation/executions/EX-TC-NET-002-20261103-01.md)
+is **PASSED_PENDING_DOCUMENTATION** for bidirectional ICMP and IPv4
+isolation. It is not closed. TC-NET-003 is unexecuted. The sentences under "What is true now" describe this file when
 it was written. This section does not accept the proposal.

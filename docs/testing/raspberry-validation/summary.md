@@ -4,12 +4,15 @@ This file is the outline of a later technical report. It is not the report
 of a finished experiment. One baseline execution, three GPIO executions,
 one microphone-enumeration execution, one WAV-capture execution, two
 push-to-talk executions, one maximum-duration execution, and three
-access-point executions are recorded. TC-ENV-001, TC-GPIO-001, TC-AUD-001,
-TC-AUD-002, TC-PTT-001, TC-PTT-002, and TC-NET-001 are not closed. The
-other cases have no measurements. The second access-point execution
-includes a `hostapd` diagnostic. That diagnostic is not a measurement of
-TC-NET-002. The third is a configuration pass of procedure version 2.
-It is not ICMP, isolation, or reboot.
+access-point executions are recorded, plus one connectivity execution.
+TC-ENV-001, TC-GPIO-001, TC-AUD-001, TC-AUD-002, TC-PTT-001, TC-PTT-002,
+TC-NET-001, and TC-NET-002 are not closed. The other cases have no
+measurements. The second access-point execution includes a `hostapd`
+diagnostic. That diagnostic is not TC-NET-002. The third access-point
+execution is **PASSED_PENDING_DOCUMENTATION**: the technical configuration
+assessment is **PASSED**, the evidence archive and the formal review are
+still open, and it is not **CLOSED_PASSED**. It does not claim ICMP,
+IPv4 isolation, reboot, service recovery, or long-term reliability.
 
 Campaign status: **IN_PROGRESS**.
 
@@ -70,8 +73,15 @@ Recorded executions:
   Not closed. Not TC-NET-002.
 - [EX-TC-NET-001-20261103-03](executions/EX-TC-NET-001-20261103-03.md),
   **PASSED_PENDING_DOCUMENTATION**. Procedure version 2 on `develop` at
-  `485559c`. Technical configuration assessment **PASSED**. Review
-  NOT_REVIEWED. Not closed. Not ICMP, isolation, reboot, or recovery.
+  `485559c`. Technical configuration assessment **PASSED**. Evidence
+  archive pending. Review NOT_REVIEWED. Not **CLOSED_PASSED**. Not ICMP,
+  isolation, reboot, recovery, or long-term reliability.
+- [EX-TC-NET-002-20261103-01](executions/EX-TC-NET-002-20261103-01.md),
+  **PASSED_PENDING_DOCUMENTATION**. Procedure version 1. Ten of ten
+  measured ICMP replies in each direction. IPv4 isolation only after
+  Ethernet was disconnected: no default route and `Network is unreachable`.
+  Evidence pending. Review NOT_REVIEWED. Not **CLOSED_PASSED**. Not
+  TC-NET-003.
 
 ## 3. Scope
 
@@ -119,8 +129,8 @@ documentation branch.
 | TC-AUD-002 | [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–4 and 6 met on 5/5 measured runs. Criterion 5 stores operator-reported hashes. Criterion 7 not triggered. Not closed. | Commit `88a95d5` on `fix/audio-capture-stream-shutdown` at the time of the run. Later `origin/develop` is `1b81442`, which merges that fix. The measured revision is unchanged. Device `voicestock_mic`. Duration error about −56.2 ms, tolerance **TO BE DEFINED**. `throttled=0x50005` at the later inventory. Review NOT_REVIEWED. WAV files remain on the Pi. |
 | TC-PTT-001 | [EX-TC-PTT-001-20261103-01](executions/EX-TC-PTT-001-20261103-01.md); [EX-TC-PTT-001-20261103-02](executions/EX-TC-PTT-001-20261103-02.md) | FAILED, then FAILED | Attempt 02: 3 measured WAV files, 1 channel, width 2, 16000 Hz, `RELEASED`, files retained. Operator heard all three. Not closed. | Attempt 01: microphone muted; listening not verified; not a demonstrated software defect. Attempt 02 phrase match and defect columns not separately confirmed. Both ran while [EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md) was **FAILED**. PC not contacted. `develop` at `1b81442`. |
 | TC-PTT-002 | [EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md) | BLOCKED | 3 `MAX_DURATION` and 3 later `RELEASED`. No extra file while held. Format 6/6. Not closed. | Second mechanical press **NOT APPLICABLE**. Header duration 1.984 s versus 2 s. Error −16 ms. Gate **TO BE DEFINED**. Prerequisite TC-PTT-001 remains **FAILED**. Not a product failure of the limit. |
-| TC-NET-001 | [EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md); [EX-TC-NET-001-20261103-02](executions/EX-TC-NET-001-20261103-02.md); [EX-TC-NET-001-20261103-03](executions/EX-TC-NET-001-20261103-03.md) | FAILED, then FAILED, then PASSED_PENDING_DOCUMENTATION | Attempt 03: configuration criteria of procedure version 2 met on one run. Not closed. Review NOT_REVIEWED. | Attempt 01: `10*` matched `100 (connected)`. Attempt 02 failed WPA2 activation and a transient MAC match; its `hostapd` diagnostic is not a pass. Both stay **FAILED** on procedure version 1. Attempt 03 does not regrade them and does not measure ICMP, isolation, reboot, or unit recovery. Pi commit confirmed `485559c`. Arch SHA **NOT RECORDED**. Ethernet left up. |
-| TC-NET-002 | none | DESIGNED | | |
+| TC-NET-001 | [EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md); [EX-TC-NET-001-20261103-02](executions/EX-TC-NET-001-20261103-02.md); [EX-TC-NET-001-20261103-03](executions/EX-TC-NET-001-20261103-03.md) | FAILED, then FAILED, then PASSED_PENDING_DOCUMENTATION | Attempt 03: technical configuration PASSED. Evidence pending. Review NOT_REVIEWED. Not CLOSED_PASSED. | Attempt 01: `10*` matched `100 (connected)`. Attempt 02 failed WPA2 activation and a transient MAC match; its `hostapd` diagnostic is not a pass. Both stay **FAILED** on procedure version 1. Attempt 03 does not regrade them and does not measure ICMP, isolation, reboot, unit recovery, or long-term reliability. Pi commit confirmed `485559c`. Arch SHA **NOT RECORDED**. Ethernet left up. |
+| TC-NET-002 | [EX-TC-NET-002-20261103-01](executions/EX-TC-NET-002-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | Connectivity: 10/10 each way. IPv4 isolation after Ethernet removal: no default route, no reply from `1.1.1.1`. Not closed. Review NOT_REVIEWED. | Tool RTT PC to Pi `0.808/4.407/5.545/1.272` ms. Pi to PC `4.101/4.561/5.827/0.512` ms. Printed-line median and sample stdev stay in the execution and do not replace those lines. Loss allowance and latency budget **TO BE DEFINED**. Pi Internet probe was `Network is unreachable`, not a three-packet loss rate. `tailscale0` observed only. Arch SHA **NOT RECORDED**. Not TC-NET-003. |
 | TC-NET-003 | none | DESIGNED | | |
 | TC-COM-001 | none | DESIGNED | | |
 | TC-COM-002 | none | DESIGNED | | |
@@ -247,7 +257,13 @@ Attempt 03 does not close these incidents.
 configuration assessment is **PASSED**. Review is NOT_REVIEWED. The Pi
 checkout was confirmed as `develop` at `485559c`. The Arch SHA was not
 recorded. No incident was opened. The earlier incidents stay **OPEN**.
-ICMP, isolation, reboot, and unit recovery were not measured.
+ICMP, isolation, reboot, and unit recovery were not measured. No
+incident file was opened for that execution.
+
+[EX-TC-NET-002-20261103-01](executions/EX-TC-NET-002-20261103-01.md) is
+**PASSED_PENDING_DOCUMENTATION**. No incident file was opened. The
+functional IPv4 result does not close TC-NET-001 and does not execute
+TC-NET-003.
 
 [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) opened
 no incident.
@@ -353,6 +369,13 @@ produced a diagnostic that it was not active. Neither observation is a
 failure. Procedure version 1 was not applied to this run, and this run
 was not written back into attempts 01 or 02.
 
+For EX-TC-NET-002-20261103-01: the ten-echo stage still had Ethernet
+connected. Isolation was recorded only after the cable was removed. The
+Pi probe to `1.1.1.1` returned `Network is unreachable` and is not a
+three-packet loss rate. `tailscale0` was visible and was not tested.
+Session times, the PC SHA, and transcript hashes were not supplied. The
+procedure text was not edited. TC-NET-003 was not run.
+
 ## 9. Conclusions
 
 Do not write a conclusion, a pass claim, or a recommendation that the
@@ -408,10 +431,19 @@ What this summary can say now:
   pass attempt 02 and do not execute TC-NET-002. Attempt 03 is
   **PASSED_PENDING_DOCUMENTATION** on procedure version 2: the repository
   installer on `develop` at `485559c` brought up the cell configuration.
-  Review is NOT_REVIEWED. That pass does not measure ICMP, isolation,
-  reboot, or recovery, and it does not close the case. TC-NET-002 and
-  TC-NET-003 remain unexecuted. Procedure version 1 is preserved as a
-  historical procedure. [ADR-0012](../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md)
+  The technical assessment is **PASSED**. Evidence is still pending.
+  Review is NOT_REVIEWED. That result does not measure ICMP, isolation,
+  reboot, recovery, or long-term reliability, and it does not close the
+  case. Procedure version 1 is preserved as a historical procedure. The
+  proposal file remains a historical design artifact under its original
+  filename.
+  [EX-TC-NET-002-20261103-01](executions/EX-TC-NET-002-20261103-01.md) is
+  **PASSED_PENDING_DOCUMENTATION** on TC-NET-002 procedure version 1.
+  Ten of ten measured echoes succeeded in each direction. After Ethernet
+  was disconnected, the Pi had no default IPv4 route and `1.1.1.1` was
+  unreachable. The loss allowance and the latency budget stay
+  **TO BE DEFINED**. Review is NOT_REVIEWED. TC-NET-003 remains
+  unexecuted. [ADR-0012](../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md)
   stays **Proposed** on this branch and is not renumbered. It does not
   replace [ADR-0010](../../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md);
 - the default PC audio stub cannot create a pending operation;
@@ -432,8 +464,8 @@ EX-TC-ENV-001-20261027-01, EX-TC-GPIO-001-20261027-01,
 EX-TC-GPIO-001-20261027-02, and EX-TC-AUD-001-20261027-01 were recorded on
 27 October 2026. EX-TC-AUD-002-20261103-01, EX-TC-GPIO-001-20261103-01,
 EX-TC-PTT-001-20261103-01, EX-TC-PTT-001-20261103-02, EX-TC-PTT-002-20261103-01,
-EX-TC-NET-001-20261103-01, EX-TC-NET-001-20261103-02, and
-EX-TC-NET-001-20261103-03 were recorded on
+EX-TC-NET-001-20261103-01, EX-TC-NET-001-20261103-02,
+EX-TC-NET-001-20261103-03, and EX-TC-NET-002-20261103-01 were recorded on
 3 November 2026.
 This change does not add a bitácora section for either day. The table stays
 empty until a real daily bitácora section exists. Unfinished cases stay

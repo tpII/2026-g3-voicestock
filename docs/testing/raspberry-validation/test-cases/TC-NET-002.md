@@ -1,7 +1,7 @@
 # TC-NET-002 — Bidirectional connectivity and isolation
 
 - Status: DESIGNED
-- Executions: none
+- Executions: [EX-TC-NET-002-20261103-01](../executions/EX-TC-NET-002-20261103-01.md) (`PASSED_PENDING_DOCUMENTATION`; technical connectivity and IPv4 isolation met; evidence and review pending; not `CLOSED_PASSED`)
 - Procedure version: 1
 
 ## Objective

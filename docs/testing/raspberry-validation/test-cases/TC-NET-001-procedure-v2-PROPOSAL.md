@@ -1,6 +1,7 @@
 # TC-NET-001 procedure version 2 — proposal
 
 - Status: **ADOPTED**
+- Role: historical design artifact. The filename is unchanged.
 - In force: no. The in-force wording is [TC-NET-001](TC-NET-001.md), procedure version 2.
 - First execution of that adopted procedure: [EX-TC-NET-001-20261103-03](../executions/EX-TC-NET-001-20261103-03.md)
 - Applies to EX-TC-NET-001-20261103-01 and EX-TC-NET-001-20261103-02: no

@@ -83,10 +83,15 @@ It is the procedure executed by
 are **FAILED** and not closed. Procedure version 2 is in force in
 [TC-NET-001](test-cases/TC-NET-001.md).
 [EX-TC-NET-001-20261103-03](executions/EX-TC-NET-001-20261103-03.md) is the
-first run of that version. It is **PASSED_PENDING_DOCUMENTATION** and not
-closed. The proposal file remains as the draft that was adopted. Do not
-apply version 2 to attempts 01 and 02. The manual ping inside attempt 02
-is not TC-NET-002. TC-NET-002 and TC-NET-003 stay unexecuted.
+first run of that version. It is **PASSED_PENDING_DOCUMENTATION**: technical
+configuration **PASSED**, evidence pending, review NOT_REVIEWED, not
+**CLOSED_PASSED**. The proposal file keeps its filename and is a historical
+design artifact, not the procedure. Do not apply version 2 to attempts 01
+and 02. The manual ping inside attempt 02 is not TC-NET-002.
+[EX-TC-NET-002-20261103-01](executions/EX-TC-NET-002-20261103-01.md) is the
+first run of TC-NET-002 procedure version 1. It is
+**PASSED_PENDING_DOCUMENTATION** and not closed. TC-NET-003 stays
+unexecuted.
 
 The project bitácora is not part of this order. Execution records, the
 summary, and this campaign's traceability are updated as each case

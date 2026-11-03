@@ -164,6 +164,52 @@ load_config
   require_not_internet_interface wlp0s20f0u4
 ) && pass "dedicated interface without a default route is accepted" || fail "dedicated interface was rejected"
 
+(
+  ip() { printf '\n'; }
+  nmcli() {
+    if [[ "$1" == "-t" ]]; then
+      printf 'voicestock-client:wlp0s20f0u4\n'
+      return 0
+    fi
+    if [[ "$1" == "-g" && "$2" == "IP4.GATEWAY" ]]; then
+      printf '\n'
+      return 0
+    fi
+    return 0
+  }
+  require_not_internet_interface wlp0s20f0u4
+) && pass "active VoiceStock profile without a route or gateway is accepted" || fail "active VoiceStock profile was rejected"
+
+(
+  ip() {
+    printf 'default via 192.168.1.1 dev wlp0s20f0u4 proto static\n'
+  }
+  nmcli() {
+    if [[ "$1" == "-t" ]]; then
+      printf 'voicestock-client:wlp0s20f0u4\n'
+      return 0
+    fi
+    return 0
+  }
+  require_not_internet_interface wlp0s20f0u4
+) >/dev/null 2>&1 && fail "active VoiceStock profile on the default route was accepted" || pass "active VoiceStock profile on the default route is rejected"
+
+(
+  ip() { printf '\n'; }
+  nmcli() {
+    if [[ "$1" == "-t" ]]; then
+      printf 'voicestock-client:wlp0s20f0u4\n'
+      return 0
+    fi
+    if [[ "$1" == "-g" && "$2" == "IP4.GATEWAY" ]]; then
+      printf '192.168.1.1\n'
+      return 0
+    fi
+    return 0
+  }
+  require_not_internet_interface wlp0s20f0u4
+) >/dev/null 2>&1 && fail "active VoiceStock profile with a gateway was accepted" || pass "active VoiceStock profile with a gateway is rejected"
+
 log="${tmp}/nmcli.log"
 : >"$log"
 profile_exists=0

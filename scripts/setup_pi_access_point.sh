@@ -314,7 +314,8 @@ write_hostapd_conf() {
       "rsn_pairwise=CCMP" \
       "ieee80211w=0" \
       "ignore_broadcast_ssid=0"
-    printf 'wpa_passphrase="%s"\n' "$VOICESTOCK_WIFI_PSK"
+    # hostapd does not use shell quotes. A quoted value would be part of the PSK.
+    printf 'wpa_passphrase=%s\n' "$VOICESTOCK_WIFI_PSK"
   } | write_private_file 600 "$dest"
 }
 
@@ -536,7 +537,8 @@ verify_generated_tree() {
     && config_line_is "$conf" "wpa_key_mgmt=WPA-PSK" \
     && config_line_is "$conf" "rsn_pairwise=CCMP" \
     && config_line_is "$conf" "ieee80211w=0" \
-    && config_line_is "$conf" "wpa_passphrase=\"${VOICESTOCK_WIFI_PSK}\""; then
+    && config_line_is "$conf" "wpa_passphrase=${VOICESTOCK_WIFI_PSK}" \
+    && ! grep -Fq 'wpa_passphrase="' "$conf"; then
     info "OK: hostapd configuration is WPA2-PSK with CCMP and PMF disabled."
   else
     printf 'FAILED: hostapd configuration does not match the VoiceStock access-point settings.\n' >&2
@@ -623,22 +625,6 @@ stop_previous_nm_ap() {
   fi
 }
 
-quiesce_other_wifi_profiles() {
-  local line name type autoconnect
-  while IFS= read -r line; do
-    [[ -n "$line" ]] || continue
-    type="${line##*:}"
-    name="${line%:*}"
-    [[ "$type" == "802-11-wireless" ]] || continue
-    [[ "$name" == "$PROFILE" ]] && continue
-    autoconnect="$(nmcli -g connection.autoconnect connection show "$name")"
-    if [[ "$autoconnect" != "no" ]]; then
-      info "Disabling autoconnect on Wi-Fi profile ${name} so it does not reclaim the radio. The profile is kept."
-      nmcli connection modify "$name" connection.autoconnect no
-    fi
-  done < <(nmcli -t -f NAME,TYPE connection show)
-}
-
 deactivate_other_profiles_on_interface() {
   local interface_name="$1"
   local line name device
@@ -656,7 +642,6 @@ deactivate_other_profiles_on_interface() {
 release_wifi_from_networkmanager() {
   local interface_name="$1"
   stop_previous_nm_ap
-  quiesce_other_wifi_profiles
   deactivate_other_profiles_on_interface "$interface_name"
   write_unmanaged_conf "$interface_name" "$(install_path etc/NetworkManager/conf.d/${UNMANAGED_FILE_NAME})"
   nmcli general reload

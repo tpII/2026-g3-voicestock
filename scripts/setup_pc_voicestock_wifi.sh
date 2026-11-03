@@ -124,17 +124,16 @@ interface_has_default_route() {
 require_not_internet_interface() {
   local interface_name="$1"
   local active gateway
-  active="$(nmcli -t -f NAME,DEVICE connection show --active | awk -F: -v dev="$interface_name" '$2 == dev { print $1; exit }')"
-  if [[ "$active" == "$PROFILE" ]]; then
-    info "Profile ${PROFILE} is already active on ${interface_name}. Updating it in place."
-    return 0
-  fi
   if interface_has_default_route "$interface_name"; then
     error "Interface ${interface_name} owns the default IPv4 route. That is the Internet path. Pass the other Wi-Fi interface. Nothing was changed."
   fi
   gateway="$(nmcli -g IP4.GATEWAY device show "$interface_name")"
   if [[ -n "$gateway" && "$gateway" != "--" && "$gateway" != "0.0.0.0" ]]; then
     error "Interface ${interface_name} has IPv4 gateway ${gateway}. That looks like the Internet path. Pass the other Wi-Fi interface. Nothing was changed."
+  fi
+  active="$(nmcli -t -f NAME,DEVICE connection show --active | awk -F: -v dev="$interface_name" '$2 == dev { print $1; exit }')"
+  if [[ "$active" == "$PROFILE" ]]; then
+    info "Profile ${PROFILE} is already active on ${interface_name}. Updating it in place."
   fi
 }
 

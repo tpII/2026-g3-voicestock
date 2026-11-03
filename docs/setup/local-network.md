@@ -190,9 +190,11 @@ Ethernet, checks Access Point capability and country `AR`, then:
    NetworkManager ignores that Wi-Fi interface after reboot.
 4. Stops the old `voicestock-ap` profile if it exists, and turns off its
    autoconnect. The profile is kept.
-5. Turns autoconnect off on other Wi-Fi profiles and deactivates any other
-   profile that is up on the access-point interface. Those profiles are kept.
-   Ethernet profiles are not modified.
+5. Deactivates any other profile that is currently up on the access-point
+   interface. Those profiles are kept, and their autoconnect setting is not
+   changed. Wi-Fi profiles on other interfaces, and every Ethernet profile,
+   are not modified. NetworkManager stays off this interface because of the
+   unmanaged-devices file, including after reboot.
 6. Reloads NetworkManager configuration and marks the Wi-Fi interface
    unmanaged for this boot. It does not restart NetworkManager.
 7. Installs `voicestock-hostapd.service` and
@@ -454,10 +456,11 @@ systemctl status voicestock-hostapd.service --no-pager
 nmcli -g GENERAL.STATE device show wlan0
 ```
 
-Both units should be enabled. `wlan0` should be unmanaged. Another Wi-Fi
-profile with autoconnect still enabled can take the radio if NetworkManager
-manages it again. The setup script turns autoconnect off on those Wi-Fi
-profiles. Run the Pi script again. That restarts the same units.
+Both units should be enabled. `wlan0` should be unmanaged. If
+`/etc/NetworkManager/conf.d/voicestock-unmanaged.conf` is missing,
+NetworkManager can claim the radio again and a client profile may associate.
+Run the Pi script again. That rewrites the same units and the unmanaged
+file. It does not change Wi-Fi profiles that are not on this interface.
 
 ### The PC loses Internet
 

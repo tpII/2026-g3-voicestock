@@ -81,10 +81,16 @@ else
   pass "passphrase stays in the hostapd configuration"
 fi
 
-if grep -Fq 'ieee80211w=0' "$conf" && grep -Fq 'wpa=2' "$conf" && grep -Fq 'rsn_pairwise=CCMP' "$conf"; then
-  pass "WPA2-PSK, CCMP, and PMF disabled are explicit"
+if grep -Fxq 'wpa_passphrase=unit-test-psk' "$conf" \
+  && [[ "$(grep -c '^wpa_passphrase=' "$conf")" == "1" ]] \
+  && ! grep -Fq 'wpa_passphrase="' "$conf" \
+  && grep -Fq 'ieee80211w=0' "$conf" \
+  && grep -Fq 'wpa=2' "$conf" \
+  && grep -Fq 'wpa_key_mgmt=WPA-PSK' "$conf" \
+  && grep -Fq 'rsn_pairwise=CCMP' "$conf"; then
+  pass "WPA2 passphrase matches the source with no added quotes"
 else
-  fail "security lines missing"
+  fail "WPA2 passphrase line does not match the source value"
 fi
 
 if grep -Fq '192.168.50.1/24' "$address_unit" && ! grep -Fq '192.168.50.1/24' "$conf"; then
@@ -226,21 +232,23 @@ release_log="${tmp}/nmcli.log"
     printf '%q ' "$@" >>"$release_log"
     printf '\n' >>"$release_log"
     if [[ "$1" == "-t" && "$3" == "NAME" ]]; then
-      printf 'voicestock-ap\nnetplan-eth0\nnetplan-wlan0-WiFi-Arriba\n'
+      printf 'voicestock-ap\nnetplan-eth0\nnetplan-wlan0-WiFi-Arriba\nother-lan\n'
       return 0
     fi
     if [[ "$1" == "-t" && "$3" == "NAME,TYPE" ]]; then
       printf '%s\n' \
         'voicestock-ap:802-11-wireless' \
         'netplan-eth0:802-3-ethernet' \
-        'netplan-wlan0-WiFi-Arriba:802-11-wireless'
+        'netplan-wlan0-WiFi-Arriba:802-11-wireless' \
+        'other-lan:802-11-wireless'
       return 0
     fi
     if [[ "$1" == "-t" && "$3" == "NAME,DEVICE" ]]; then
       printf '%s\n' \
         'voicestock-ap:wlan0' \
         'netplan-eth0:eth0' \
-        'netplan-wlan0-WiFi-Arriba:wlan0'
+        'netplan-wlan0-WiFi-Arriba:wlan0' \
+        'other-lan:wlan1'
       return 0
     fi
     if [[ "$1" == "-g" && "$2" == "connection.autoconnect" ]]; then
@@ -251,18 +259,23 @@ release_log="${tmp}/nmcli.log"
   }
   VOICESTOCK_CONFIG_ROOT="${tmp}/release-root"
   release_wifi_from_networkmanager wlan0
+  cp -a "${tmp}/release-root/etc/NetworkManager/conf.d/voicestock-unmanaged.conf" "${tmp}/unmanaged-first"
+  release_wifi_from_networkmanager wlan0
 )
 if grep -Fq 'connection modify voicestock-ap connection.autoconnect no' "$release_log" \
   && grep -Fq 'connection down voicestock-ap' "$release_log" \
-  && grep -Fq 'connection modify netplan-wlan0-WiFi-Arriba connection.autoconnect no' "$release_log" \
   && grep -Fq 'connection down netplan-wlan0-WiFi-Arriba' "$release_log" \
+  && ! grep -Fq 'connection modify netplan-wlan0-WiFi-Arriba' "$release_log" \
+  && ! grep -Fq 'other-lan' "$release_log" \
   && grep -Fq 'general reload' "$release_log" \
   && grep -Fq 'device set wlan0 managed no' "$release_log" \
+  && grep -Fq 'unmanaged-devices+=interface-name:wlan0' "${tmp}/release-root/etc/NetworkManager/conf.d/voicestock-unmanaged.conf" \
+  && cmp -s "${tmp}/unmanaged-first" "${tmp}/release-root/etc/NetworkManager/conf.d/voicestock-unmanaged.conf" \
   && ! grep -Fq 'netplan-eth0' "$release_log" \
   && ! grep -Fq 'device set eth0' "$release_log"; then
-  pass "NetworkManager release keeps Ethernet and drops only Wi-Fi ownership"
+  pass "release keeps unrelated profiles and stays idempotent"
 else
-  fail "NetworkManager release touched Ethernet or skipped a Wi-Fi step"
+  fail "release changed an unrelated profile or skipped the AP interface"
 fi
 
 mock_bin="${tmp}/bin"

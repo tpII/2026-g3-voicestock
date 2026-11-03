@@ -63,7 +63,10 @@ at **PASSED_PENDING_DOCUMENTATION**. [TC-GPIO-001](test-cases/TC-GPIO-001.md)
 has [EX-TC-GPIO-001-20261027-01](executions/EX-TC-GPIO-001-20261027-01.md)
 (**BLOCKED**) and
 [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md)
-(**FAILED**). [TC-AUD-001](test-cases/TC-AUD-001.md) has
+(**FAILED**), and
+[EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md)
+(**FAILED**; measured GPIO events met, cleanup not verified).
+[TC-AUD-001](test-cases/TC-AUD-001.md) has
 [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md)
 at **PASSED_PENDING_DOCUMENTATION**. [TC-AUD-002](test-cases/TC-AUD-002.md)
 has [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md)

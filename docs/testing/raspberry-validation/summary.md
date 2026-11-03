@@ -1,8 +1,8 @@
 # Campaign summary
 
 This file is the outline of a later technical report. It is not the report
-of a finished experiment. One baseline execution, two GPIO executions, one
-microphone-enumeration execution, and one WAV-capture execution are
+of a finished experiment. One baseline execution, three GPIO executions,
+one microphone-enumeration execution, and one WAV-capture execution are
 recorded. TC-ENV-001, TC-GPIO-001, TC-AUD-001, and TC-AUD-002 are not
 closed. The other cases have no measurements.
 
@@ -38,6 +38,10 @@ Recorded executions:
 - [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md),
   **FAILED**. The failure is the omitted practice action. The supplied
   extract still contains nine `PRESSED` lines and nine `RELEASED` lines.
+- [EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md),
+  **FAILED**. Nine measured pairs, practice excluded, quiet intervals
+  empty. Cleanup after Ctrl+C not verified. Not a confirmed `close()`
+  defect. Not closed.
 - [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md),
   **PASSED_PENDING_DOCUMENTATION**. Enumeration only. Not a WAV result.
 - [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md),
@@ -85,7 +89,7 @@ documentation branch.
 | Test | Executions | Status | Measured success | Notes |
 | --- | --- | --- | --- | --- |
 | TC-ENV-001 | [EX-TC-ENV-001-20261027-01](executions/EX-TC-ENV-001-20261027-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–5 met. Not closed. | Pi baseline only. No raw transcript. Review NOT_REVIEWED. `get_throttled` `0x50000` on 15 readings. |
-| TC-GPIO-001 | [EX-TC-GPIO-001-20261027-01](executions/EX-TC-GPIO-001-20261027-01.md); [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md) | BLOCKED, then FAILED | Attempt 02 extract: 9 `PRESSED` and 9 `RELEASED`, alternating, no missing pair. Not closed. | Attempt 01 stopped before `READY` (`OSError: [Errno 22] Invalid argument`). Attempt 02 omitted the practice action. Pause and idle intervals: not measured. Logs remain on the Pi. |
+| TC-GPIO-001 | [EX-TC-GPIO-001-20261027-01](executions/EX-TC-GPIO-001-20261027-01.md); [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md); [EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md) | BLOCKED, then FAILED, then FAILED | Attempt 03: 9 measured presses and 9 releases, practice excluded, 3 pauses and 3 idles empty. Cleanup not verified. Not closed. | Attempt 01 stopped before `READY` (`OSError: [Errno 22] Invalid argument`). Attempt 02 omitted the practice action. Pause and idle intervals on attempt 02: not measured. Attempt 03 does not rewrite those results. Logs remain on the Pi. |
 | TC-AUD-001 | [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–4 met. Not closed. | G435 in 3 of 3 plugged lists, absent while unplugged. Query: `G435 Wireless Gaming Headset: USB Audio (hw:2,0)`. Default rate 48000 Hz. Detection latency NOT MEASURED. Logs remain on the Pi. |
 | TC-AUD-002 | [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–4 and 6 met on 5/5 measured runs. Criterion 5 stores operator-reported hashes. Criterion 7 not triggered. Not closed. | Commit `88a95d5` on `fix/audio-capture-stream-shutdown`, not merged to `develop`. Device `voicestock_mic`. Duration error about −56.2 ms, tolerance **TO BE DEFINED**. `throttled=0x50005`. Review NOT_REVIEWED. WAV files remain on the Pi. |
 | TC-PTT-001 | none | DESIGNED | | |
@@ -114,6 +118,19 @@ Git. Display rounding is one decimal place, in milliseconds.
 | Callback hold, attempt 02 | 9 | ms | 515.4 | 239.9 | 478.1 | 112.3 | 1361.8 |
 
 No hold limit is defined. This row is not an acceptance result.
+
+Callback hold for
+[EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md).
+Practice is excluded. Each value is the printed release timestamp minus
+the printed press timestamp. It is not GPIO edge latency. Edge latency is
+**NOT MEASURED**. One decimal place is the display rounding. The
+six-decimal second rows in that record are the source. No hold limit is
+defined. This row is not an acceptance result, and it does not close
+criterion 3.
+
+| Metric | n | Unit | Mean | Median | Stdev | Min | Max |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Callback hold, attempt 03 | 9 | ms | 392.3 | 210.7 | 291.9 | 157.8 | 931.3 |
 
 Formal TC-AUD-002 durations for
 [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md).
@@ -147,6 +164,12 @@ the native GPIO backend before any press. No incident file was opened.
 **FAILED** because the written practice action was omitted. No incident
 file was opened.
 
+[EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md) is
+**FAILED** because cleanup after Ctrl+C was not verified. The measured
+press, release, pause, and idle observations are in that record. No
+incident file was opened. The missing cleanup lines are not recorded as a
+confirmed product defect.
+
 [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) opened
 no incident.
 
@@ -170,15 +193,22 @@ Session start, end, and operator were not recorded. The raw command
 transcript was not archived. The PC was not inspected. Details are in the
 execution record.
 
-For both GPIO executions: the Pi checkout is the same `develop` commit,
-`3aee132b4769f418bbe71efccaf8ed5f501e02c1`. Session start, end, operator,
-and timezone were not recorded. The raw logs were not copied into Git.
-Their SHA-256 values are operator-reported.
+For the two GPIO executions on 27 October 2026: the Pi checkout is the
+same `develop` commit, `3aee132b4769f418bbe71efccaf8ed5f501e02c1`. Session
+start, end, operator, and timezone were not recorded. The raw logs were
+not copied into Git. Their SHA-256 values are operator-reported.
 
 After the blocked attempt, `lgpio` 0.2.2.0 was installed into the Pi
 `.venv`. That change is later than the environment baseline. No repository
 dependency manifest was modified. The install is not recorded here as a
 step that a fresh checkout reproduces.
+
+For EX-TC-GPIO-001-20261103-01: the Pi checkout is `develop` at
+`1b814424b560cafb406ce7069011ba962a5fb82b`, with a clean worktree. The pin
+factory printed `LGPIOFactory`. Package versions, the operator, and the
+session start and end were not recorded. The raw log was not copied into
+Git. Its SHA-256 is operator-reported. Cleanup after Ctrl+C was not
+verified.
 
 For EX-TC-AUD-001-20261027-01: the Pi checkout is the same `develop`
 commit. USB port, hub, operator, and worktree status were not recorded.
@@ -212,6 +242,11 @@ What this summary can say now:
 - TC-GPIO-001 attempt 02 printed nine press callbacks and nine release
   callbacks and did not meet the written procedure, because the practice
   action was omitted and the pause and idle intervals were not measured;
+- TC-GPIO-001 attempt 03, on 3 November 2026, recorded the practice pair,
+  nine measured press/release pairs, and empty pause and idle checks.
+  Cleanup after Ctrl+C was not verified, so the execution is **FAILED**
+  and is not closed. That attempt does not change the result of attempt
+  01 or attempt 02;
 - whether `lgpio` belongs in the project dependency configuration is still
   open. The Pi virtual environment was changed outside the repository
   manifests;
@@ -242,7 +277,8 @@ The campaign was planned for 23 October 2026 and 24 October 2026. Those
 dates were scheduling targets. They are not entries in the table below.
 EX-TC-ENV-001-20261027-01, EX-TC-GPIO-001-20261027-01,
 EX-TC-GPIO-001-20261027-02, and EX-TC-AUD-001-20261027-01 were recorded on
-27 October 2026. EX-TC-AUD-002-20261103-01 was recorded on 3 November 2026.
+27 October 2026. EX-TC-AUD-002-20261103-01 and
+EX-TC-GPIO-001-20261103-01 were recorded on 3 November 2026.
 This change does not add a bitácora section for either day. The table stays
 empty until a real daily bitácora section exists. Unfinished cases stay
 pending or blocked. They are not marked complete to match a planned date.

@@ -79,6 +79,49 @@ into the backend.
 The behavior is described in
 [audio capture](../architecture/audio-capture.md).
 
+### Who closes the stream
+
+The callback queue is what unblocks `read`. It does not decide which thread
+may call `RawInputStream.close`.
+
+Commit `de54733` was run on the project Raspberry Pi 3, Python 3.13.5, with
+`voicestock_mic`. The automated audio tests passed (`38 passed`). An
+`AudioCapture` warm-up then failed with `audio capture worker did not stop`
+after about 0.324532 seconds in `start`. `faulthandler` showed the worker
+blocked in `sounddevice` `RawInputStream.close`, reached from
+`SoundDeviceBackend.close` and from the worker’s backend release. The caller
+was in `AudioCapture.stop`, joining that worker. The blocking `read` was not
+the frame that was stuck.
+
+Further standalone runs on that board, using the same backend shape, are
+recorded as observations rather than as a finished root cause:
+
+| Scenario | Result |
+| --- | --- |
+| `RawInputStream` abort and close on one thread | Returned |
+| Main thread abort, worker close | Returned |
+| Backend with a normal PCM callback and a consumer, worker calls `close` | Blocked in `close` |
+| Same backend without `finished_callback` | Blocked in `close` |
+| Empty callback | Returned |
+| Callback copies PCM and does not queue it | Returned |
+| Producer queue, no consumer, about 0.7 s and about 2 s | Returned |
+| Producer and consumer, worker calls `close` | Blocked in `close` |
+| Producer and consumer, worker returns without `close`, main thread calls `close` after join | `stop` about 0.000912 s, `close` about 0.000884 s, worker not alive |
+
+The last row is the sequence this implementation now uses for a normal
+recording. `AudioCapture`’s worker calls `start` and `read` and writes the
+temporary WAV. It does not call `close` when it exits. The caller calls
+`stop`, joins the worker, calls `close`, and only then validates and
+publishes the WAV. A startup error follows the same close-after-join rule
+once the worker has left `backend.start()`. If the worker is still inside
+`start` when the start wait times out, the caller does not close it.
+
+These rows do not show that the PCM queue is defective. They also do not
+show that PortAudio is incapable of closing from a worker on every device or
+every build. They show one board, one virtual device, and one pair of
+threads where close from the consumer did not return and close from the
+controlling thread after the consumer had returned did return.
+
 ## Alternatives considered
 
 ### 1. Keep blocking reads and increase the join timeout
@@ -146,8 +189,19 @@ already accepts a callback and does not require NumPy.
   publishing a shorter file that looks valid.
 - Callback failures and PortAudio status flags have to be stored for `read`
   to raise. An exception that escaped the callback would not reach the worker.
-- Automated tests do not replace a new hardware run. `TC-AUD-002` is still
-  outstanding for this implementation.
+- The caller must close the stream. A worker that also closed it blocked on
+  the Pi in the run above. Splitting those roles adds ordering constraints:
+  no close while the worker is still inside the backend, and no published WAV
+  before that close returns.
+- A `start`, `stop`, or `close` that never returns cannot be cancelled from
+  the other thread without racing PortAudio. The capture object then stays
+  unable to begin another recording, or the caller stays inside the hung
+  call. That limit is accepted because a second close was the hang this
+  change is avoiding.
+- Automated tests do not replace a hardware run of this lifecycle. The Pi
+  run of `de54733` found the worker-close hang. The follow-up that closed
+  from the main thread was a standalone experiment, not this module, and not
+  `TC-AUD-002`. `TC-AUD-002` is still outstanding.
 
 ## Validation
 
@@ -159,6 +213,10 @@ PortAudio callbacks and a bounded queue. It did not import `AudioCapture` or
 The checks that run in CI and on a development machine are the audio unit
 tests. They fake the stream. They do not open ALSA.
 
-No result in this record, and no test added with this change, is a passed
-`TC-AUD-002`. After integration, that case has to be executed again and
-recorded on the validation branch. Until then the previous failure stands.
+No result in this record is a passed `TC-AUD-002`. The callback diagnostic
+motivated the queue. The later Pi warm-up of `de54733` showed `read`
+unblocking and `close` from the worker blocking. The standalone main-thread
+close motivated the lifecycle split. None of those runs is an execution of
+the formal procedure against the code after that split. After integration,
+`TC-AUD-002` has to be executed again and recorded on the validation branch.
+Until then the earlier failure stands.

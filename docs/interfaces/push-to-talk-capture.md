@@ -56,8 +56,10 @@ index. `output_directory` is where the temporary file and the WAV are written.
 `SoundDeviceBackend` opens `sounddevice.RawInputStream` with a callback and
 a bounded PCM queue. `read` waits on that queue. `stop` closes the queue so
 a blocked `read` returns, including when aborting the stream does not unblock
-a PortAudio read. The capture worker writes those blocks to the WAV. The
-callback does not. How the threads and the queue behave is
+a PortAudio read. The capture worker writes those blocks to the WAV and does not close the
+stream. The thread that calls `AudioCapture.stop` joins the worker and then
+calls `backend.close()` before the WAV is published. The callback does not
+write the file. How the threads and the queue behave is
 [audio capture](../architecture/audio-capture.md). Why the callback replaced
 blocking `read` is
 [ADR-0011](../decisions/0011-use-callback-driven-audio-capture-with-a-bounded-pcm-queue.md).
@@ -160,7 +162,9 @@ AudioCapture.stop()
       ↓
 read returns the blocks still queued, then empty bytes
       ↓
-the worker exits before the file is published
+the worker exits without closing the backend
+      ↓
+the caller closes the backend
       ↓
 WAV header closed
       ↓

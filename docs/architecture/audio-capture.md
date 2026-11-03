@@ -44,8 +44,9 @@ Validated, published WAV
 | Piece | Owns | Does not own |
 | --- | --- | --- |
 | ALSA | The hardware device and, on a `plug` PCM, format conversion before PortAudio sees the samples. | When to start or stop, the WAV file, device selection inside VoiceStock. |
-| `SoundDeviceBackend` | Resolving `input_device`, opening the stream, the callback, the PCM queue, and unblocking `read`. | The WAV path, the button, resampling in Python. |
-| `AudioCapture` | One recording at a time, the worker thread, the temporary file, validation, and publication. | Which microphone a deployment plugs in, speech-to-text. |
+| `SoundDeviceBackend` | Resolving `input_device`, opening the stream, the callback, the PCM queue, and unblocking `read`. `close` releases the PortAudio stream. | The WAV path, the button, resampling in Python, which thread is allowed to call `close` during a recording. |
+| `AudioCapture` caller | Starting a recording, requesting `stop`, joining the worker, calling `backend.close()` after that join, then validating and publishing the WAV. | Reading PCM. |
+| `AudioCapture` worker | `backend.start()`, `backend.read()`, and writing PCM to the temporary WAV. | Closing the PortAudio stream on the way out. |
 | `AudioInputBackend` | The four methods `start`, `read`, `stop`, and `close`. | PortAudio. Tests supply another implementation. |
 
 `AudioCapture` is constructed with an `AudioCaptureConfig` and a backend.
@@ -106,9 +107,9 @@ VoiceStock accepts the copy so the queue owns the samples, and does not add
 any further work there.
 
 `read` is the consumer. It returns one queued block, or empty bytes after a
-normal stop. `AudioCapture` writes returned blocks to the temporary WAV.
-Empty bytes end the worker loop, so audio that was queued before `stop` is
-still written.
+normal stop. The capture worker writes returned blocks to the temporary WAV.
+Empty bytes end that loop, so audio that was queued before `stop` is still
+written. The worker then returns. It does not call `backend.close()`.
 
 ## Queue
 
@@ -199,12 +200,16 @@ Existing types are unchanged.
 | Queue already holds 32 data blocks | `AudioStreamError` from the next `read` after the queued audio |
 | Stream stops without `stop` | `AudioStreamError` from `read` |
 | Normal `stop` | `read` returns `b""` after any queued blocks. Not an error. |
-| Worker still alive after the join timeout | `AudioStreamError`, no artifact |
+| Worker still alive after the join timeout | `AudioStreamError`, no artifact, and the stream is not closed while that worker is still inside the backend |
+| `backend.close()` raises after the worker has exited | `AudioStreamError`, no artifact. The capture returns to idle. |
 
-`AudioCapture.stop` publishes only after the worker has exited and the WAV
-header matches the contract. Any of the `read` failures above become
-`_worker_error`. `stop` then deletes the temporary file and raises. No
-`.wav` is left behind.
+`AudioCapture.stop` publishes only after the worker has exited, `backend.close()`
+has returned, and the WAV header matches the contract. Any of the `read`
+failures above become `_worker_error`. `stop` still closes the backend from
+the caller thread, then deletes the temporary file and raises. No `.wav` is
+left behind. A close error is raised as well. It is not discarded because a
+read error was also stored: the read error is the one raised, and the close
+error is attached as its cause when that error does not already have one.
 
 A PCM length that is not a multiple of two bytes fails the same way. The
 backend does not pad or drop a trailing byte to force alignment.
@@ -217,9 +222,29 @@ checks the contract, creates a new queue, and starts a callback stream.
 stream once. `close` invalidates that stream generation, calls `stop`, and
 closes the PortAudio stream. `stop` and `close` can be called again.
 
-`AudioCapture.start` opens `<uuid>.recording`, starts the worker, and waits
-until the backend has started or failed. `AudioCapture.stop` asks the backend
-to stop, joins the worker, and only then renames the file to `<uuid>.wav`.
+`AudioCapture.start`, on the caller thread, closes a stream left by a worker
+that has already exited, opens `<uuid>.recording`, and starts the worker.
+The worker calls `backend.start()` and then `read`. `AudioCapture.stop`,
+again on the caller thread, calls `backend.stop()`, joins the worker, calls
+`backend.close()`, and only then renames the file to `<uuid>.wav`.
+
+The worker used to call `close` in its `finally` block. On a Raspberry Pi 3
+running commit `de54733`, with `voicestock_mic`, that call blocked inside
+`sounddevice` `RawInputStream.close`. `faulthandler` showed the worker in
+`SoundDeviceBackend.close` and the caller blocked in `AudioCapture.stop`
+waiting for that worker. `read` had already been able to finish. A separate
+experiment on the same board started the backend, consumed PCM on the worker,
+called `stop` from the main thread, joined the worker without closing, and
+then called `close` from the main thread. That `stop` returned in about
+0.000912 seconds and that `close` in about 0.000884 seconds. The same
+experiment's other rows are in
+[ADR-0011](../decisions/0011-use-callback-driven-audio-capture-with-a-bounded-pcm-queue.md).
+They show that close from the consumer worker failed in the rows where a
+consumer was reading, and that close from the controlling thread after the
+worker had returned succeeded once. They do not show that `_PcmBuffer` is
+defective, and they do not show that PortAudio can never close from a worker
+thread. The production change follows the sequence that succeeded: the
+consumer leaves the backend, and the caller closes it afterwards.
 
 ```mermaid
 sequenceDiagram
@@ -245,8 +270,8 @@ sequenceDiagram
     Backend->>Queue: close with sentinel
     Backend->>Callback: abort stream
     Queue-->>Worker: queued blocks, then empty bytes
-    Worker->>Backend: close()
-    Worker-->>Capture: thread exits
+    Worker-->>Capture: thread exits without closing the stream
+    Capture->>Backend: close()
     Capture->>Capture: close header, validate, rename to .wav
     Capture-->>Caller: AudioArtifact
 ```
@@ -272,17 +297,41 @@ write from another session, or a write after that file was closed, does not
 touch the new file and does not raise into a later recording.
 
 If the worker is still alive when the join times out, `AudioCapture` deletes
-the temporary file, keeps that thread as an orphan, and raises. `start` fails
-with `audio capture worker did not stop` until the orphan has exited. The
-orphan’s later `read` cannot publish into a new file, and its `close` runs
-only if the session id is still the one it started. A new session is not
-opened underneath it.
+the temporary file, keeps that thread as an orphan, and raises. It does not
+call `backend.close()` while the orphan can still be inside `start`, `read`,
+or a previous backend call. `start` fails with `audio capture worker did not
+stop` until the orphan has exited, and that rejected `start` does not close
+the backend either. The orphan’s later `read` cannot publish into a new file:
+the file lock and the session id drop the write once the recording has been
+closed. After the orphan has exited, the next `start` closes the leftover
+stream on the caller thread before it creates the next worker.
+
+### Startup failure
+
+`start` waits until the worker has entered the read loop or has reported an
+error from `backend.start()`. Device lookup, an unsupported format, a failure
+to construct the stream, and a failure inside `stream.start()` all make
+`backend.start()` raise. The worker stores that exception, signals the caller,
+and returns without closing. The caller joins the worker and then calls
+`backend.close()`. `SoundDeviceBackend.start` also closes a stream it opened
+if `stream.start()` itself fails, on the worker, before the exception leaves
+`start`. The caller’s later `close` is idempotent in that case. The temporary
+WAV is deleted. The same `AudioCapture` can start again.
+
+If that wait times out and the worker is still inside `backend.start()`, the
+caller does not call `stop` or `close`. Both would race a stream the worker
+may still be creating. The temporary file is deleted, the worker is retained
+as an orphan, and `start` raises `audio capture did not start`. If `start`
+finishes and the worker is blocked in `read` by the time the caller looks
+again, the caller does `stop`, joins, and then `close`.
 
 ## Resources
 
-A completed `stop` joins the worker and the worker’s `finally` closes the
-backend. The PortAudio stream is closed. The queue does not grow past 33
-slots. The next `start` allocates a new queue and a new stream.
+A completed `stop` joins the worker and then, on the caller thread, closes
+the backend. The PortAudio stream is closed before the WAV is published. The
+queue does not grow past 33 slots. The next `start` allocates a new queue and
+a new stream from the worker, after the caller has already closed the
+previous one.
 
 `AudioCapture` owns `<uuid>.recording` from the moment `start` creates it
 until `stop` either publishes `<uuid>.wav` or deletes both paths. The caller
@@ -307,9 +356,17 @@ resampler in this path.
 
 ## Limitations
 
-- Hardware validation of this backend has not been repeated. The callback
-  experiment that motivated the design was a standalone diagnostic, not an
-  execution of `TC-AUD-002` and not a run of this module.
+- The callback implementation was run on the Raspberry Pi at `de54733`.
+  `read` unblocked, and `close` from the consumer worker did not return.
+  Moving `close` to the caller thread follows a later standalone experiment
+  on that board. That experiment is not a passed `TC-AUD-002`, and this
+  lifecycle change has not been run on the Pi yet.
+- If `backend.start()` never returns, `AudioCapture` will not call `stop` or
+  `close` against it. The orphan keeps the object from starting another
+  recording. Nothing in this process can force that native call to finish.
+- If `backend.stop()` or `backend.close()` never returns on the caller
+  thread, `stop` does not reach publication and does not join past that
+  call. A hung PortAudio close is not interrupted from the worker.
 - The callback copies each block. That is an allocation on the audio thread.
 - A queue overflow fails the whole take. There is no drop-oldest mode and no
   larger adaptive buffer.

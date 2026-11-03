@@ -35,9 +35,10 @@ class AudioCapture:
     Construction does not open a device. ``start`` asks the backend for PCM
     and a worker writes each chunk to a temporary ``.recording`` file. The
     worker keeps reading until ``read`` returns empty bytes, so PCM already
-    queued when ``stop`` runs is still written. ``stop`` finalizes that file
-    and, only when it is a valid WAV, renames it to ``.wav`` and returns an
-    ``AudioArtifact``. The caller then owns the file.
+    queued when ``stop`` runs is still written. The worker does not close the
+    backend. ``stop``, on the caller thread, joins that worker and only then
+    calls ``backend.close()``. The WAV is published after that close succeeds.
+    The caller then owns the file.
     """
 
     def __init__(
@@ -55,6 +56,7 @@ class AudioCapture:
         self._worker: threading.Thread | None = None
         self._startup_error: BaseException | None = None
         self._worker_error: BaseException | None = None
+        self._cleanup_error: BaseException | None = None
         self._wav: wave.Wave_write | None = None
         self._file_lock = threading.Lock()
         self._active_session = 0
@@ -71,13 +73,15 @@ class AudioCapture:
             AudioCaptureStateError: a recording is already in progress.
         """
         with self._lock:
-            if self._state is not _State.IDLE:
-                raise AudioCaptureStateError(
-                    "cannot start audio capture while it is already recording"
-                )
-            self._reap_orphaned_worker()
-            if self._orphaned_worker is not None:
-                raise AudioStreamError("audio capture worker did not stop")
+            self._require_idle_locked()
+        # The previous worker has exited. Release a stream it did not close
+        # before the new worker can call ``start`` and touch PortAudio.
+        self._close_from_controller()
+        if self._cleanup_error is not None:
+            self._fail(self._cleanup_error)
+
+        with self._lock:
+            self._require_idle_locked()
             try:
                 self._open_temp_file()
             except Exception:
@@ -87,6 +91,7 @@ class AudioCapture:
             self._started_event.clear()
             self._startup_error = None
             self._worker_error = None
+            self._cleanup_error = None
             self._state = _State.RECORDING
             worker = threading.Thread(
                 target=self._run,
@@ -97,13 +102,21 @@ class AudioCapture:
 
         if not self._started_event.wait(_WORKER_JOIN_TIMEOUT_SECONDS):
             self._stop_event.set()
-            self._release_backend(self._active_session)
             worker.join(_WORKER_JOIN_TIMEOUT_SECONDS)
-            self._fail(AudioStreamError("audio capture did not start"))
+            if worker.is_alive() and self._started_event.is_set():
+                self._stop_backend()
+                worker.join(_WORKER_JOIN_TIMEOUT_SECONDS)
+            if worker.is_alive():
+                self._fail(AudioStreamError("audio capture did not start"))
+            self._close_from_controller()
+            self._fail(self._startup_failure())
 
         if self._startup_error is not None:
             worker.join(_WORKER_JOIN_TIMEOUT_SECONDS)
-            self._fail(self._startup_error)
+            if worker.is_alive():
+                self._fail(self._startup_error)
+            self._close_from_controller()
+            self._fail(self._startup_failure())
 
     def stop(self) -> AudioArtifact:
         """Finish the recording and transfer the WAV to the caller.
@@ -121,14 +134,14 @@ class AudioCapture:
             worker = self._worker
             self._stop_event.set()
 
-        self._unblock_backend()
+        self._stop_backend()
         if worker is not None:
             worker.join(_WORKER_JOIN_TIMEOUT_SECONDS)
             if worker.is_alive():
-                self._fail(AudioStreamError("audio capture worker did not stop"))
+                self._fail(self._worker_timeout_error())
 
-        if self._worker_error is not None:
-            self._fail(self._worker_error)
+        self._close_from_controller()
+        self._raise_recorded_errors()
 
         try:
             artifact = self._publish()
@@ -149,7 +162,6 @@ class AudioCapture:
             if session == self._active_session:
                 self._startup_error = exc
             self._started_event.set()
-            self._release_backend(session)
             return
 
         self._started_event.set()
@@ -162,8 +174,6 @@ class AudioCapture:
         except Exception as exc:
             if session == self._active_session:
                 self._worker_error = exc
-        finally:
-            self._release_backend(session)
 
     def _write_chunk(self, chunk: bytes, session: int) -> None:
         frame_bytes = SAMPLE_WIDTH_BYTES * CHANNELS
@@ -229,6 +239,7 @@ class AudioCapture:
                 self._orphaned_worker = worker
             self._startup_error = None
             self._worker_error = None
+            self._cleanup_error = None
         if isinstance(error, AudioCaptureError):
             raise error
         raise AudioStreamError("audio capture failed") from error
@@ -257,22 +268,54 @@ class AudioCapture:
             if wav is not None:
                 wav.close()
 
-    def _unblock_backend(self) -> None:
+    def _require_idle_locked(self) -> None:
+        if self._state is not _State.IDLE:
+            raise AudioCaptureStateError(
+                "cannot start audio capture while it is already recording"
+            )
+        self._reap_orphaned_worker()
+        if self._orphaned_worker is not None:
+            raise AudioStreamError("audio capture worker did not stop")
+
+    def _startup_failure(self) -> BaseException:
+        error = self._startup_error or AudioStreamError("audio capture did not start")
+        return self._with_cleanup_cause(error)
+
+    def _worker_timeout_error(self) -> BaseException:
+        return self._with_cleanup_cause(
+            AudioStreamError("audio capture worker did not stop")
+        )
+
+    def _with_cleanup_cause(self, error: BaseException) -> BaseException:
+        if self._cleanup_error is not None and error.__cause__ is None:
+            error.__cause__ = self._cleanup_error
+        return error
+
+    def _raise_recorded_errors(self) -> None:
+        if self._worker_error is not None:
+            self._fail(self._with_cleanup_cause(self._worker_error))
+        if self._cleanup_error is not None:
+            self._fail(self._cleanup_error)
+
+    def _stop_backend(self) -> None:
         try:
             self._backend.stop()
         except Exception as exc:
-            if self._worker_error is None and self._startup_error is None:
-                self._worker_error = exc
+            if self._cleanup_error is None:
+                self._cleanup_error = exc
 
-    def _release_backend(self, session: int) -> None:
-        if session != self._active_session:
-            return
-        self._unblock_backend()
+    def _close_from_controller(self) -> None:
+        """Close the backend on the thread that is orchestrating shutdown.
+
+        Call this only after the capture worker has left the backend, or
+        before that worker has been started. A worker that is still inside
+        ``start``, ``read``, or a previous close must not be raced.
+        """
         try:
             self._backend.close()
         except Exception as exc:
-            if self._worker_error is None and self._startup_error is None:
-                self._worker_error = exc
+            if self._cleanup_error is None:
+                self._cleanup_error = exc
 
 
 def _validate_wav(path: Path) -> None:

@@ -156,7 +156,13 @@ class SoundDeviceBackend:
         self._pcm: _PcmBuffer | None = None
 
     def start(self) -> None:
-        """Resolve the configured device and open a callback input stream."""
+        """Resolve the configured device and open a callback input stream.
+
+        ``close`` runs first so a stream left open by an abandoned session is
+        not leaked. ``AudioCapture`` closes a live stream from the controlling
+        thread after the consumer worker has exited, so this call normally
+        finds the stream already released.
+        """
         self.close()
         self._aborted = False
         self._stop_requested.clear()

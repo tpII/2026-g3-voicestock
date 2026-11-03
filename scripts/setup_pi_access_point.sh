@@ -117,15 +117,43 @@ resolve_interface() {
   printf '%s\n' "${found[0]}"
 }
 
+# NetworkManager device state from `nmcli -g GENERAL.STATE` is
+# "<code> (<label>)". Unmanaged is exactly code 10
+# (NM_DEVICE_STATE_UNMANAGED). Connected is 100 and deactivating is 110,
+# so a prefix match on 10 rejects both. The numeric code is authoritative.
+# A label is used only when nmcli prints no leading code, and only the
+# exact unmanaged label is rejected.
+device_state_is_unmanaged() {
+  local state="$1"
+  local code textual
+
+  state="${state%%$'\n'*}"
+  state="${state//$'\r'/}"
+  state="${state#"${state%%[![:space:]]*}"}"
+  state="${state%"${state##*[![:space:]]}"}"
+
+  if [[ "$state" =~ ^([0-9]+) ]]; then
+    code="${BASH_REMATCH[1]}"
+    if [[ "$code" == "10" ]]; then
+      return 0
+    fi
+    return 1
+  fi
+
+  textual="$(printf '%s' "$state" | tr '[:upper:]' '[:lower:]')"
+  if [[ "$textual" == "unmanaged" ]]; then
+    return 0
+  fi
+  return 1
+}
+
 require_managed() {
   local interface_name="$1"
   local state
   state="$(nmcli -g GENERAL.STATE device show "$interface_name")"
-  case "$state" in
-    10* | unmanaged* | Unmanaged*)
-      error "Wi-Fi interface ${interface_name} is not managed by NetworkManager."
-      ;;
-  esac
+  if device_state_is_unmanaged "$state"; then
+    error "Wi-Fi interface ${interface_name} is not managed by NetworkManager."
+  fi
 }
 
 require_ap_capable() {
@@ -480,25 +508,31 @@ verify_and_report() {
   info "No gateway, DNS, DHCP, NAT, or default route was added on ${interface_name}."
 }
 
-if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
-  usage
-  exit 0
-fi
-if [[ "$#" -gt 1 ]]; then
-  usage
-  error "Too many arguments."
-fi
+main() {
+  if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+    usage
+    exit 0
+  fi
+  if [[ "$#" -gt 1 ]]; then
+    usage
+    error "Too many arguments."
+  fi
 
-load_config
-require_command nmcli
-require_command ip
-require_command iw
-require_root
+  load_config
+  require_command nmcli
+  require_command ip
+  require_command iw
+  require_root
 
-INTERFACE="$(resolve_interface "${1:-}")"
-require_managed "$INTERFACE"
-require_ap_capable "$INTERFACE"
-require_regulatory_domain
-info "Using Wi-Fi interface ${INTERFACE} as the VoiceStock access point."
-create_or_update_profile "$INTERFACE"
-verify_and_report "$INTERFACE"
+  INTERFACE="$(resolve_interface "${1:-}")"
+  require_managed "$INTERFACE"
+  require_ap_capable "$INTERFACE"
+  require_regulatory_domain
+  info "Using Wi-Fi interface ${INTERFACE} as the VoiceStock access point."
+  create_or_update_profile "$INTERFACE"
+  verify_and_report "$INTERFACE"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
+fi

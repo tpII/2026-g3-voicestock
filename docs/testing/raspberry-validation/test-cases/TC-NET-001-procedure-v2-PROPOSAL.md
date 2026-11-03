@@ -1,16 +1,19 @@
 # TC-NET-001 procedure version 2 — proposal
 
-- Status: **PROPOSED**
-- In force: no
-- Executions: none
+- Status: **ADOPTED**
+- In force: no. The in-force wording is [TC-NET-001](TC-NET-001.md), procedure version 2.
+- First execution of that adopted procedure: [EX-TC-NET-001-20261103-03](../executions/EX-TC-NET-001-20261103-03.md)
 - Applies to EX-TC-NET-001-20261103-01 and EX-TC-NET-001-20261103-02: no
 
-Procedure version 1 in [TC-NET-001](TC-NET-001.md) remains the procedure
-those executions ran. Do not regrade them with this file. Do not edit
-version 1 so that it describes `hostapd`. Adopt this proposal only by
-changing TC-NET-001 in a later revision that states procedure version 2,
-after an implementation exists. Until that adoption, TC-NET-001 stays at
-procedure version 1 and stays not closed.
+This file is the proposal as it was written. It is kept so the adoption
+does not erase the draft. The specification that attempt 03 ran is
+[TC-NET-001](TC-NET-001.md) at procedure version 2.
+[Procedure version 1](TC-NET-001-procedure-v1.md) remains the procedure
+attempts 01 and 02 ran. Do not regrade them with this file. Do not edit
+version 1 so that it describes `hostapd`.
+
+The adoption happened after the `hostapd` installer was on `develop` at
+`485559c` (pull request #36). TC-NET-001 is not closed by that adoption.
 
 This draft exists because attempt 02 showed that the NetworkManager
 access-point path did not yield a working WPA2 cell, and because a manual
@@ -96,7 +99,11 @@ stop. A corrected rerun is a new execution id.
 
 ## What this proposal does not do
 
-- It does not close TC-NET-001.
+- It does not close TC-NET-001. Adoption of procedure version 2 does not
+  close it either.
 - It does not execute TC-NET-002 or TC-NET-003.
-- It does not change product scripts.
-- It does not move the campaign status of attempt 02 off **FAILED**.
+- It does not change product scripts. The installer it assumed is the one
+  already on `develop` at `485559c`. This campaign branch does not carry
+  that code.
+- It does not move the campaign status of attempt 01 or attempt 02 off
+  **FAILED**.

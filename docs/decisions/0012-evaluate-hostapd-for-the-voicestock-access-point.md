@@ -110,3 +110,18 @@ execution of those scripts.
 - Disabled PMF, missing persistent IPv4, the PC MAC restriction, and the
   PC `10*` check are open defects or limits. They are not resolved by
   writing this ADR.
+
+## Later campaign facts
+
+This section does not change the status, the title, or the identifier.
+This file stays **Proposed**. It is not renumbered, and it is not
+reconciled with any other ADR-0012.
+
+`develop` at `485559c` (pull request #36) contains the `hostapd` installer.
+[TC-NET-001](../testing/raspberry-validation/test-cases/TC-NET-001.md)
+procedure version 2 is in force for new executions.
+[EX-TC-NET-001-20261103-03](../testing/raspberry-validation/executions/EX-TC-NET-001-20261103-03.md)
+is **PASSED_PENDING_DOCUMENTATION** for configuration only. Attempts 01 and
+02 stay **FAILED** on procedure version 1. TC-NET-002 and TC-NET-003 are
+unexecuted. The sentences under "What is true now" describe this file when
+it was written. This section does not accept the proposal.

@@ -1,7 +1,18 @@
 # Evaluation note: hostapd as the VoiceStock access point service
 
-Status: evidence note for a **proposed** implementation change. It is not
-an accepted design, and it is not a passed test.
+Status: evidence note for the out-of-repository experiment in
+[EX-TC-NET-001-20261103-02](executions/EX-TC-NET-001-20261103-02.md).
+That experiment is still a diagnostic. It is not a pass of procedure
+version 1, and it is not
+[EX-TC-NET-001-20261103-03](executions/EX-TC-NET-001-20261103-03.md).
+
+Procedure version 2 is now the in-force text of
+[TC-NET-001](test-cases/TC-NET-001.md). The installer attempt 03 ran is on
+`develop` at `485559c` (pull request #36). This note is not rewritten to
+describe that installer. ADR numbering on this branch is unchanged. The
+campaign file
+[ADR-0012](../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md)
+stays **Proposed**.
 
 The isolated cell is still the decision in
 [ADR-0010](../../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md):
@@ -9,9 +20,9 @@ SSID `VoiceStock`, Pi `192.168.50.1/24`, PC `192.168.50.2/24`, no DHCP,
 DNS, gateway, NAT, forwarding, or bridge, and the PC default route kept
 on the Internet interface. This note does not replace that decision.
 
-The proposed record is
+The proposed record, still **Proposed** on this branch, is
 [ADR-0012](../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md).
-The observations are
+The observations in this note are
 [EX-TC-NET-001-20261103-02](executions/EX-TC-NET-001-20261103-02.md).
 
 ## Original approach
@@ -71,7 +82,9 @@ same WPA2-PSK policy with the clients that failed against NetworkManager.
 The team is therefore considering `hostapd` as the process that owns AP
 mode, while the addressing rules of ADR-0010 stay in place.
 
-That consideration is not an implemented migration.
+That consideration was not an implemented migration when this note was
+written. The later installer on `develop` at `485559c` is a different
+artifact. This section does not describe it.
 
 ## Responsibilities
 
@@ -121,5 +134,10 @@ not procedure version 1, has to show at least:
 7. TC-NET-002 and TC-NET-003 are run as their own cases. A manual ping in
    this note does not substitute for them.
 
-[Procedure version 2 (proposal)](test-cases/TC-NET-001-procedure-v2-PROPOSAL.md)
-is the draft of that later procedure. It is not in force.
+[Procedure version 2](test-cases/TC-NET-001.md) is in force for executions
+from attempt 03 onward. The proposal file is retained as the draft that
+was adopted. It does not regrade attempt 02.
+[EX-TC-NET-001-20261103-03](executions/EX-TC-NET-001-20261103-03.md) is the
+configuration execution of the repository installer. It does not replace
+the observations in this note, it does not measure ICMP, and it does not
+run TC-NET-002 or TC-NET-003.

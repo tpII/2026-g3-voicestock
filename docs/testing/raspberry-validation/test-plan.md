@@ -75,13 +75,18 @@ measured sample, if the baseline did not already record them. Those cases
 stay **BLOCKED** until that PC inventory exists. Collecting it still does
 not pass TC-NET-002.
 
-TC-NET-001 procedure version 1 is the procedure executed by
+TC-NET-001 procedure version 1 is preserved in
+[TC-NET-001 procedure version 1](test-cases/TC-NET-001-procedure-v1.md).
+It is the procedure executed by
 [EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md) and
 [EX-TC-NET-001-20261103-02](executions/EX-TC-NET-001-20261103-02.md). Both
-are **FAILED** and not closed. A `hostapd` procedure is only a draft:
-[TC-NET-001 procedure version 2 (proposal)](test-cases/TC-NET-001-procedure-v2-PROPOSAL.md).
-Do not apply that draft to those executions. The manual ping inside
-attempt 02 is not TC-NET-002. TC-NET-002 and TC-NET-003 stay unexecuted.
+are **FAILED** and not closed. Procedure version 2 is in force in
+[TC-NET-001](test-cases/TC-NET-001.md).
+[EX-TC-NET-001-20261103-03](executions/EX-TC-NET-001-20261103-03.md) is the
+first run of that version. It is **PASSED_PENDING_DOCUMENTATION** and not
+closed. The proposal file remains as the draft that was adopted. Do not
+apply version 2 to attempts 01 and 02. The manual ping inside attempt 02
+is not TC-NET-002. TC-NET-002 and TC-NET-003 stay unexecuted.
 
 The project bitácora is not part of this order. Execution records, the
 summary, and this campaign's traceability are updated as each case

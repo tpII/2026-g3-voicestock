@@ -78,8 +78,11 @@ has [EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md)
 at **BLOCKED**. [TC-NET-001](test-cases/TC-NET-001.md) has
 [EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md)
 and [EX-TC-NET-001-20261103-02](executions/EX-TC-NET-001-20261103-02.md),
-both **FAILED**. Attempt 02 also records a `hostapd` diagnostic that is
-not a pass. None of these cases is
+both **FAILED** on procedure version 1, and
+[EX-TC-NET-001-20261103-03](executions/EX-TC-NET-001-20261103-03.md)
+at **PASSED_PENDING_DOCUMENTATION** on procedure version 2. Attempt 02's
+`hostapd` diagnostic is not a pass. Attempt 03 does not close the case.
+None of these cases is
 **CLOSED_PASSED**. The other cases are unexecuted. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
 without evidence, are in the [test plan](test-plan.md#status-model).
 

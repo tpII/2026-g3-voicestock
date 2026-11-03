@@ -3,12 +3,13 @@
 This file is the outline of a later technical report. It is not the report
 of a finished experiment. One baseline execution, three GPIO executions,
 one microphone-enumeration execution, one WAV-capture execution, two
-push-to-talk executions, one maximum-duration execution, and two
+push-to-talk executions, one maximum-duration execution, and three
 access-point executions are recorded. TC-ENV-001, TC-GPIO-001, TC-AUD-001,
 TC-AUD-002, TC-PTT-001, TC-PTT-002, and TC-NET-001 are not closed. The
 other cases have no measurements. The second access-point execution
 includes a `hostapd` diagnostic. That diagnostic is not a measurement of
-TC-NET-002.
+TC-NET-002. The third is a configuration pass of procedure version 2.
+It is not ICMP, isolation, or reboot.
 
 Campaign status: **IN_PROGRESS**.
 
@@ -67,6 +68,10 @@ Recorded executions:
   detection and failed WPA2 activation. The PC script failed a MAC match.
   A manual `hostapd` session is recorded separately and is not a pass.
   Not closed. Not TC-NET-002.
+- [EX-TC-NET-001-20261103-03](executions/EX-TC-NET-001-20261103-03.md),
+  **PASSED_PENDING_DOCUMENTATION**. Procedure version 2 on `develop` at
+  `485559c`. Technical configuration assessment **PASSED**. Review
+  NOT_REVIEWED. Not closed. Not ICMP, isolation, reboot, or recovery.
 
 ## 3. Scope
 
@@ -114,7 +119,7 @@ documentation branch.
 | TC-AUD-002 | [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–4 and 6 met on 5/5 measured runs. Criterion 5 stores operator-reported hashes. Criterion 7 not triggered. Not closed. | Commit `88a95d5` on `fix/audio-capture-stream-shutdown` at the time of the run. Later `origin/develop` is `1b81442`, which merges that fix. The measured revision is unchanged. Device `voicestock_mic`. Duration error about −56.2 ms, tolerance **TO BE DEFINED**. `throttled=0x50005` at the later inventory. Review NOT_REVIEWED. WAV files remain on the Pi. |
 | TC-PTT-001 | [EX-TC-PTT-001-20261103-01](executions/EX-TC-PTT-001-20261103-01.md); [EX-TC-PTT-001-20261103-02](executions/EX-TC-PTT-001-20261103-02.md) | FAILED, then FAILED | Attempt 02: 3 measured WAV files, 1 channel, width 2, 16000 Hz, `RELEASED`, files retained. Operator heard all three. Not closed. | Attempt 01: microphone muted; listening not verified; not a demonstrated software defect. Attempt 02 phrase match and defect columns not separately confirmed. Both ran while [EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md) was **FAILED**. PC not contacted. `develop` at `1b81442`. |
 | TC-PTT-002 | [EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md) | BLOCKED | 3 `MAX_DURATION` and 3 later `RELEASED`. No extra file while held. Format 6/6. Not closed. | Second mechanical press **NOT APPLICABLE**. Header duration 1.984 s versus 2 s. Error −16 ms. Gate **TO BE DEFINED**. Prerequisite TC-PTT-001 remains **FAILED**. Not a product failure of the limit. |
-| TC-NET-001 | [EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md); [EX-TC-NET-001-20261103-02](executions/EX-TC-NET-001-20261103-02.md) | FAILED, then FAILED | Attempt 02: prescribed scripts failed. Criteria 1–3 fail. Criterion 4 not recorded. Not closed. | Attempt 01: `10*` matched `100 (connected)`. Attempt 02 passed that Pi check and failed WPA2 (`supplicant-timeout`, then RSN `IE_DIFFERENT`). PC script pinned a transient MAC. `hostapd` diagnostic: two stations authenticated; operator-confirmed ICMP after manual addressing. No RTT series. Not TC-NET-002. Pi SHA **NOT RECORDED**. Ethernet left up. |
+| TC-NET-001 | [EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md); [EX-TC-NET-001-20261103-02](executions/EX-TC-NET-001-20261103-02.md); [EX-TC-NET-001-20261103-03](executions/EX-TC-NET-001-20261103-03.md) | FAILED, then FAILED, then PASSED_PENDING_DOCUMENTATION | Attempt 03: configuration criteria of procedure version 2 met on one run. Not closed. Review NOT_REVIEWED. | Attempt 01: `10*` matched `100 (connected)`. Attempt 02 failed WPA2 activation and a transient MAC match; its `hostapd` diagnostic is not a pass. Both stay **FAILED** on procedure version 1. Attempt 03 does not regrade them and does not measure ICMP, isolation, reboot, or unit recovery. Pi commit confirmed `485559c`. Arch SHA **NOT RECORDED**. Ethernet left up. |
 | TC-NET-002 | none | DESIGNED | | |
 | TC-NET-003 | none | DESIGNED | | |
 | TC-COM-001 | none | DESIGNED | | |
@@ -233,7 +238,16 @@ are **OPEN**. A foreground `hostapd` process authenticated the smartphone
 and the Arch USB client. The operator confirmed ICMP only after
 `ip addr add 192.168.50.1/24`. That experiment is not a pass and not
 TC-NET-002. PMF stayed disabled. Isolation was not proven while Ethernet
-was up.
+was up. The sentence above about `10*` on `origin/develop` describes the
+tip inspected for attempt 02. It is not a description of `485559c`.
+Attempt 03 does not close these incidents.
+
+[EX-TC-NET-001-20261103-03](executions/EX-TC-NET-001-20261103-03.md) is
+**PASSED_PENDING_DOCUMENTATION** on procedure version 2. The technical
+configuration assessment is **PASSED**. Review is NOT_REVIEWED. The Pi
+checkout was confirmed as `develop` at `485559c`. The Arch SHA was not
+recorded. No incident was opened. The earlier incidents stay **OPEN**.
+ICMP, isolation, reboot, and unit recovery were not measured.
 
 [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) opened
 no incident.
@@ -326,8 +340,18 @@ The prescribed procedure stopped at script failure; manual PMF, MAC, and
 `hostapd` steps are deviations. The configuration-file SHA-256 was
 supplied and is in the execution. Other transcripts were not archived.
 The scripts were not modified by the documentation of this run. Procedure
-version 1 was not rewritten. A version 2 proposal exists and was not
-applied to this execution.
+version 1 was not rewritten. A version 2 proposal existed when this
+execution was recorded and was not applied to it. Adopting version 2
+later does not change this paragraph.
+
+For EX-TC-NET-001-20261103-03: the operator confirmed the Pi checkout as
+`develop` at `485559c`, with a clean worktree. The porcelain text and the
+Arch SHA were not captured. Ethernet stayed at `192.168.1.100/24`. No
+transcript hash was supplied. The distribution `hostapd` unit was
+observed masked, and deactivating the inactive `voicestock-ap` profile
+produced a diagnostic that it was not active. Neither observation is a
+failure. Procedure version 1 was not applied to this run, and this run
+was not written back into attempts 01 or 02.
 
 ## 9. Conclusions
 
@@ -376,17 +400,20 @@ What this summary can say now:
   TC-PTT-001 is still **FAILED**. A second mechanical press was not
   possible while the switch stayed down. The duration error of −16 ms has
   no acceptance gate yet;
-- TC-NET-001 has two executions on 3 November 2026, both **FAILED** and
-  not closed. Attempt 01 exited because `10*` matched `100 (connected)`.
-  Attempt 02 passed that Pi check and did not produce the scripted cell:
-  NetworkManager WPA2 activation failed, and the PC script rejected a
-  transient MAC. A `hostapd` diagnostic then authenticated two clients,
-  and the operator confirmed ICMP after a manual address assignment. That
-  diagnostic does not pass attempt 02 and does not execute TC-NET-002.
-  TC-NET-002 and TC-NET-003 remain unexecuted. Procedure version 1 is
-  unchanged. [ADR-0012](../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md)
-  is **Proposed** and does not replace
-  [ADR-0010](../../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md);
+- TC-NET-001 has three executions on 3 November 2026. Attempts 01 and
+  02 stay **FAILED** on procedure version 1 and are not closed. Attempt
+  01 exited because `10*` matched `100 (connected)`. Attempt 02 did not
+  produce the scripted NetworkManager cell. Its `hostapd` diagnostic and
+  the operator-confirmed ICMP after a manual address assignment do not
+  pass attempt 02 and do not execute TC-NET-002. Attempt 03 is
+  **PASSED_PENDING_DOCUMENTATION** on procedure version 2: the repository
+  installer on `develop` at `485559c` brought up the cell configuration.
+  Review is NOT_REVIEWED. That pass does not measure ICMP, isolation,
+  reboot, or recovery, and it does not close the case. TC-NET-002 and
+  TC-NET-003 remain unexecuted. Procedure version 1 is preserved as a
+  historical procedure. [ADR-0012](../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md)
+  stays **Proposed** on this branch and is not renumbered. It does not
+  replace [ADR-0010](../../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md);
 - the default PC audio stub cannot create a pending operation;
 - simulated end-to-end execution is blocked on a fixture that is specified
   and not implemented;
@@ -405,7 +432,8 @@ EX-TC-ENV-001-20261027-01, EX-TC-GPIO-001-20261027-01,
 EX-TC-GPIO-001-20261027-02, and EX-TC-AUD-001-20261027-01 were recorded on
 27 October 2026. EX-TC-AUD-002-20261103-01, EX-TC-GPIO-001-20261103-01,
 EX-TC-PTT-001-20261103-01, EX-TC-PTT-001-20261103-02, EX-TC-PTT-002-20261103-01,
-EX-TC-NET-001-20261103-01, and EX-TC-NET-001-20261103-02 were recorded on
+EX-TC-NET-001-20261103-01, EX-TC-NET-001-20261103-02, and
+EX-TC-NET-001-20261103-03 were recorded on
 3 November 2026.
 This change does not add a bitácora section for either day. The table stays
 empty until a real daily bitácora section exists. Unfinished cases stay

@@ -125,5 +125,9 @@ is **PASSED_PENDING_DOCUMENTATION** for configuration only. Attempts 01 and
 02 stay **FAILED** on procedure version 1.
 [EX-TC-NET-002-20261103-01](../testing/raspberry-validation/executions/EX-TC-NET-002-20261103-01.md)
 is **PASSED_PENDING_DOCUMENTATION** for bidirectional ICMP and IPv4
-isolation. It is not closed. TC-NET-003 is unexecuted. The sentences under "What is true now" describe this file when
+isolation. It is not closed.
+[EX-TC-NET-003-20261103-01](../testing/raspberry-validation/executions/EX-TC-NET-003-20261103-01.md)
+is **PASSED_PENDING_DOCUMENTATION** for reboot recovery under TC-NET-003
+procedure version 2. Procedure version 1 of that case was not run. It is
+not closed. The sentences under "What is true now" describe this file when
 it was written. This section does not accept the proposal.

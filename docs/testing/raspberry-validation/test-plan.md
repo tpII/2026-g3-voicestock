@@ -90,8 +90,11 @@ design artifact, not the procedure. Do not apply version 2 to attempts 01
 and 02. The manual ping inside attempt 02 is not TC-NET-002.
 [EX-TC-NET-002-20261103-01](executions/EX-TC-NET-002-20261103-01.md) is the
 first run of TC-NET-002 procedure version 1. It is
-**PASSED_PENDING_DOCUMENTATION** and not closed. TC-NET-003 stays
-unexecuted.
+**PASSED_PENDING_DOCUMENTATION** and not closed.
+[EX-TC-NET-003-20261103-01](executions/EX-TC-NET-003-20261103-01.md) is the
+first run of TC-NET-003 procedure version 2. It is
+**PASSED_PENDING_DOCUMENTATION** and not closed. Procedure version 1 of
+TC-NET-003 was not executed.
 
 The project bitácora is not part of this order. Execution records, the
 summary, and this campaign's traceability are updated as each case

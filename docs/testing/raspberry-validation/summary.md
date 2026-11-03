@@ -4,10 +4,10 @@ This file is the outline of a later technical report. It is not the report
 of a finished experiment. One baseline execution, three GPIO executions,
 one microphone-enumeration execution, one WAV-capture execution, two
 push-to-talk executions, one maximum-duration execution, and three
-access-point executions are recorded, plus one connectivity execution.
-TC-ENV-001, TC-GPIO-001, TC-AUD-001, TC-AUD-002, TC-PTT-001, TC-PTT-002,
-TC-NET-001, and TC-NET-002 are not closed. The other cases have no
-measurements. The second access-point execution includes a `hostapd`
+access-point executions are recorded, plus one connectivity execution and
+one reboot-persistence execution. TC-ENV-001, TC-GPIO-001, TC-AUD-001,
+TC-AUD-002, TC-PTT-001, TC-PTT-002, TC-NET-001, TC-NET-002, and TC-NET-003
+are not closed. The other cases have no measurements. The second access-point execution includes a `hostapd`
 diagnostic. That diagnostic is not TC-NET-002. The third access-point
 execution is **PASSED_PENDING_DOCUMENTATION**: the technical configuration
 assessment is **PASSED**, the evidence archive and the formal review are
@@ -82,6 +82,11 @@ Recorded executions:
   Ethernet was disconnected: no default route and `Network is unreachable`.
   Evidence pending. Review NOT_REVIEWED. Not **CLOSED_PASSED**. Not
   TC-NET-003.
+- [EX-TC-NET-003-20261103-01](executions/EX-TC-NET-003-20261103-01.md),
+  **PASSED_PENDING_DOCUMENTATION**. Procedure version 2. Both machines
+  rebooted, confirmed by boot id. Units and `voicestock-client` returned
+  without a setup script. IPv4 isolation held. Evidence pending. Review
+  NOT_REVIEWED. Not **CLOSED_PASSED**. Not a startup-time result.
 
 ## 3. Scope
 
@@ -131,7 +136,7 @@ documentation branch.
 | TC-PTT-002 | [EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md) | BLOCKED | 3 `MAX_DURATION` and 3 later `RELEASED`. No extra file while held. Format 6/6. Not closed. | Second mechanical press **NOT APPLICABLE**. Header duration 1.984 s versus 2 s. Error −16 ms. Gate **TO BE DEFINED**. Prerequisite TC-PTT-001 remains **FAILED**. Not a product failure of the limit. |
 | TC-NET-001 | [EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md); [EX-TC-NET-001-20261103-02](executions/EX-TC-NET-001-20261103-02.md); [EX-TC-NET-001-20261103-03](executions/EX-TC-NET-001-20261103-03.md) | FAILED, then FAILED, then PASSED_PENDING_DOCUMENTATION | Attempt 03: technical configuration PASSED. Evidence pending. Review NOT_REVIEWED. Not CLOSED_PASSED. | Attempt 01: `10*` matched `100 (connected)`. Attempt 02 failed WPA2 activation and a transient MAC match; its `hostapd` diagnostic is not a pass. Both stay **FAILED** on procedure version 1. Attempt 03 does not regrade them and does not measure ICMP, isolation, reboot, unit recovery, or long-term reliability. Pi commit confirmed `485559c`. Arch SHA **NOT RECORDED**. Ethernet left up. |
 | TC-NET-002 | [EX-TC-NET-002-20261103-01](executions/EX-TC-NET-002-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | Connectivity: 10/10 each way. IPv4 isolation after Ethernet removal: no default route, no reply from `1.1.1.1`. Not closed. Review NOT_REVIEWED. | Tool RTT PC to Pi `0.808/4.407/5.545/1.272` ms. Pi to PC `4.101/4.561/5.827/0.512` ms. Printed-line median and sample stdev stay in the execution and do not replace those lines. Loss allowance and latency budget **TO BE DEFINED**. Pi Internet probe was `Network is unreachable`, not a three-packet loss rate. `tailscale0` observed only. Arch SHA **NOT RECORDED**. Not TC-NET-003. |
-| TC-NET-003 | none | DESIGNED | | |
+| TC-NET-003 | [EX-TC-NET-003-20261103-01](executions/EX-TC-NET-003-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | Both reboots confirmed by boot id. 10/10 functional replies in each post-reboot direction that was measured. No Pi default route. Not closed. Review NOT_REVIEWED. | Procedure version 2. No setup script. Arch Internet stayed on `wlo1` at metric 601. Pi Internet probe was `Network is unreachable`, not a three-packet loss rate. Startup time **NOT RECORDED**. Loss allowance **TO BE DEFINED**. Not a latency baseline. PC SHA **NOT RECORDED**. |
 | TC-COM-001 | none | DESIGNED | | |
 | TC-COM-002 | none | DESIGNED | | |
 | TC-COM-003 | none | DESIGNED | | |
@@ -265,6 +270,10 @@ incident file was opened for that execution.
 functional IPv4 result does not close TC-NET-001 and does not execute
 TC-NET-003.
 
+[EX-TC-NET-003-20261103-01](executions/EX-TC-NET-003-20261103-01.md) is
+**PASSED_PENDING_DOCUMENTATION**. No incident file was opened. It does not
+close TC-NET-001 or TC-NET-002.
+
 [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) opened
 no incident.
 
@@ -374,7 +383,13 @@ connected. Isolation was recorded only after the cable was removed. The
 Pi probe to `1.1.1.1` returned `Network is unreachable` and is not a
 three-packet loss rate. `tailscale0` was visible and was not tested.
 Session times, the PC SHA, and transcript hashes were not supplied. The
-procedure text was not edited. TC-NET-003 was not run.
+procedure text was not edited. TC-NET-003 was not run in that execution.
+
+For EX-TC-NET-003-20261103-01: procedure version 2 was used. Procedure
+version 1 was not run. Ethernet stayed disconnected. Reboot timestamps,
+startup time, the PC SHA, and transcript hashes were not supplied. The
+ten-echo elapsed times are not boot times. `ipv4.never-default` was not
+re-read. A local fallback console was not recorded.
 
 ## 9. Conclusions
 
@@ -442,8 +457,17 @@ What this summary can say now:
   Ten of ten measured echoes succeeded in each direction. After Ethernet
   was disconnected, the Pi had no default IPv4 route and `1.1.1.1` was
   unreachable. The loss allowance and the latency budget stay
-  **TO BE DEFINED**. Review is NOT_REVIEWED. TC-NET-003 remains
-  unexecuted. [ADR-0012](../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md)
+  **TO BE DEFINED**. Review is NOT_REVIEWED.
+  [EX-TC-NET-003-20261103-01](executions/EX-TC-NET-003-20261103-01.md) is
+  **PASSED_PENDING_DOCUMENTATION** on TC-NET-003 procedure version 2.
+  Procedure version 1 was not run. The Pi boot id changed from
+  `9cd60757-0417-4e4d-bdb8-282907f2f944` to
+  `318f958f-a7ca-425d-a21f-ca68d2c70e05`, and the PC boot id changed from
+  `8a0df48a-bae1-4844-a09e-72f8ea25437b` to
+  `f41c0bc4-6b79-45bb-b24a-c1dd2f429ff4`. The access point and the client
+  returned without a setup script. IPv4 isolation held. Startup time was
+  not recorded. Review is NOT_REVIEWED. The case is not **CLOSED_PASSED**.
+  [ADR-0012](../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md)
   stays **Proposed** on this branch and is not renumbered. It does not
   replace [ADR-0010](../../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md);
 - the default PC audio stub cannot create a pending operation;
@@ -465,7 +489,8 @@ EX-TC-GPIO-001-20261027-02, and EX-TC-AUD-001-20261027-01 were recorded on
 27 October 2026. EX-TC-AUD-002-20261103-01, EX-TC-GPIO-001-20261103-01,
 EX-TC-PTT-001-20261103-01, EX-TC-PTT-001-20261103-02, EX-TC-PTT-002-20261103-01,
 EX-TC-NET-001-20261103-01, EX-TC-NET-001-20261103-02,
-EX-TC-NET-001-20261103-03, and EX-TC-NET-002-20261103-01 were recorded on
+EX-TC-NET-001-20261103-03, EX-TC-NET-002-20261103-01, and
+EX-TC-NET-003-20261103-01 were recorded on
 3 November 2026.
 This change does not add a bitácora section for either day. The table stays
 empty until a real daily bitácora section exists. Unfinished cases stay

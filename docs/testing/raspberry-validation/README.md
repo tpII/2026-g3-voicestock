@@ -88,7 +88,10 @@ isolation, reboot, recovery, or long-term reliability. Attempt 02's
 [TC-NET-002](test-cases/TC-NET-002.md) has
 [EX-TC-NET-002-20261103-01](executions/EX-TC-NET-002-20261103-01.md)
 at **PASSED_PENDING_DOCUMENTATION**. It is not **CLOSED_PASSED**.
-[TC-NET-003](test-cases/TC-NET-003.md) is unexecuted. None of these cases is
+[TC-NET-003](test-cases/TC-NET-003.md) has
+[EX-TC-NET-003-20261103-01](executions/EX-TC-NET-003-20261103-01.md)
+at **PASSED_PENDING_DOCUMENTATION** on procedure version 2. It is not
+**CLOSED_PASSED**. Procedure version 1 of that case was not run. None of these cases is
 **CLOSED_PASSED**. The other cases are unexecuted. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
 without evidence, are in the [test plan](test-plan.md#status-model).
 

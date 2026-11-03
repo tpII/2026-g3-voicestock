@@ -143,3 +143,6 @@ the observations in this note, it does not measure ICMP, and it does not
 run TC-NET-002 or TC-NET-003.
 [EX-TC-NET-002-20261103-01](executions/EX-TC-NET-002-20261103-01.md) is a
 later execution of TC-NET-002. It does not rewrite this note.
+[EX-TC-NET-003-20261103-01](executions/EX-TC-NET-003-20261103-01.md) is a
+later execution of TC-NET-003 procedure version 2. It does not rewrite
+this note, and it does not mean procedure version 1 of TC-NET-003 was run.

@@ -21,6 +21,8 @@ No results sheet has been filed.
 is **PASSED**. The evidence archive is pending. Review is NOT_REVIEWED.
 It is not **CLOSED_PASSED**.
 [EX-TC-NET-002-20261103-01](../executions/EX-TC-NET-002-20261103-01.md) is
+**PASSED_PENDING_DOCUMENTATION** and not **CLOSED_PASSED**.
+[EX-TC-NET-003-20261103-01](../executions/EX-TC-NET-003-20261103-01.md) is
 **PASSED_PENDING_DOCUMENTATION** and not **CLOSED_PASSED**. Per-run numbers
 stay in the execution records.
 

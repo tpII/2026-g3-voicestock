@@ -48,6 +48,7 @@ production operation contract.
 
 | Component | File | Entry or responsibility |
 | --- | --- | --- |
+| Capture path | `src/pi/audio/` | Callback stream, bounded PCM queue, and WAV publication. See [audio capture](audio-capture.md). |
 | Capture completion | `src/pi/push_to_talk/controller.py` | `on_capture_completed(AudioCaptureResult)` |
 | Captured audio | `src/pi/push_to_talk/result.py` | WAV path in `result.artifact.path` |
 | Recording upload | `src/pi/push_to_talk/sender.py` | `RecordingSender`, a capture consumer |

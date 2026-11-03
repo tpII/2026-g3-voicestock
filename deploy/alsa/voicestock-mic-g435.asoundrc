@@ -1,0 +1,9 @@
+pcm.voicestock_mic {
+    type plug
+    slave.pcm "hw:CARD=Headset,DEV=0"
+
+    hint {
+        show on
+        description "VoiceStock G435 microphone with ALSA format conversion"
+    }
+}

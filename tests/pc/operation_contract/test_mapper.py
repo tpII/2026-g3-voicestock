@@ -122,3 +122,27 @@ def test_blank_or_non_text_product_is_rejected(product: object) -> None:
 def test_non_integer_quantity_is_rejected(quantity: object) -> None:
     with pytest.raises(DraftMappingError, match="cantidad"):
         map_draft(_with_operation(cantidad=quantity))
+
+
+def test_attribute_object_maps_to_separate_contract_fields() -> None:
+    payload = map_draft(
+        {
+            "operaciones": [
+                {
+                    "operacion": "agregar_stock",
+                    "producto": {
+                        "nombre": "Arroz",
+                        "marca": "Marolio",
+                        "variante": None,
+                        "presentacion": "1 kg",
+                    },
+                    "cantidad": 2,
+                }
+            ]
+        }
+    )
+    product = payload.operations[0].product
+    assert product.name == "Arroz"
+    assert product.brand == "Marolio"
+    assert product.variant is None
+    assert product.presentation == "1 kg"

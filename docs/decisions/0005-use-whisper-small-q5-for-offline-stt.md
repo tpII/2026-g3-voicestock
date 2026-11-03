@@ -78,3 +78,11 @@ until the hardware and acceptance work is completed. See
 
 [The public module interface](../interfaces/speech-to-text.md) records inputs,
 outputs, lifecycle, errors and replaceability.
+
+## PC network adapter — 3 November 2026
+
+The selectable PC audio pipeline transcribes with Groq Whisper
+(`whisper-large-v3-turbo` unless configured otherwise). That path does not
+replace this offline candidate and does not accept it on Raspberry Pi
+hardware. The PC adapter lives under `src/pc/speech_to_text/` and is off
+unless `VOICESTOCK_AUDIO_PIPELINE=groq`.

@@ -12,6 +12,14 @@ class ServiceErrorCode(StrEnum):
     INVALID_INPUT = "invalid_input"
     PROVIDER_NOT_CONFIGURED = "provider_not_configured"
     PROVIDER_FAILURE = "provider_failure"
+    EMPTY_TRANSCRIPTION = "empty_transcription"
+    TRANSCRIPTION_FAILURE = "transcription_failure"
+    TRANSCRIPTION_TIMEOUT = "transcription_timeout"
+    UNSUPPORTED_COMMAND = "unsupported_command"
+    AMBIGUOUS_PRODUCT = "ambiguous_product"
+    UNKNOWN_PRODUCT = "unknown_product"
+    INSUFFICIENT_PRODUCT = "insufficient_product"
+    CONTRACT_MAPPING_FAILURE = "contract_mapping_failure"
 
 
 class ServiceError(BaseModel):

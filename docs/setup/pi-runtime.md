@@ -49,7 +49,11 @@ pip install -e ".[dev]"
 ```
 
 The button and the microphone use the same system packages as
-[push-to-talk](push-to-talk.md). The page does not need Node.js. The catalog
+[push-to-talk](push-to-talk.md). A headset that cannot open 16000 Hz on the
+raw ALSA device needs an explicit plug profile before `--input-device` will
+accept it. The Logitech G435 profile used in validation is the
+[ALSA microphone profile](alsa-microphone.md). Other microphones are not
+routed through that profile. The page does not need Node.js. The catalog
 file is a JSON list of products, the format `pi.operation_contract.load_catalog`
 reads. Product identity follows
 [ADR-0006](../decisions/0006-identify-products-by-unique-attribute-match.md).

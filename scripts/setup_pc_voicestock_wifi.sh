@@ -2,6 +2,9 @@
 # Connect one explicit Arch Linux Wi-Fi interface to the VoiceStock access
 # point. Persistent NetworkManager profile voicestock-client.
 # Does not select or modify the Internet Wi-Fi interface.
+# Binds the profile with connection.interface-name only. A transient MAC
+# must not be stored in 802-11-wireless.mac-address: NetworkManager matches
+# that property against the permanent device address.
 # See docs/setup/local-network.md and scripts/voicestock-network.conf.
 
 set -euo pipefail
@@ -77,6 +80,10 @@ valid_interface_name() {
   [[ "$interface_name" =~ ^[A-Za-z0-9._-]+$ ]]
 }
 
+sys_net_dir() {
+  printf '%s\n' "${VOICESTOCK_SYS_NET:-/sys/class/net}"
+}
+
 device_type() {
   local interface_name="$1"
   nmcli -g GENERAL.TYPE device show "$interface_name" 2>/dev/null || true
@@ -117,11 +124,6 @@ interface_has_default_route() {
 require_not_internet_interface() {
   local interface_name="$1"
   local active gateway
-  active="$(nmcli -t -f NAME,DEVICE connection show --active | awk -F: -v dev="$interface_name" '$2 == dev { print $1; exit }')"
-  if [[ "$active" == "$PROFILE" ]]; then
-    info "Profile ${PROFILE} is already active on ${interface_name}. Updating it in place."
-    return 0
-  fi
   if interface_has_default_route "$interface_name"; then
     error "Interface ${interface_name} owns the default IPv4 route. That is the Internet path. Pass the other Wi-Fi interface. Nothing was changed."
   fi
@@ -129,12 +131,16 @@ require_not_internet_interface() {
   if [[ -n "$gateway" && "$gateway" != "--" && "$gateway" != "0.0.0.0" ]]; then
     error "Interface ${interface_name} has IPv4 gateway ${gateway}. That looks like the Internet path. Pass the other Wi-Fi interface. Nothing was changed."
   fi
+  active="$(nmcli -t -f NAME,DEVICE connection show --active | awk -F: -v dev="$interface_name" '$2 == dev { print $1; exit }')"
+  if [[ "$active" == "$PROFILE" ]]; then
+    info "Profile ${PROFILE} is already active on ${interface_name}. Updating it in place."
+  fi
 }
 
 resolve_interface() {
   local requested="$1"
   valid_interface_name "$requested" || error "Invalid interface name: ${requested}"
-  if [[ ! -d "/sys/class/net/${requested}" ]]; then
+  if [[ ! -d "$(sys_net_dir)/${requested}" ]]; then
     error "Network interface ${requested} does not exist."
   fi
   if ! nmcli device show "$requested" >/dev/null 2>&1; then
@@ -146,15 +152,43 @@ resolve_interface() {
   printf '%s\n' "$requested"
 }
 
+# NetworkManager device state from `nmcli -g GENERAL.STATE` is
+# "<code> (<label>)". Unmanaged is exactly code 10
+# (NM_DEVICE_STATE_UNMANAGED). Connected is 100 and deactivating is 110,
+# so a prefix match on 10 rejects both. The numeric code is authoritative.
+# A label is used only when nmcli prints no leading code, and only the
+# exact unmanaged label is rejected.
+device_state_is_unmanaged() {
+  local state="$1"
+  local code textual
+
+  state="${state%%$'\n'*}"
+  state="${state//$'\r'/}"
+  state="${state#"${state%%[![:space:]]*}"}"
+  state="${state%"${state##*[![:space:]]}"}"
+
+  if [[ "$state" =~ ^([0-9]+) ]]; then
+    code="${BASH_REMATCH[1]}"
+    if [[ "$code" == "10" ]]; then
+      return 0
+    fi
+    return 1
+  fi
+
+  textual="$(printf '%s' "$state" | tr '[:upper:]' '[:lower:]')"
+  if [[ "$textual" == "unmanaged" ]]; then
+    return 0
+  fi
+  return 1
+}
+
 require_managed() {
   local interface_name="$1"
   local state
   state="$(nmcli -g GENERAL.STATE device show "$interface_name")"
-  case "$state" in
-    10* | unmanaged* | Unmanaged*)
-      error "Wi-Fi interface ${interface_name} is not managed by NetworkManager."
-      ;;
-  esac
+  if device_state_is_unmanaged "$state"; then
+    error "Wi-Fi interface ${interface_name} is not managed by NetworkManager."
+  fi
 }
 
 profile_count() {
@@ -169,21 +203,12 @@ require_single_profile_if_present() {
   fi
 }
 
-interface_mac() {
-  local interface_name="$1"
-  local mac
-  mac="$(tr '[:upper:]' '[:lower:]' < "/sys/class/net/${interface_name}/address")"
-  mac="${mac//$'\n'/}"
-  if [[ ! "$mac" =~ ^([0-9a-f]{2}:){5}[0-9a-f]{2}$ ]]; then
-    error "Could not read a Wi-Fi MAC address for ${interface_name}."
-  fi
-  printf '%s\n' "$mac"
-}
-
 apply_profile_settings() {
   local interface_name="$1"
-  local mac
-  mac="$(interface_mac "$interface_name")"
+
+  # Clear a stale permanent-MAC restriction before writing the rest.
+  # An empty value is the NetworkManager way to remove it.
+  nmcli connection modify "$PROFILE" 802-11-wireless.mac-address ""
 
   nmcli connection modify "$PROFILE" \
     connection.interface-name "$interface_name" \
@@ -192,7 +217,7 @@ apply_profile_settings() {
     802-11-wireless.mode infrastructure \
     802-11-wireless.band bg \
     802-11-wireless.ssid "$VOICESTOCK_WIFI_SSID" \
-    802-11-wireless.mac-address "$mac" \
+    802-11-wireless.mac-address "" \
     802-11-wireless-security.key-mgmt wpa-psk \
     802-11-wireless-security.proto rsn \
     802-11-wireless-security.pairwise ccmp \
@@ -280,7 +305,6 @@ create_or_update_profile() {
       ssid "$VOICESTOCK_WIFI_SSID" \
       802-11-wireless.mode infrastructure \
       802-11-wireless.band bg \
-      802-11-wireless.mac-address "$(interface_mac "$interface_name")" \
       802-11-wireless-security.key-mgmt wpa-psk \
       802-11-wireless-security.proto rsn \
       802-11-wireless-security.psk "$VOICESTOCK_WIFI_PSK" \
@@ -345,15 +369,6 @@ stored_psk_matches() {
   [[ "$stored" == "$VOICESTOCK_WIFI_PSK" ]]
 }
 
-mac_matches() {
-  local interface_name="$1"
-  local actual expected
-  actual="$(nmcli -g 802-11-wireless.mac-address connection show "$PROFILE" | tr '[:upper:]' '[:lower:]')"
-  actual="${actual// /}"
-  expected="$(interface_mac "$interface_name")"
-  [[ "$actual" == "$expected" ]]
-}
-
 verify_and_report() {
   local interface_name="$1"
   local -a failures=()
@@ -402,7 +417,7 @@ verify_and_report() {
     && property_is 802-11-wireless-security.proto rsn \
     && property_is ipv4.method manual \
     && property_is connection.interface-name "$interface_name" \
-    && mac_matches "$interface_name" \
+    && property_is_empty 802-11-wireless.mac-address \
     && [[ "$psk_flags" == 0* ]] \
     && stored_psk_matches; then
     info "OK: ${PROFILE} is a 2.4 GHz WPA2-PSK client for ${VOICESTOCK_WIFI_SSID} on ${interface_name}."
@@ -430,24 +445,30 @@ verify_and_report() {
   info "Other Wi-Fi interfaces were not modified. Confirm the default route is still the Internet interface: ip -4 route"
 }
 
-if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
-  usage
-  exit 0
-fi
-if [[ "$#" -ne 1 ]]; then
-  usage
-  error "The VoiceStock Wi-Fi interface is required. This script does not choose one."
-fi
+main() {
+  if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+    usage
+    exit 0
+  fi
+  if [[ "$#" -ne 1 ]]; then
+    usage
+    error "The VoiceStock Wi-Fi interface is required. This script does not choose one."
+  fi
 
-load_config
-require_command nmcli
-require_command ip
-require_root
+  load_config
+  require_command nmcli
+  require_command ip
+  require_root
 
-require_two_wifi_interfaces
-INTERFACE="$(resolve_interface "$1")"
-require_managed "$INTERFACE"
-require_not_internet_interface "$INTERFACE"
-info "Using Wi-Fi interface ${INTERFACE} for VoiceStock only."
-create_or_update_profile "$INTERFACE"
-verify_and_report "$INTERFACE"
+  require_two_wifi_interfaces
+  INTERFACE="$(resolve_interface "$1")"
+  require_managed "$INTERFACE"
+  require_not_internet_interface "$INTERFACE"
+  info "Using Wi-Fi interface ${INTERFACE} for VoiceStock only."
+  create_or_update_profile "$INTERFACE"
+  verify_and_report "$INTERFACE"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
+fi

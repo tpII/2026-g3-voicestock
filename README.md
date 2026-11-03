@@ -118,8 +118,11 @@ La Raspberry Pi graba un WAV al pulsar y soltar un botón. La decisión de stack
 el contrato de audio y la prueba en la placa están separados:
 
 - [Decisión de arquitectura](docs/decisions/0003-use-event-driven-gpio-and-sounddevice-for-ptt-capture.md)
+- [ADR-0011: captura por callback y cola acotada](docs/decisions/0011-use-callback-driven-audio-capture-with-a-bounded-pcm-queue.md)
+- [Arquitectura de la captura](docs/architecture/audio-capture.md)
 - [Interfaz de captura](docs/interfaces/push-to-talk-capture.md)
 - [Conexión, configuración y prueba manual](docs/setup/push-to-talk.md)
+- [Perfil ALSA del Logitech G435](docs/setup/alsa-microphone.md)
 
 Con `--send-to-pc`, `voicestock-pi-ptt` envía cada grabación a la PC y muestra
 la respuesta
@@ -172,11 +175,12 @@ VOICESTOCK_WEB_HOST=127.0.0.1 VOICESTOCK_WEB_PORT=8123 voicestock-pi-web
 
 ## Estado de la evaluación de voz
 
-El ciclo implementado envía el WAV a la PC. El reconocimiento corre,
-conceptualmente, en la PC; el servidor todavía usa el handler provisional.
-La evaluación de Whisper en la Raspberry Pi y de los modelos de lenguaje queda
-como registro:
+El ciclo implementado envía el WAV a la PC. Por defecto el servidor responde
+con el stub de diagnóstico. Con `VOICESTOCK_AUDIO_PIPELINE=groq` transcribe e
+interpreta el WAV y devuelve un contrato versión 1. La confirmación todavía
+no persiste stock.
 
+- [Pipeline de audio en la PC](docs/setup/pc-audio-pipeline.md)
 - [Integración de captura e interpretación](docs/architecture/audio-interpretation-integration.md)
 - [Evaluación de Speech-to-Text](docs/research/speech-to-text-engine-evaluation.md)
 - [ADR-0005](docs/decisions/0005-use-whisper-small-q5-for-offline-stt.md)
@@ -207,7 +211,10 @@ como registro:
 - [ADR-0007: Envío del audio push-to-talk como WAV crudo por HTTP](docs/decisions/0007-send-push-to-talk-audio-as-raw-wav-over-http.md)
 - [Contrato de operación (JSON versionado y validación)](docs/interfaces/operation-contract.md)
 - [Captura push-to-talk](docs/interfaces/push-to-talk-capture.md)
+- [Arquitectura de la captura de audio](docs/architecture/audio-capture.md)
+- [ADR-0011: captura por callback y cola acotada](docs/decisions/0011-use-callback-driven-audio-capture-with-a-bounded-pcm-queue.md)
 - [Prueba manual de push-to-talk](docs/setup/push-to-talk.md)
+- [Perfil ALSA del Logitech G435](docs/setup/alsa-microphone.md)
 - [Red local VoiceStock](docs/setup/local-network.md)
 - [Servidor web de la Raspberry Pi](docs/setup/pi-web.md)
 - [API de la operación pendiente](docs/interfaces/pending-operation-web-api.md)

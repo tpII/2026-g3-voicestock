@@ -1,8 +1,10 @@
 """HTTP adapter for Raspberry Pi to PC interpretation requests."""
 
 from collections.abc import Callable
+from contextlib import AbstractAsyncContextManager
 from typing import Any, TypeVar
 
+import anyio
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic_core import PydanticSerializationError
@@ -23,13 +25,20 @@ _Input = TypeVar("_Input")
 def create_app(
     handler: InterpretationHandler,
     audio_handler: AudioHandler | None = None,
+    lifespan: Callable[[FastAPI], AbstractAsyncContextManager[None]] | None = None,
 ) -> FastAPI:
     """Create the PC HTTP server around replaceable handlers.
 
     ``handler`` serves recognized text. ``audio_handler`` serves WAV
-    recordings; without it the audio endpoint is not exposed.
+    recordings; without it the audio endpoint is not exposed. ``lifespan``
+    opens and closes resources owned by the process. Handlers run outside
+    the ASGI event loop because transcription and interpretation block.
     """
-    app = FastAPI(title="VoiceStock PC Communication", version="1.0.0")
+    app = FastAPI(
+        title="VoiceStock PC Communication",
+        version="1.0.0",
+        lifespan=lifespan,
+    )
 
     @app.post("/api/v1/interpret")
     async def interpret(request: Request) -> JSONResponse:
@@ -52,7 +61,7 @@ def create_app(
         except ValueError:
             return _error_response(422, "invalid_request", "request body is not valid")
 
-        return _run_handler(handler, parsed_request.text)
+        return await _run_handler(handler, parsed_request.text)
 
     if audio_handler is not None:
 
@@ -82,7 +91,7 @@ def create_app(
                     422, "invalid_audio", "audio body is not a readable WAV file"
                 )
 
-            return _run_handler(audio_handler, audio)
+            return await _run_handler(audio_handler, audio)
 
     return app
 
@@ -106,9 +115,9 @@ async def _read_limited_body(request: Request, limit: int) -> bytes | None:
     return bytes(body)
 
 
-def _run_handler(handler: Callable[[_Input], Any], value: _Input) -> JSONResponse:
+async def _run_handler(handler: Callable[[_Input], Any], value: _Input) -> JSONResponse:
     try:
-        payload = handler(value)
+        payload = await anyio.to_thread.run_sync(handler, value)
     except Exception:
         return _error_response(
             500,

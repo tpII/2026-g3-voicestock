@@ -55,7 +55,7 @@ it.
 
 ## Status
 
-Campaign status: **DESIGNED**.
+Campaign status: **IN_PROGRESS**.
 
 The procedures are **DESIGNED**. [TC-ENV-001](test-cases/TC-ENV-001.md) has
 one execution, [EX-TC-ENV-001-20261027-01](executions/EX-TC-ENV-001-20261027-01.md),
@@ -70,7 +70,10 @@ has [EX-TC-GPIO-001-20261027-01](executions/EX-TC-GPIO-001-20261027-01.md)
 [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md)
 at **PASSED_PENDING_DOCUMENTATION**. [TC-AUD-002](test-cases/TC-AUD-002.md)
 has [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md)
-at **PASSED_PENDING_DOCUMENTATION**. None of these cases is
+at **PASSED_PENDING_DOCUMENTATION**. [TC-PTT-001](test-cases/TC-PTT-001.md)
+has [EX-TC-PTT-001-20261103-01](executions/EX-TC-PTT-001-20261103-01.md)
+and [EX-TC-PTT-001-20261103-02](executions/EX-TC-PTT-001-20261103-02.md),
+both **FAILED** and not closed. None of these cases is
 **CLOSED_PASSED**. The other cases are unexecuted. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
 without evidence, are in the [test plan](test-plan.md#status-model).
 

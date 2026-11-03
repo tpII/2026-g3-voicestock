@@ -3,10 +3,12 @@
 This file is the outline of a later technical report. It is not the report
 of a finished experiment. One baseline execution, three GPIO executions,
 one microphone-enumeration execution, one WAV-capture execution, two
-push-to-talk executions, one maximum-duration execution, and one
-access-point execution are recorded. TC-ENV-001, TC-GPIO-001, TC-AUD-001,
+push-to-talk executions, one maximum-duration execution, and two
+access-point executions are recorded. TC-ENV-001, TC-GPIO-001, TC-AUD-001,
 TC-AUD-002, TC-PTT-001, TC-PTT-002, and TC-NET-001 are not closed. The
-other cases have no measurements.
+other cases have no measurements. The second access-point execution
+includes a `hostapd` diagnostic. That diagnostic is not a measurement of
+TC-NET-002.
 
 Campaign status: **IN_PROGRESS**.
 
@@ -60,6 +62,11 @@ Recorded executions:
 - [EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md),
   **FAILED**. The access-point script rejected a connected `wlan0`.
   Not closed. Not a traffic result.
+- [EX-TC-NET-001-20261103-02](executions/EX-TC-NET-001-20261103-02.md),
+  **FAILED**. Procedure version 1: the updated Pi script passed state
+  detection and failed WPA2 activation. The PC script failed a MAC match.
+  A manual `hostapd` session is recorded separately and is not a pass.
+  Not closed. Not TC-NET-002.
 
 ## 3. Scope
 
@@ -107,7 +114,7 @@ documentation branch.
 | TC-AUD-002 | [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–4 and 6 met on 5/5 measured runs. Criterion 5 stores operator-reported hashes. Criterion 7 not triggered. Not closed. | Commit `88a95d5` on `fix/audio-capture-stream-shutdown` at the time of the run. Later `origin/develop` is `1b81442`, which merges that fix. The measured revision is unchanged. Device `voicestock_mic`. Duration error about −56.2 ms, tolerance **TO BE DEFINED**. `throttled=0x50005` at the later inventory. Review NOT_REVIEWED. WAV files remain on the Pi. |
 | TC-PTT-001 | [EX-TC-PTT-001-20261103-01](executions/EX-TC-PTT-001-20261103-01.md); [EX-TC-PTT-001-20261103-02](executions/EX-TC-PTT-001-20261103-02.md) | FAILED, then FAILED | Attempt 02: 3 measured WAV files, 1 channel, width 2, 16000 Hz, `RELEASED`, files retained. Operator heard all three. Not closed. | Attempt 01: microphone muted; listening not verified; not a demonstrated software defect. Attempt 02 phrase match and defect columns not separately confirmed. Both ran while [EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md) was **FAILED**. PC not contacted. `develop` at `1b81442`. |
 | TC-PTT-002 | [EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md) | BLOCKED | 3 `MAX_DURATION` and 3 later `RELEASED`. No extra file while held. Format 6/6. Not closed. | Second mechanical press **NOT APPLICABLE**. Header duration 1.984 s versus 2 s. Error −16 ms. Gate **TO BE DEFINED**. Prerequisite TC-PTT-001 remains **FAILED**. Not a product failure of the limit. |
-| TC-NET-001 | [EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md) | FAILED | Script exited before any VoiceStock profile. Criteria 1–4 not executed. Not closed. | `wlan0` state `100 (connected)`. Pattern `10*` in `require_managed`. Incident OPEN. PC script not run. Ethernet left up for SSH. No ping. |
+| TC-NET-001 | [EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md); [EX-TC-NET-001-20261103-02](executions/EX-TC-NET-001-20261103-02.md) | FAILED, then FAILED | Attempt 02: prescribed scripts failed. Criteria 1–3 fail. Criterion 4 not recorded. Not closed. | Attempt 01: `10*` matched `100 (connected)`. Attempt 02 passed that Pi check and failed WPA2 (`supplicant-timeout`, then RSN `IE_DIFFERENT`). PC script pinned a transient MAC. `hostapd` diagnostic: two stations authenticated; operator-confirmed ICMP after manual addressing. No RTT series. Not TC-NET-002. Pi SHA **NOT RECORDED**. Ethernet left up. |
 | TC-NET-002 | none | DESIGNED | | |
 | TC-NET-003 | none | DESIGNED | | |
 | TC-COM-001 | none | DESIGNED | | |
@@ -206,7 +213,27 @@ duration-limit behavior is not recorded as a product failure.
 [INC-EX-TC-NET-001-20261103-01-01](executions/INC-EX-TC-NET-001-20261103-01-01.md),
 which is **OPEN**. `require_managed` treated `100 (connected)` as
 unmanaged because the shell pattern is `10*`. The access point was not
-activated. The incident is not closed.
+activated. The incident is not closed. Attempt 02 does not rewrite this
+result.
+
+[EX-TC-NET-001-20261103-02](executions/EX-TC-NET-001-20261103-02.md) is
+**FAILED** on procedure version 1. The operator reported the Pi
+state-detection fix on `develop`. The script passed that check. The board
+SHA was not recorded. Activation then failed with `supplicant-timeout`.
+After a manual PMF disable, the Arch handshake failed with `IE_DIFFERENT`
+because message 3/4 added a WPA-PSK-SHA256 AKM suite. The Broadcom cause
+is not identified. The PC script failed because it stored a temporary MAC.
+The PC script on `origin/develop` still contains `10*`; that pattern was
+not the exit of this run.
+[INC-EX-TC-NET-001-20261103-02-01](executions/INC-EX-TC-NET-001-20261103-02-01.md),
+[INC-EX-TC-NET-001-20261103-02-02](executions/INC-EX-TC-NET-001-20261103-02-02.md),
+and
+[INC-EX-TC-NET-001-20261103-02-03](executions/INC-EX-TC-NET-001-20261103-02-03.md)
+are **OPEN**. A foreground `hostapd` process authenticated the smartphone
+and the Arch USB client. The operator confirmed ICMP only after
+`ip addr add 192.168.50.1/24`. That experiment is not a pass and not
+TC-NET-002. PMF stayed disabled. Isolation was not proven while Ethernet
+was up.
 
 [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) opened
 no incident.
@@ -291,6 +318,17 @@ for a later isolation test. It is not the cause of the script error. The
 PC script was not run. No transcript hash was supplied. The setup script
 was not modified.
 
+For EX-TC-NET-001-20261103-02: the operator reported that the
+state-detection fix was on `develop` and that the updated Pi script ran.
+`git rev-parse HEAD` was not captured on either machine. Do not treat a
+later `develop` tip as that checkout. Ethernet stayed at `192.168.1.100/24`.
+The prescribed procedure stopped at script failure; manual PMF, MAC, and
+`hostapd` steps are deviations. The configuration-file SHA-256 was
+supplied and is in the execution. Other transcripts were not archived.
+The scripts were not modified by the documentation of this run. Procedure
+version 1 was not rewritten. A version 2 proposal exists and was not
+applied to this execution.
+
 ## 9. Conclusions
 
 Do not write a conclusion, a pass claim, or a recommendation that the
@@ -338,11 +376,17 @@ What this summary can say now:
   TC-PTT-001 is still **FAILED**. A second mechanical press was not
   possible while the switch stayed down. The duration error of −16 ms has
   no acceptance gate yet;
-- TC-NET-001 has one execution on 3 November 2026. The access-point script
-  exited because `10*` matched `100 (connected)`. The execution is
-  **FAILED** and not closed. The incident is **OPEN**. Criteria 1–4 were
-  not executed. No ping was run. TC-NET-002 and TC-NET-003 remain
-  unexecuted;
+- TC-NET-001 has two executions on 3 November 2026, both **FAILED** and
+  not closed. Attempt 01 exited because `10*` matched `100 (connected)`.
+  Attempt 02 passed that Pi check and did not produce the scripted cell:
+  NetworkManager WPA2 activation failed, and the PC script rejected a
+  transient MAC. A `hostapd` diagnostic then authenticated two clients,
+  and the operator confirmed ICMP after a manual address assignment. That
+  diagnostic does not pass attempt 02 and does not execute TC-NET-002.
+  TC-NET-002 and TC-NET-003 remain unexecuted. Procedure version 1 is
+  unchanged. [ADR-0012](../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md)
+  is **Proposed** and does not replace
+  [ADR-0010](../../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md);
 - the default PC audio stub cannot create a pending operation;
 - simulated end-to-end execution is blocked on a fixture that is specified
   and not implemented;
@@ -360,8 +404,9 @@ dates were scheduling targets. They are not entries in the table below.
 EX-TC-ENV-001-20261027-01, EX-TC-GPIO-001-20261027-01,
 EX-TC-GPIO-001-20261027-02, and EX-TC-AUD-001-20261027-01 were recorded on
 27 October 2026. EX-TC-AUD-002-20261103-01, EX-TC-GPIO-001-20261103-01,
-EX-TC-PTT-001-20261103-01, EX-TC-PTT-001-20261103-02, EX-TC-PTT-002-20261103-01, and
-EX-TC-NET-001-20261103-01 were recorded on 3 November 2026.
+EX-TC-PTT-001-20261103-01, EX-TC-PTT-001-20261103-02, EX-TC-PTT-002-20261103-01,
+EX-TC-NET-001-20261103-01, and EX-TC-NET-001-20261103-02 were recorded on
+3 November 2026.
 This change does not add a bitácora section for either day. The table stays
 empty until a real daily bitácora section exists. Unfinished cases stay
 pending or blocked. They are not marked complete to match a planned date.

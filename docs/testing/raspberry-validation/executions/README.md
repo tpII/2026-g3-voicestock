@@ -13,7 +13,11 @@ Filed executions:
 - [EX-TC-PTT-001-20261103-02.md](EX-TC-PTT-001-20261103-02.md) — **FAILED**. Three measured WAV files at the contract, heard by the operator. Phrase-match and defect columns not separately confirmed. GPIO prerequisite unmet. Not a closed fail.
 - [EX-TC-PTT-002-20261103-01.md](EX-TC-PTT-002-20261103-01.md) — **BLOCKED**. Three `MAX_DURATION` captures and three later `RELEASED` captures. Second mechanical press not applicable. TC-PTT-001 prerequisite unmet. Not a product failure of the duration limit. Not closed.
 - [EX-TC-NET-001-20261103-01.md](EX-TC-NET-001-20261103-01.md) — **FAILED**. Access-point script rejected connected `wlan0`. Not a closed fail. Not a traffic result.
-- [INC-EX-TC-NET-001-20261103-01-01.md](INC-EX-TC-NET-001-20261103-01-01.md) — **OPEN**. `require_managed` pattern `10*` matches `100 (connected)`. Fix not deployed.
+- [INC-EX-TC-NET-001-20261103-01-01.md](INC-EX-TC-NET-001-20261103-01-01.md) — **OPEN**. Historical result unchanged: `10*` matched `100 (connected)` on the Pi script. Attempt 02 does not close this incident.
+- [EX-TC-NET-001-20261103-02.md](EX-TC-NET-001-20261103-02.md) — **FAILED**. Updated Pi script passed state detection and failed WPA2 activation. PC script failed a transient MAC match. `hostapd` diagnostic authenticated two stations and is not a pass. Not closed. Not TC-NET-002.
+- [INC-EX-TC-NET-001-20261103-02-01.md](INC-EX-TC-NET-001-20261103-02-01.md) — **OPEN**. NetworkManager WPA2 activation timeout, then Beacon/handshake RSN mismatch. Fails the case.
+- [INC-EX-TC-NET-001-20261103-02-02.md](INC-EX-TC-NET-001-20261103-02-02.md) — **OPEN**. PC profile `mac-address` was set from a temporary interface MAC.
+- [INC-EX-TC-NET-001-20261103-02-03.md](INC-EX-TC-NET-001-20261103-02-03.md) — **OPEN**. Observation. PC script still uses `10*` for unmanaged detection. Not the exit of attempt 02.
 
 Add one Markdown file per run:
 

@@ -1,8 +1,17 @@
 # TC-NET-001 — Raspberry Pi access point configuration
 
 - Status: DESIGNED
-- Executions: [EX-TC-NET-001-20261103-01](../executions/EX-TC-NET-001-20261103-01.md) (`FAILED`, script rejected connected `wlan0`, not closed). Incident: [INC-EX-TC-NET-001-20261103-01-01](../executions/INC-EX-TC-NET-001-20261103-01-01.md) (`OPEN`).
+- Executions: [EX-TC-NET-001-20261103-01](../executions/EX-TC-NET-001-20261103-01.md) (`FAILED`, script rejected connected `wlan0`, not closed). Incident: [INC-EX-TC-NET-001-20261103-01-01](../executions/INC-EX-TC-NET-001-20261103-01-01.md) (`OPEN`). [EX-TC-NET-001-20261103-02](../executions/EX-TC-NET-001-20261103-02.md) (`FAILED`, prescribed scripts did not produce a working cell; `hostapd` diagnostic is not a pass, not closed). Incidents: [INC-EX-TC-NET-001-20261103-02-01](../executions/INC-EX-TC-NET-001-20261103-02-01.md) (`OPEN`), [INC-EX-TC-NET-001-20261103-02-02](../executions/INC-EX-TC-NET-001-20261103-02-02.md) (`OPEN`), [INC-EX-TC-NET-001-20261103-02-03](../executions/INC-EX-TC-NET-001-20261103-02-03.md) (`OPEN`).
 - Procedure version: 1
+
+Procedure version 1 below is the procedure both executions ran. A draft
+for a later `hostapd` procedure is
+[TC-NET-001 procedure version 2 (proposal)](TC-NET-001-procedure-v2-PROPOSAL.md).
+That proposal is not in force and does not regrade either execution.
+[ADR-0010](../../../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md)
+remains the topology.
+[ADR-0012](../../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md)
+is **Proposed** only.
 
 ## Objective
 

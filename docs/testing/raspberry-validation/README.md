@@ -77,7 +77,9 @@ both **FAILED** and not closed. [TC-PTT-002](test-cases/TC-PTT-002.md)
 has [EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md)
 at **BLOCKED**. [TC-NET-001](test-cases/TC-NET-001.md) has
 [EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md)
-at **FAILED**. None of these cases is
+and [EX-TC-NET-001-20261103-02](executions/EX-TC-NET-001-20261103-02.md),
+both **FAILED**. Attempt 02 also records a `hostapd` diagnostic that is
+not a pass. None of these cases is
 **CLOSED_PASSED**. The other cases are unexecuted. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
 without evidence, are in the [test plan](test-plan.md#status-model).
 
@@ -229,6 +231,9 @@ These notes come from the current source. They are not physical results.
 - [Integrated runtime](../../setup/pi-runtime.md)
 - [Push-to-talk setup](../../setup/push-to-talk.md)
 - [Local network](../../setup/local-network.md)
+- [hostapd evaluation note](hostapd-evaluation.md) (diagnostic only; not a passed case)
+- [ADR-0010](../../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md)
+- [ADR-0012](../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md) (**Proposed**)
 - [Web setup](../../setup/pi-web.md)
 - [Pending-operation workflow](../../architecture/pending-operation-flow.md)
 - [Audio transport](../../interfaces/pc-audio-communication.md)

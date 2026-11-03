@@ -96,6 +96,13 @@ first run of TC-NET-003 procedure version 2. It is
 **PASSED_PENDING_DOCUMENTATION** and not closed. Procedure version 1 of
 TC-NET-003 was not executed.
 
+[EX-TC-COM-003-20261103-01](executions/EX-TC-COM-003-20261103-01.md) followed
+[TC-COM-003 procedure version 1](test-cases/TC-COM-003-procedure-v1.md).
+The `ncat` example was not run. A Python listener was. Procedure version 2
+in [TC-COM-003](test-cases/TC-COM-003.md) was written after that execution
+and is not applied to it. The run is **PASSED_PENDING_DOCUMENTATION** and
+not **CLOSED_PASSED**.
+
 The project bitácora is not part of this order. Execution records, the
 summary, and this campaign's traceability are updated as each case
 finishes. [The bitácora](README.md#bitácora) is appended once at the end of

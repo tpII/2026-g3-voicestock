@@ -27,7 +27,10 @@ It is not **CLOSED_PASSED**.
 [EX-TC-COM-001-20261103-01](../executions/EX-TC-COM-001-20261103-01.md) is
 **PASSED_PENDING_DOCUMENTATION** and not **CLOSED_PASSED**.
 [EX-TC-COM-002-20261103-01](../executions/EX-TC-COM-002-20261103-01.md) is
-**PASSED_PENDING_DOCUMENTATION** and not **CLOSED_PASSED**. Per-run numbers
+**PASSED_PENDING_DOCUMENTATION** and not **CLOSED_PASSED**.
+[EX-TC-COM-003-20261103-01](../executions/EX-TC-COM-003-20261103-01.md) is
+**PASSED_PENDING_DOCUMENTATION** and not **CLOSED_PASSED**. The listener
+tooling deviation is recorded in that execution. Per-run numbers
 stay in the execution records.
 
 This directory is for a summary sheet only after at least one execution is

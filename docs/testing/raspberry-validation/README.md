@@ -98,7 +98,12 @@ at **PASSED_PENDING_DOCUMENTATION**. It is not **CLOSED_PASSED**.
 [TC-COM-002](test-cases/TC-COM-002.md) has
 [EX-TC-COM-002-20261103-01](executions/EX-TC-COM-002-20261103-01.md)
 at **PASSED_PENDING_DOCUMENTATION**. It is not **CLOSED_PASSED**.
-TC-COM-003 is unexecuted. None of these cases is
+[TC-COM-003](test-cases/TC-COM-003.md) has
+[EX-TC-COM-003-20261103-01](executions/EX-TC-COM-003-20261103-01.md)
+at **PASSED_PENDING_DOCUMENTATION** on procedure version 1. The silent
+peer was a Python listener, not the `ncat` example. Procedure version 2
+was written afterward and is not applied to that run. It is not
+**CLOSED_PASSED**. None of these cases is
 **CLOSED_PASSED**. The other cases are unexecuted. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
 without evidence, are in the [test plan](test-plan.md#status-model).
 

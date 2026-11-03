@@ -5,11 +5,11 @@ of a finished experiment. One baseline execution, three GPIO executions,
 one microphone-enumeration execution, one WAV-capture execution, two
 push-to-talk executions, one maximum-duration execution, and three
 access-point executions are recorded, plus one connectivity execution and
-one reboot-persistence execution, one text-HTTP execution, and one
-WAV-transfer execution.
+one reboot-persistence execution, one text-HTTP execution, one
+WAV-transfer execution, and one client-error execution.
 TC-ENV-001, TC-GPIO-001, TC-AUD-001, TC-AUD-002, TC-PTT-001, TC-PTT-002,
-TC-NET-001, TC-NET-002, TC-NET-003, TC-COM-001, and TC-COM-002 are not
-closed. The other cases have no measurements. The second access-point execution includes a `hostapd`
+TC-NET-001, TC-NET-002, TC-NET-003, TC-COM-001, TC-COM-002, and TC-COM-003
+are not closed. The other cases have no measurements. The second access-point execution includes a `hostapd`
 diagnostic. That diagnostic is not TC-NET-002. The third access-point
 execution is **PASSED_PENDING_DOCUMENTATION**: the technical configuration
 assessment is **PASSED**, the evidence archive and the formal review are
@@ -100,6 +100,12 @@ Recorded executions:
   SHA-256 unchanged. Evidence pending. Review NOT_REVIEWED. Not
   **CLOSED_PASSED**. Not a digest of the received body and not
   interpretation.
+- [EX-TC-COM-003-20261103-01](executions/EX-TC-COM-003-20261103-01.md),
+  **PASSED_PENDING_DOCUMENTATION**. Procedure version 1. Three
+  `connection_failed` and three `timeout` outcomes. The silent peer was
+  Python, not the `ncat` example. Not a run of procedure version 2.
+  Evidence pending. Review NOT_REVIEWED. Not **CLOSED_PASSED**. Cleanup
+  of port 8000 was NOT RECORDED.
 
 ## 3. Scope
 
@@ -152,7 +158,7 @@ documentation branch.
 | TC-NET-003 | [EX-TC-NET-003-20261103-01](executions/EX-TC-NET-003-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | Both reboots confirmed by boot id. 10/10 functional replies in each post-reboot direction that was measured. No Pi default route. Not closed. Review NOT_REVIEWED. | Procedure version 2. No setup script. Arch Internet stayed on `wlo1` at metric 601. Pi Internet probe was `Network is unreachable`, not a three-packet loss rate. Startup time **NOT RECORDED**. Loss allowance **TO BE DEFINED**. Not a latency baseline. PC SHA **NOT RECORDED**. |
 | TC-COM-001 | [EX-TC-COM-001-20261103-01](executions/EX-TC-COM-001-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | 10/10 CLI calls exit 0 with the stub text. Mean CLI duration 3092.4 ms. Not closed. Review NOT_REVIEWED. | Both machines reported `develop` `485559c`. Bind `192.168.50.2:8000`; the `ss` peer column is not a bind to every interface. Ten JSON responses were supplied interactively; no transcript file. Warm-up duration NOT RECORDED. Budget **TO BE DEFINED**. Not TC-COM-002. |
 | TC-COM-002 | [EX-TC-COM-002-20261103-01](executions/EX-TC-COM-002-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | 5/5 WAV uploads exit 0. Size 59436 and header fields matched. Local SHA-256 unchanged. Not closed. Review NOT_REVIEWED. | Reused the TC-COM-001 server. No new `ss` paste. Mean CLI duration 3136.7 ms. Budget **TO BE DEFINED**. Not a received-body digest. Not TC-COM-003. Source file remains owned by the **FAILED** PTT attempt 02. |
-| TC-COM-003 | none | DESIGNED | | |
+| TC-COM-003 | [EX-TC-COM-003-20261103-01](executions/EX-TC-COM-003-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | 3/3 `connection_failed` and 3/3 `timeout`. Not closed. Review NOT_REVIEWED. | Procedure version 1. Python listener instead of the `ncat` example. Not relabeled as version 2. Scenario A has no TCP-attempt trace. Port cleanup NOT RECORDED. Durations stay out of TC-COM-001. |
 | TC-WEB-001 | none | DESIGNED | | |
 | TC-WEB-002 | none | DESIGNED | | |
 | TC-CON-001 | none | DESIGNED | | |
@@ -295,6 +301,11 @@ close interpretation quality, WAV transfer, or the earlier network cases.
 **PASSED_PENDING_DOCUMENTATION**. No incident file was opened. It does not
 prove a digest of the received body, and it does not execute TC-COM-003.
 
+[EX-TC-COM-003-20261103-01](executions/EX-TC-COM-003-20261103-01.md) is
+**PASSED_PENDING_DOCUMENTATION**. No incident file was opened. The Python
+listener is a tooling deviation from procedure version 1, not a product
+defect. Port cleanup was not evidenced.
+
 [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) opened
 no incident.
 
@@ -424,6 +435,12 @@ transcript file, packet captures, and a digest of the received body were
 not supplied. The five JSON responses were supplied interactively. The
 local SHA-256 was unchanged. TC-COM-003 was not run.
 
+For EX-TC-COM-003-20261103-01: the run followed procedure version 1. The
+silent peer was Python. `ncat` was neither shown absent nor executed.
+Three accepts were logged for the timeout trial. No packet capture and no
+closed-port TCP trace were supplied. The listener stop was not evidenced.
+Procedure version 2 was written after this execution.
+
 ## 9. Conclusions
 
 Do not write a conclusion, a pass claim, or a recommendation that the
@@ -510,6 +527,11 @@ What this summary can say now:
   uploads exited 0. Reported size and PCM fields matched the local file.
   The local SHA-256 was unchanged. Review is NOT_REVIEWED. It is not a
   digest of the received HTTP body and not interpretation quality.
+  [EX-TC-COM-003-20261103-01](executions/EX-TC-COM-003-20261103-01.md) is
+  **PASSED_PENDING_DOCUMENTATION** on procedure version 1. Both expected
+  client errors occurred. The silent listener was Python, which is a
+  tooling deviation and not a run of procedure version 2. Review is
+  NOT_REVIEWED. Port cleanup was not recorded.
   [ADR-0012](../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md)
   stays **Proposed** on this branch and is not renumbered. It does not
   replace [ADR-0010](../../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md);
@@ -533,8 +555,8 @@ EX-TC-GPIO-001-20261027-02, and EX-TC-AUD-001-20261027-01 were recorded on
 EX-TC-PTT-001-20261103-01, EX-TC-PTT-001-20261103-02, EX-TC-PTT-002-20261103-01,
 EX-TC-NET-001-20261103-01, EX-TC-NET-001-20261103-02,
 EX-TC-NET-001-20261103-03, EX-TC-NET-002-20261103-01,
-EX-TC-NET-003-20261103-01, EX-TC-COM-001-20261103-01, and
-EX-TC-COM-002-20261103-01 were recorded on
+EX-TC-NET-003-20261103-01, EX-TC-COM-001-20261103-01,
+EX-TC-COM-002-20261103-01, and EX-TC-COM-003-20261103-01 were recorded on
 3 November 2026.
 This change does not add a bitácora section for either day. The table stays
 empty until a real daily bitácora section exists. Unfinished cases stay

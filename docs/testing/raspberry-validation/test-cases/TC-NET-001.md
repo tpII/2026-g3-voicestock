@@ -1,7 +1,7 @@
 # TC-NET-001 — Raspberry Pi access point configuration
 
 - Status: DESIGNED
-- Executions: none
+- Executions: [EX-TC-NET-001-20261103-01](../executions/EX-TC-NET-001-20261103-01.md) (`FAILED`, script rejected connected `wlan0`, not closed). Incident: [INC-EX-TC-NET-001-20261103-01-01](../executions/INC-EX-TC-NET-001-20261103-01-01.md) (`OPEN`).
 - Procedure version: 1
 
 ## Objective

@@ -3,9 +3,10 @@
 This file is the outline of a later technical report. It is not the report
 of a finished experiment. One baseline execution, three GPIO executions,
 one microphone-enumeration execution, one WAV-capture execution, two
-push-to-talk executions, and one maximum-duration execution are recorded.
-TC-ENV-001, TC-GPIO-001, TC-AUD-001, TC-AUD-002, TC-PTT-001, and TC-PTT-002
-are not closed. The other cases have no measurements.
+push-to-talk executions, one maximum-duration execution, and one
+access-point execution are recorded. TC-ENV-001, TC-GPIO-001, TC-AUD-001,
+TC-AUD-002, TC-PTT-001, TC-PTT-002, and TC-NET-001 are not closed. The
+other cases have no measurements.
 
 Campaign status: **IN_PROGRESS**.
 
@@ -56,6 +57,9 @@ Recorded executions:
 - [EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md),
   **BLOCKED**. Max-duration observations met. TC-PTT-001 prerequisite
   unmet. Not a product failure of the duration limit. Not closed.
+- [EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md),
+  **FAILED**. The access-point script rejected a connected `wlan0`.
+  Not closed. Not a traffic result.
 
 ## 3. Scope
 
@@ -103,7 +107,7 @@ documentation branch.
 | TC-AUD-002 | [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–4 and 6 met on 5/5 measured runs. Criterion 5 stores operator-reported hashes. Criterion 7 not triggered. Not closed. | Commit `88a95d5` on `fix/audio-capture-stream-shutdown` at the time of the run. Later `origin/develop` is `1b81442`, which merges that fix. The measured revision is unchanged. Device `voicestock_mic`. Duration error about −56.2 ms, tolerance **TO BE DEFINED**. `throttled=0x50005` at the later inventory. Review NOT_REVIEWED. WAV files remain on the Pi. |
 | TC-PTT-001 | [EX-TC-PTT-001-20261103-01](executions/EX-TC-PTT-001-20261103-01.md); [EX-TC-PTT-001-20261103-02](executions/EX-TC-PTT-001-20261103-02.md) | FAILED, then FAILED | Attempt 02: 3 measured WAV files, 1 channel, width 2, 16000 Hz, `RELEASED`, files retained. Operator heard all three. Not closed. | Attempt 01: microphone muted; listening not verified; not a demonstrated software defect. Attempt 02 phrase match and defect columns not separately confirmed. Both ran while [EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md) was **FAILED**. PC not contacted. `develop` at `1b81442`. |
 | TC-PTT-002 | [EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md) | BLOCKED | 3 `MAX_DURATION` and 3 later `RELEASED`. No extra file while held. Format 6/6. Not closed. | Second mechanical press **NOT APPLICABLE**. Header duration 1.984 s versus 2 s. Error −16 ms. Gate **TO BE DEFINED**. Prerequisite TC-PTT-001 remains **FAILED**. Not a product failure of the limit. |
-| TC-NET-001 | none | DESIGNED | | |
+| TC-NET-001 | [EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md) | FAILED | Script exited before any VoiceStock profile. Criteria 1–4 not executed. Not closed. | `wlan0` state `100 (connected)`. Pattern `10*` in `require_managed`. Incident OPEN. PC script not run. Ethernet left up for SSH. No ping. |
 | TC-NET-002 | none | DESIGNED | | |
 | TC-NET-003 | none | DESIGNED | | |
 | TC-COM-001 | none | DESIGNED | | |
@@ -197,6 +201,13 @@ is still **FAILED**. The three `MAX_DURATION` holds and three later
 `RELEASED` holds are in that record. No incident file was opened. The
 duration-limit behavior is not recorded as a product failure.
 
+[EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md) is
+**FAILED** and links
+[INC-EX-TC-NET-001-20261103-01-01](executions/INC-EX-TC-NET-001-20261103-01-01.md),
+which is **OPEN**. `require_managed` treated `100 (connected)` as
+unmanaged because the shell pattern is `10*`. The access point was not
+activated. The incident is not closed.
+
 [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) opened
 no incident.
 
@@ -272,6 +283,14 @@ execution was already **FAILED**. The second mechanical press was not
 possible on the momentary switch. WAV files were not copied into Git.
 Checksums are operator-reported.
 
+For EX-TC-NET-001-20261103-01: the Pi checkout is `develop` at
+`1b814424b560cafb406ce7069011ba962a5fb82b`. A clean worktree was reported
+earlier that day. This failed run did not capture a new `git status`.
+Ethernet `eth0` stayed connected for SSH. That default route is a limit
+for a later isolation test. It is not the cause of the script error. The
+PC script was not run. No transcript hash was supplied. The setup script
+was not modified.
+
 ## 9. Conclusions
 
 Do not write a conclusion, a pass claim, or a recommendation that the
@@ -319,6 +338,11 @@ What this summary can say now:
   TC-PTT-001 is still **FAILED**. A second mechanical press was not
   possible while the switch stayed down. The duration error of −16 ms has
   no acceptance gate yet;
+- TC-NET-001 has one execution on 3 November 2026. The access-point script
+  exited because `10*` matched `100 (connected)`. The execution is
+  **FAILED** and not closed. The incident is **OPEN**. Criteria 1–4 were
+  not executed. No ping was run. TC-NET-002 and TC-NET-003 remain
+  unexecuted;
 - the default PC audio stub cannot create a pending operation;
 - simulated end-to-end execution is blocked on a fixture that is specified
   and not implemented;
@@ -336,8 +360,8 @@ dates were scheduling targets. They are not entries in the table below.
 EX-TC-ENV-001-20261027-01, EX-TC-GPIO-001-20261027-01,
 EX-TC-GPIO-001-20261027-02, and EX-TC-AUD-001-20261027-01 were recorded on
 27 October 2026. EX-TC-AUD-002-20261103-01, EX-TC-GPIO-001-20261103-01,
-EX-TC-PTT-001-20261103-01, EX-TC-PTT-001-20261103-02, and
-EX-TC-PTT-002-20261103-01 were recorded on 3 November 2026.
+EX-TC-PTT-001-20261103-01, EX-TC-PTT-001-20261103-02, EX-TC-PTT-002-20261103-01, and
+EX-TC-NET-001-20261103-01 were recorded on 3 November 2026.
 This change does not add a bitácora section for either day. The table stays
 empty until a real daily bitácora section exists. Unfinished cases stay
 pending or blocked. They are not marked complete to match a planned date.

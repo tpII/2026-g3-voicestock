@@ -12,6 +12,8 @@ Filed executions:
 - [EX-TC-PTT-001-20261103-01.md](EX-TC-PTT-001-20261103-01.md) — **FAILED**. Four button captures with the printed WAV format. Microphone muted. Listening not verified. Not a closed fail.
 - [EX-TC-PTT-001-20261103-02.md](EX-TC-PTT-001-20261103-02.md) — **FAILED**. Three measured WAV files at the contract, heard by the operator. Phrase-match and defect columns not separately confirmed. GPIO prerequisite unmet. Not a closed fail.
 - [EX-TC-PTT-002-20261103-01.md](EX-TC-PTT-002-20261103-01.md) — **BLOCKED**. Three `MAX_DURATION` captures and three later `RELEASED` captures. Second mechanical press not applicable. TC-PTT-001 prerequisite unmet. Not a product failure of the duration limit. Not closed.
+- [EX-TC-NET-001-20261103-01.md](EX-TC-NET-001-20261103-01.md) — **FAILED**. Access-point script rejected connected `wlan0`. Not a closed fail. Not a traffic result.
+- [INC-EX-TC-NET-001-20261103-01-01.md](INC-EX-TC-NET-001-20261103-01-01.md) — **OPEN**. `require_managed` pattern `10*` matches `100 (connected)`. Fix not deployed.
 
 Add one Markdown file per run:
 

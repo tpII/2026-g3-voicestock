@@ -11,8 +11,9 @@ use the resulting addresses. They do not choose the network.
 | Area | Status |
 | --- | --- |
 | Topology | Revised on 2026-10-11: isolated Wi-Fi access point on the Raspberry Pi 3, with two Wi-Fi interfaces on the PC. |
+| Access-point process | Revised on 2026-11-03: `hostapd` on the Pi. NetworkManager remains the Arch client and the Pi's manager for other interfaces. See [ADR-0012](../decisions/0012-run-the-voicestock-access-point-with-hostapd.md). |
 | Addressing | Kept: static `192.168.50.0/24`. Raspberry Pi `192.168.50.1/24`. PC `192.168.50.2/24`. |
-| Physical validation | Pending. LocalNetworkInfra-04 has not been run on the project hardware. |
+| Physical validation | A manual `hostapd` session on 2026-11-03 authenticated two clients. The persistent installer has not had a new hardware run. LocalNetworkInfra-04 is not closed. |
 
 ## Purpose
 
@@ -184,10 +185,12 @@ The Raspberry Pi 3 radio is used in one role only. It advertises `VoiceStock`
 on 2.4 GHz. The Pi 3 does not provide a 5 GHz radio, and the architecture
 does not ask it to join another network at the same time.
 
-Static addresses stay simpler than DHCP for two known hosts. NetworkManager
-on the Pi and on the reference PC (Arch Linux) can hold a persistent profile
-without `hostapd` or `dnsmasq`. Those extra services would have been a DHCP
-or access-point stack the design does not need.
+Static addresses stay simpler than DHCP for two known hosts. The first
+implementation kept both ends in NetworkManager and did not install
+`hostapd` or `dnsmasq`. On 3 November 2026 that access-point path failed
+WPA2 negotiation on the Pi radio. [ADR-0012](../decisions/0012-run-the-voicestock-access-point-with-hostapd.md)
+moves only the access point to `hostapd`. The address is still static.
+`dnsmasq` is still not used. The PC client stays on NetworkManager.
 
 The same address pair is kept so `RaspberryPiPCCommunication` does not change
 because the medium changed. The application still talks to `192.168.50.2`
@@ -221,15 +224,16 @@ receives that interface as an explicit argument.
 DHCP would add a service in order to hand out two addresses that are already
 known. NAT, forwarding, bridging, and Internet Connection Sharing would turn
 the VoiceStock cell into a path beyond the two hosts. None of those belong
-in this feature. The access point is configured with NetworkManager's manual
-IPv4 method, not with the shared method that starts DHCP and masquerading.
+in this feature. The access point does not use NetworkManager's shared IPv4
+method, which would start DHCP and masquerading.
 
 ## Requirements now in force
 
 - The Raspberry Pi Wi-Fi interface runs only as the `VoiceStock` access
-  point, using NetworkManager profile `voicestock-ap`.
+  point, using `hostapd`. NetworkManager does not manage that interface.
 - The PC VoiceStock interface is chosen explicitly and is configured only by
-  NetworkManager profile `voicestock-client` on Arch Linux.
+  NetworkManager profile `voicestock-client` on Arch Linux. The profile is
+  bound by interface name, not by a MAC address copied from sysfs.
 - Subnet `192.168.50.0/24`, Raspberry Pi `192.168.50.1/24`, PC
   `192.168.50.2/24`.
 - WPA2-PSK, 2.4 GHz, IPv4 only, static addresses, autoconnect enabled.
@@ -261,12 +265,13 @@ PC
             Raspberry Pi 3 access point
 ```
 
-The Raspberry Pi profile `voicestock-ap` has static IPv4 `192.168.50.1/24`,
-no gateway, no DNS, IPv6 disabled, and `ipv4.never-default`. The PC profile
-`voicestock-client` has static IPv4 `192.168.50.2/24` on the interface the
-operator named, with the same restrictions. Checking that the two addresses
-can reach each other, and that the PC still has Internet, is
-LocalNetworkInfra-04. This research does not claim that check was done.
+The Raspberry Pi access point is `hostapd` on the Wi-Fi interface, with
+static IPv4 `192.168.50.1/24`, no gateway, no DNS, and no default route on
+that interface. The PC profile `voicestock-client` has static IPv4
+`192.168.50.2/24` on the interface the operator named, with the same
+restrictions. Checking that the two addresses can reach each other, and
+that the PC still has Internet, is LocalNetworkInfra-04. This research
+does not claim that check was done.
 
 ## Limitations
 
@@ -302,3 +307,5 @@ the Raspberry Pi an Internet path.
   `192.168.50.0/24` sits inside the private `192.168.0.0/16` block defined there.
 - [ADR-0010](../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md),
   the decision record for this revision.
+- [ADR-0012](../decisions/0012-run-the-voicestock-access-point-with-hostapd.md),
+  the access-point process. The topology in ADR-0010 stays in force.

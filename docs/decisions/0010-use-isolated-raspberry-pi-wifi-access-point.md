@@ -5,6 +5,10 @@
 Accepted. Renumbered from ADR-0004 on 23 October 2026. That number is kept by
 the interpretation-provider decision. The network decision itself is unchanged.
 
+[ADR-0012](0012-run-the-voicestock-access-point-with-hostapd.md) names
+`hostapd` as the access-point process. It does not change the topology in
+this record.
+
 ## Context
 
 VoiceStock needs a private IPv4 link between the Raspberry Pi 3 and the PC.

@@ -103,7 +103,11 @@ at **PASSED_PENDING_DOCUMENTATION**. It is not **CLOSED_PASSED**.
 at **PASSED_PENDING_DOCUMENTATION** on procedure version 1. The silent
 peer was a Python listener, not the `ncat` example. Procedure version 2
 was written afterward and is not applied to that run. It is not
-**CLOSED_PASSED**. None of these cases is
+**CLOSED_PASSED**.
+[TC-WEB-001](test-cases/TC-WEB-001.md) has
+[EX-TC-WEB-001-20261103-01](executions/EX-TC-WEB-001-20261103-01.md)
+at **PASSED_PENDING_DOCUMENTATION**. It is not **CLOSED_PASSED**.
+What is still blocked is in [readiness.md](readiness.md). None of these cases is
 **CLOSED_PASSED**. The other cases are unexecuted. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
 without evidence, are in the [test plan](test-plan.md#status-model).
 
@@ -116,6 +120,7 @@ docs/testing/raspberry-validation/
 ├── traceability-matrix.md
 ├── measurement-methodology.md
 ├── summary.md
+├── readiness.md
 ├── fixtures/
 ├── test-cases/
 ├── templates/

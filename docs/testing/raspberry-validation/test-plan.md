@@ -103,6 +103,11 @@ in [TC-COM-003](test-cases/TC-COM-003.md) was written after that execution
 and is not applied to it. The run is **PASSED_PENDING_DOCUMENTATION** and
 not **CLOSED_PASSED**.
 
+Which later cases can start, and which stay blocked on the missing PC
+contract entry point, is in [readiness.md](readiness.md). That note does
+not change the fixture rules in this plan and does not implement the entry
+point.
+
 The project bitácora is not part of this order. Execution records, the
 summary, and this campaign's traceability are updated as each case
 finishes. [The bitácora](README.md#bitácora) is appended once at the end of

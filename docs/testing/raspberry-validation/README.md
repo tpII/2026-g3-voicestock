@@ -2,12 +2,11 @@
 
 This campaign specifies how to show that the Raspberry Pi subsystem runs on
 the real board and that its components integrate. It is a test specification.
-It does not contain measurements, logs, or execution results.
+Measurements live in execution records, not in this README.
 
-No test in this campaign has been executed. Automated tests, mocks, and
-earlier development sessions are not evidence for these cases. Passing a
-software test does not show that a GPIO pin, a USB microphone, or the
-VoiceStock Wi-Fi cell works.
+Automated tests, mocks, and earlier development sessions are not evidence
+for these cases. Passing a software test does not show that a GPIO pin, a
+USB microphone, or the VoiceStock Wi-Fi cell works.
 
 The language of this campaign follows the Raspberry Pi setup and architecture
 documents it cites. Session notes in the project log stay in Spanish; see
@@ -66,6 +65,8 @@ has [EX-TC-GPIO-001-20261027-01](executions/EX-TC-GPIO-001-20261027-01.md)
 [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md)
 (**FAILED**). [TC-AUD-001](test-cases/TC-AUD-001.md) has
 [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md)
+at **PASSED_PENDING_DOCUMENTATION**. [TC-AUD-002](test-cases/TC-AUD-002.md)
+has [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md)
 at **PASSED_PENDING_DOCUMENTATION**. None of these cases is
 **CLOSED_PASSED**. The other cases are unexecuted. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
 without evidence, are in the [test plan](test-plan.md#status-model).
@@ -87,8 +88,9 @@ docs/testing/raspberry-validation/
 └── results/
 ```
 
-`executions/`, `evidence/`, and `results/` are reserved for future runs.
-Their READMEs are the retention rules. They do not hold results yet.
+`executions/` holds the records that have been filed. `evidence/` and
+`results/` still have no closed-run sheet. Their READMEs are the retention
+rules.
 `fixtures/` holds specification inputs (the campaign catalog and contract
 examples). Those files are not recordings and they are not evidence that a
 test ran.

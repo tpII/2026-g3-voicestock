@@ -1,7 +1,7 @@
 # TC-AUD-002 — VoiceStock audio capture and WAV integrity
 
 - Status: DESIGNED
-- Executions: none
+- Executions: [EX-TC-AUD-002-20261103-01](../executions/EX-TC-AUD-002-20261103-01.md) (`PASSED_PENDING_DOCUMENTATION`, not closed). Diagnostic history: [INC-EX-TC-AUD-002-20261103-01-01](../executions/INC-EX-TC-AUD-002-20261103-01-01.md).
 - Procedure version: 1
 
 ## Objective

@@ -1,9 +1,10 @@
 # Campaign summary
 
 This file is the outline of a later technical report. It is not the report
-of a finished experiment. One baseline execution, two GPIO executions, and
-one microphone-enumeration execution are recorded. TC-ENV-001, TC-GPIO-001,
-and TC-AUD-001 are not closed. The other cases have no measurements.
+of a finished experiment. One baseline execution, two GPIO executions, one
+microphone-enumeration execution, and one WAV-capture execution are
+recorded. TC-ENV-001, TC-GPIO-001, TC-AUD-001, and TC-AUD-002 are not
+closed. The other cases have no measurements.
 
 Campaign status: **IN_PROGRESS**.
 
@@ -39,6 +40,9 @@ Recorded executions:
   extract still contains nine `PRESSED` lines and nine `RELEASED` lines.
 - [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md),
   **PASSED_PENDING_DOCUMENTATION**. Enumeration only. Not a WAV result.
+- [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md),
+  **PASSED_PENDING_DOCUMENTATION**. Five measured WAV captures. Not closed.
+  Review NOT_REVIEWED.
 
 ## 3. Scope
 
@@ -83,7 +87,7 @@ documentation branch.
 | TC-ENV-001 | [EX-TC-ENV-001-20261027-01](executions/EX-TC-ENV-001-20261027-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–5 met. Not closed. | Pi baseline only. No raw transcript. Review NOT_REVIEWED. `get_throttled` `0x50000` on 15 readings. |
 | TC-GPIO-001 | [EX-TC-GPIO-001-20261027-01](executions/EX-TC-GPIO-001-20261027-01.md); [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md) | BLOCKED, then FAILED | Attempt 02 extract: 9 `PRESSED` and 9 `RELEASED`, alternating, no missing pair. Not closed. | Attempt 01 stopped before `READY` (`OSError: [Errno 22] Invalid argument`). Attempt 02 omitted the practice action. Pause and idle intervals: not measured. Logs remain on the Pi. |
 | TC-AUD-001 | [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–4 met. Not closed. | G435 in 3 of 3 plugged lists, absent while unplugged. Query: `G435 Wireless Gaming Headset: USB Audio (hw:2,0)`. Default rate 48000 Hz. Detection latency NOT MEASURED. Logs remain on the Pi. |
-| TC-AUD-002 | none | DESIGNED | | |
+| TC-AUD-002 | [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–4 and 6 met on 5/5 measured runs. Criterion 5 stores operator-reported hashes. Criterion 7 not triggered. Not closed. | Commit `88a95d5` on `fix/audio-capture-stream-shutdown`, not merged to `develop`. Device `voicestock_mic`. Duration error about −56.2 ms, tolerance **TO BE DEFINED**. `throttled=0x50005`. Review NOT_REVIEWED. WAV files remain on the Pi. |
 | TC-PTT-001 | none | DESIGNED | | |
 | TC-PTT-002 | none | DESIGNED | | |
 | TC-NET-001 | none | DESIGNED | | |
@@ -111,6 +115,22 @@ Git. Display rounding is one decimal place, in milliseconds.
 
 No hold limit is defined. This row is not an acceptance result.
 
+Formal TC-AUD-002 durations for
+[EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md).
+The warm-up is excluded. The source is the raw six-decimal second table in
+that record. Display here is milliseconds to three decimal places, because
+one decimal place prints the hold and duration-error standard deviations
+as 0.0. No duration-error limit is defined. These rows are not a closed
+pass.
+
+| Metric | n | Unit | Mean | Median | Stdev | Min | Max |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Start | 5 | ms | 30.915 | 30.708 | 0.606 | 30.324 | 31.599 |
+| Hold | 5 | ms | 3000.218 | 3000.208 | 0.027 | 3000.203 | 3000.266 |
+| Stop | 5 | ms | 2.892 | 2.904 | 0.083 | 2.800 | 3.011 |
+| WAV header duration | 5 | ms | 2944.000 | 2944.000 | 0.000 | 2944.000 | 2944.000 |
+| Duration error | 5 | ms | -56.218 | -56.208 | 0.027 | -56.266 | -56.203 |
+
 ## 7. Incidents
 
 [EX-TC-ENV-001-20261027-01](executions/EX-TC-ENV-001-20261027-01.md) opened
@@ -128,8 +148,19 @@ the native GPIO backend before any press. No incident file was opened.
 file was opened.
 
 [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) opened
-no incident. The remaining cases have not been executed. This section
-does not mean the product has no defects.
+no incident.
+
+[EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md) links
+[INC-EX-TC-AUD-002-20261103-01-01](executions/INC-EX-TC-AUD-002-20261103-01-01.md).
+That incident records a blocked PortAudio `read()` before the callback
+fix, then a worker blocked in `stream.close()` after the first fix, then
+the second lifecycle correction on `022e2a6` and `88a95d5`. It is an
+observation about earlier revisions. It does not fail the five measured
+runs. It does not name a single proven PortAudio or queue defect.
+`throttled=0x50005` is not identified as the cause of those blocks.
+
+The remaining cases have not been executed. This section does not mean the
+product has no defects.
 
 ## 8. Deviations from the specification
 
@@ -153,6 +184,18 @@ For EX-TC-AUD-001-20261027-01: the Pi checkout is the same `develop`
 commit. USB port, hub, operator, and worktree status were not recorded.
 The three raw logs were not copied into Git. Their SHA-256 values are
 operator-reported.
+
+For EX-TC-AUD-002-20261103-01: the Pi checkout is
+`fix/audio-capture-stream-shutdown` at
+`88a95d5754c72f419adb3461348161fa09f7ce8d`, with a clean worktree. That
+branch was not merged into `develop`. The capture device was
+`voicestock_mic`, an ALSA `plug` device, not the TC-AUD-001 hardware name.
+`vcgencmd get_throttled` was `0x50005` at the evidence inventory. The
+supply description, several package versions, the operator, and the
+session start and end were not recorded. WAV files and raw logs were not
+copied into Git. Supplied SHA-256 values are operator-reported. No
+inventory-log hash is stored. The duration-error tolerance stays
+**TO BE DEFINED**.
 
 ## 9. Conclusions
 
@@ -178,6 +221,11 @@ What this summary can say now:
   3 plugged listings and recorded the name query
   `G435 Wireless Gaming Headset: USB Audio (hw:2,0)`. That execution does
   not record a WAV, a 16 kHz contract, or acoustic quality;
+- TC-AUD-002 has one execution on 3 November 2026. Five of five measured
+  runs published a WAV at 1 channel, sample width 2, and 16000 Hz. The
+  execution is not closed. Review is NOT_REVIEWED. Speech intelligibility
+  and quantitative audio quality were not evaluated. The code under test
+  was still on `fix/audio-capture-stream-shutdown`;
 - the default PC audio stub cannot create a pending operation;
 - simulated end-to-end execution is blocked on a fixture that is specified
   and not implemented;
@@ -194,10 +242,10 @@ The campaign was planned for 23 October 2026 and 24 October 2026. Those
 dates were scheduling targets. They are not entries in the table below.
 EX-TC-ENV-001-20261027-01, EX-TC-GPIO-001-20261027-01,
 EX-TC-GPIO-001-20261027-02, and EX-TC-AUD-001-20261027-01 were recorded on
-27 October 2026. This change does not add a bitácora section for that day
-or for any other day. The table stays empty until a real daily bitácora
-section exists. Unfinished cases stay pending or blocked. They are not
-marked complete to match a planned date.
+27 October 2026. EX-TC-AUD-002-20261103-01 was recorded on 3 November 2026.
+This change does not add a bitácora section for either day. The table stays
+empty until a real daily bitácora section exists. Unfinished cases stay
+pending or blocked. They are not marked complete to match a planned date.
 
 | Date | Bitácora section | Executions |
 | --- | --- | --- |

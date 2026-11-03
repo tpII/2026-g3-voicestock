@@ -2,10 +2,10 @@
 
 This file is the outline of a later technical report. It is not the report
 of a finished experiment. One baseline execution, three GPIO executions,
-one microphone-enumeration execution, one WAV-capture execution, and two
-push-to-talk executions are recorded. TC-ENV-001, TC-GPIO-001, TC-AUD-001,
-TC-AUD-002, and TC-PTT-001 are not closed. The other cases have no
-measurements.
+one microphone-enumeration execution, one WAV-capture execution, two
+push-to-talk executions, and one maximum-duration execution are recorded.
+TC-ENV-001, TC-GPIO-001, TC-AUD-001, TC-AUD-002, TC-PTT-001, and TC-PTT-002
+are not closed. The other cases have no measurements.
 
 Campaign status: **IN_PROGRESS**.
 
@@ -53,6 +53,9 @@ Recorded executions:
 - [EX-TC-PTT-001-20261103-02](executions/EX-TC-PTT-001-20261103-02.md),
   **FAILED**. WAV contract met and the three measured files were heard.
   Listening table incomplete. GPIO prerequisite unmet. Not closed.
+- [EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md),
+  **BLOCKED**. Max-duration observations met. TC-PTT-001 prerequisite
+  unmet. Not a product failure of the duration limit. Not closed.
 
 ## 3. Scope
 
@@ -99,7 +102,7 @@ documentation branch.
 | TC-AUD-001 | [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–4 met. Not closed. | G435 in 3 of 3 plugged lists, absent while unplugged. Query: `G435 Wireless Gaming Headset: USB Audio (hw:2,0)`. Default rate 48000 Hz. Detection latency NOT MEASURED. Logs remain on the Pi. |
 | TC-AUD-002 | [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–4 and 6 met on 5/5 measured runs. Criterion 5 stores operator-reported hashes. Criterion 7 not triggered. Not closed. | Commit `88a95d5` on `fix/audio-capture-stream-shutdown` at the time of the run. Later `origin/develop` is `1b81442`, which merges that fix. The measured revision is unchanged. Device `voicestock_mic`. Duration error about −56.2 ms, tolerance **TO BE DEFINED**. `throttled=0x50005` at the later inventory. Review NOT_REVIEWED. WAV files remain on the Pi. |
 | TC-PTT-001 | [EX-TC-PTT-001-20261103-01](executions/EX-TC-PTT-001-20261103-01.md); [EX-TC-PTT-001-20261103-02](executions/EX-TC-PTT-001-20261103-02.md) | FAILED, then FAILED | Attempt 02: 3 measured WAV files, 1 channel, width 2, 16000 Hz, `RELEASED`, files retained. Operator heard all three. Not closed. | Attempt 01: microphone muted; listening not verified; not a demonstrated software defect. Attempt 02 phrase match and defect columns not separately confirmed. Both ran while [EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md) was **FAILED**. PC not contacted. `develop` at `1b81442`. |
-| TC-PTT-002 | none | DESIGNED | | |
+| TC-PTT-002 | [EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md) | BLOCKED | 3 `MAX_DURATION` and 3 later `RELEASED`. No extra file while held. Format 6/6. Not closed. | Second mechanical press **NOT APPLICABLE**. Header duration 1.984 s versus 2 s. Error −16 ms. Gate **TO BE DEFINED**. Prerequisite TC-PTT-001 remains **FAILED**. Not a product failure of the limit. |
 | TC-NET-001 | none | DESIGNED | | |
 | TC-NET-002 | none | DESIGNED | | |
 | TC-NET-003 | none | DESIGNED | | |
@@ -188,6 +191,12 @@ because the GPIO prerequisite was unmet. The WAV contract observations
 remain in that record. No incident file was opened. No HTTP transport was
 tested.
 
+[EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md) is
+**BLOCKED** because [EX-TC-PTT-001-20261103-02](executions/EX-TC-PTT-001-20261103-02.md)
+is still **FAILED**. The three `MAX_DURATION` holds and three later
+`RELEASED` holds are in that record. No incident file was opened. The
+duration-limit behavior is not recorded as a product failure.
+
 [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) opened
 no incident.
 
@@ -253,7 +262,15 @@ For both TC-PTT-001 executions on 3 November 2026: the Pi checkout is
 not used. The input device was `voicestock_mic`. The latest TC-GPIO-001
 execution was already **FAILED**, so the formal prerequisite was unmet.
 WAV files were not copied into Git. Attempt 02 checksums are
-operator-reported. Attempt 01 has no supplied checksums or `wave` fields.
+operator-reported. Attempt 01 has no supplied checksums or `wave` fields. The observed
+`.wav` paths for both attempts are in those execution records.
+
+For EX-TC-PTT-002-20261103-01: the Pi checkout is the same `develop`
+commit, checked clean after the run. `--max-duration` was 2 seconds for
+this process only. `--send-to-pc` was not used. The latest TC-PTT-001
+execution was already **FAILED**. The second mechanical press was not
+possible on the momentary switch. WAV files were not copied into Git.
+Checksums are operator-reported.
 
 ## 9. Conclusions
 
@@ -296,6 +313,12 @@ What this summary can say now:
   separately confirmed. Both attempts ran while TC-GPIO-001 attempt 03 was
   **FAILED**, so another PTT execution is still required after that
   prerequisite is met. PC communication was not tested;
+- TC-PTT-002 has one execution on 3 November 2026. The three long holds
+  stopped with one `MAX_DURATION` file each, and the three following holds
+  printed `RELEASED`. The execution is **BLOCKED**, not closed, because
+  TC-PTT-001 is still **FAILED**. A second mechanical press was not
+  possible while the switch stayed down. The duration error of −16 ms has
+  no acceptance gate yet;
 - the default PC audio stub cannot create a pending operation;
 - simulated end-to-end execution is blocked on a fixture that is specified
   and not implemented;
@@ -313,8 +336,8 @@ dates were scheduling targets. They are not entries in the table below.
 EX-TC-ENV-001-20261027-01, EX-TC-GPIO-001-20261027-01,
 EX-TC-GPIO-001-20261027-02, and EX-TC-AUD-001-20261027-01 were recorded on
 27 October 2026. EX-TC-AUD-002-20261103-01, EX-TC-GPIO-001-20261103-01,
-EX-TC-PTT-001-20261103-01, and EX-TC-PTT-001-20261103-02 were recorded on
-3 November 2026.
+EX-TC-PTT-001-20261103-01, EX-TC-PTT-001-20261103-02, and
+EX-TC-PTT-002-20261103-01 were recorded on 3 November 2026.
 This change does not add a bitácora section for either day. The table stays
 empty until a real daily bitácora section exists. Unfinished cases stay
 pending or blocked. They are not marked complete to match a planned date.

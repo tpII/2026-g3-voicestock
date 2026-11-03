@@ -1,7 +1,7 @@
 # TC-PTT-002 — Maximum duration and ignored extra presses
 
 - Status: DESIGNED
-- Executions: none
+- Executions: [EX-TC-PTT-002-20261103-01](../executions/EX-TC-PTT-002-20261103-01.md) (`BLOCKED`, functional max-duration observations met, TC-PTT-001 prerequisite unmet, not closed)
 - Procedure version: 1
 
 ## Objective

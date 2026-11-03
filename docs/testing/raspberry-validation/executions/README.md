@@ -11,6 +11,7 @@ Filed executions:
 - [INC-EX-TC-AUD-002-20261103-01-01.md](INC-EX-TC-AUD-002-20261103-01-01.md) — observation. Earlier blocked `read()` and blocked worker `close()`, then two fix iterations. Does not fail the five measured runs.
 - [EX-TC-PTT-001-20261103-01.md](EX-TC-PTT-001-20261103-01.md) — **FAILED**. Four button captures with the printed WAV format. Microphone muted. Listening not verified. Not a closed fail.
 - [EX-TC-PTT-001-20261103-02.md](EX-TC-PTT-001-20261103-02.md) — **FAILED**. Three measured WAV files at the contract, heard by the operator. Phrase-match and defect columns not separately confirmed. GPIO prerequisite unmet. Not a closed fail.
+- [EX-TC-PTT-002-20261103-01.md](EX-TC-PTT-002-20261103-01.md) — **BLOCKED**. Three `MAX_DURATION` captures and three later `RELEASED` captures. Second mechanical press not applicable. TC-PTT-001 prerequisite unmet. Not a product failure of the duration limit. Not closed.
 
 Add one Markdown file per run:
 

@@ -9,7 +9,9 @@ No results sheet has been filed.
 **FAILED** and not **CLOSED_FAILED**.
 [EX-TC-PTT-001-20261103-01](../executions/EX-TC-PTT-001-20261103-01.md) and
 [EX-TC-PTT-001-20261103-02](../executions/EX-TC-PTT-001-20261103-02.md) are
-**FAILED** and not **CLOSED_FAILED**. Per-run numbers stay in the execution
+**FAILED** and not **CLOSED_FAILED**.
+[EX-TC-PTT-002-20261103-01](../executions/EX-TC-PTT-002-20261103-01.md) is
+**BLOCKED** and not **CLOSED_PASSED**. Per-run numbers stay in the execution
 records.
 
 This directory is for a summary sheet only after at least one execution is

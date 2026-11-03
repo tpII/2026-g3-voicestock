@@ -73,7 +73,9 @@ has [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md)
 at **PASSED_PENDING_DOCUMENTATION**. [TC-PTT-001](test-cases/TC-PTT-001.md)
 has [EX-TC-PTT-001-20261103-01](executions/EX-TC-PTT-001-20261103-01.md)
 and [EX-TC-PTT-001-20261103-02](executions/EX-TC-PTT-001-20261103-02.md),
-both **FAILED** and not closed. None of these cases is
+both **FAILED** and not closed. [TC-PTT-002](test-cases/TC-PTT-002.md)
+has [EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md)
+at **BLOCKED**. None of these cases is
 **CLOSED_PASSED**. The other cases are unexecuted. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
 without evidence, are in the [test plan](test-plan.md#status-model).
 

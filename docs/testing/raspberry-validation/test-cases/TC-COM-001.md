@@ -1,7 +1,7 @@
 # TC-COM-001 — Raspberry Pi HTTP client
 
 - Status: DESIGNED
-- Executions: none
+- Executions: [EX-TC-COM-001-20261103-01](../executions/EX-TC-COM-001-20261103-01.md) (`PASSED_PENDING_DOCUMENTATION`; technical text HTTP PASSED; evidence pending; procedure version 1; review NOT_REVIEWED; not `CLOSED_PASSED`)
 - Procedure version: 1
 
 ## Objective

@@ -91,7 +91,11 @@ at **PASSED_PENDING_DOCUMENTATION**. It is not **CLOSED_PASSED**.
 [TC-NET-003](test-cases/TC-NET-003.md) has
 [EX-TC-NET-003-20261103-01](executions/EX-TC-NET-003-20261103-01.md)
 at **PASSED_PENDING_DOCUMENTATION** on procedure version 2. It is not
-**CLOSED_PASSED**. Procedure version 1 of that case was not run. None of these cases is
+**CLOSED_PASSED**. Procedure version 1 of that case was not run.
+[TC-COM-001](test-cases/TC-COM-001.md) has
+[EX-TC-COM-001-20261103-01](executions/EX-TC-COM-001-20261103-01.md)
+at **PASSED_PENDING_DOCUMENTATION**. It is not **CLOSED_PASSED**.
+TC-COM-002 and TC-COM-003 are unexecuted. None of these cases is
 **CLOSED_PASSED**. The other cases are unexecuted. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
 without evidence, are in the [test plan](test-plan.md#status-model).
 

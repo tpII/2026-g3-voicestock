@@ -3,7 +3,9 @@
 Rules for every execution in this campaign. A case may add a metric. It may
 not replace these rules with a single untimed impression.
 
-No sample in this repository was collected under this methodology. Empty
+Some execution records now contain samples taken under these rules. That
+does not certify every earlier record. A run that omitted a clock, a
+warm-up, a raw transcript, or an interval stays as it was written. Empty
 tables stay empty until an execution record fills them.
 
 ## Sample size

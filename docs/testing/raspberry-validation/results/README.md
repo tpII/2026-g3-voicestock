@@ -7,6 +7,8 @@ No results sheet has been filed.
 **CLOSED_FAILED**, so it does not add a sheet here.
 [EX-TC-GPIO-001-20261103-01](../executions/EX-TC-GPIO-001-20261103-01.md) is
 **FAILED** and not **CLOSED_FAILED**.
+[EX-TC-GPIO-001-20261104-01](../executions/EX-TC-GPIO-001-20261104-01.md) is
+**PASSED_PENDING_DOCUMENTATION** and does not add a closed sheet.
 [EX-TC-PTT-001-20261103-01](../executions/EX-TC-PTT-001-20261103-01.md) and
 [EX-TC-PTT-001-20261103-02](../executions/EX-TC-PTT-001-20261103-02.md) are
 **FAILED** and not **CLOSED_FAILED**.

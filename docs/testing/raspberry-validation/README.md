@@ -87,7 +87,11 @@ has [EX-TC-GPIO-001-20261027-01](executions/EX-TC-GPIO-001-20261027-01.md)
 [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md)
 (**FAILED**), and
 [EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md)
-(**FAILED**; measured GPIO events met, cleanup not verified).
+(**FAILED**; measured GPIO events met, cleanup not verified), and
+[EX-TC-GPIO-001-20261104-01](executions/EX-TC-GPIO-001-20261104-01.md)
+(**PASSED_PENDING_DOCUMENTATION**; latest; technical result PASSED;
+cleanup evidenced; quiet-interval durations not instrumented; not
+**CLOSED_PASSED**). The three earlier GPIO results are unchanged.
 [TC-AUD-001](test-cases/TC-AUD-001.md) has
 [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md)
 at **PASSED_PENDING_DOCUMENTATION**. [TC-AUD-002](test-cases/TC-AUD-002.md)

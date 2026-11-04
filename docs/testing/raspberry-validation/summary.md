@@ -1,7 +1,7 @@
 # Campaign summary
 
 This file is the outline of a later technical report. It is not the report
-of a finished experiment. One baseline execution, three GPIO executions,
+of a finished experiment. One baseline execution, four GPIO executions,
 one microphone-enumeration execution, one WAV-capture execution, two
 push-to-talk executions, one maximum-duration execution, and three
 access-point executions are recorded, plus one connectivity execution and
@@ -73,6 +73,11 @@ Recorded executions:
   **FAILED**. Nine measured pairs, practice excluded, quiet intervals
   empty. Cleanup after Ctrl+C not verified. Not a confirmed `close()`
   defect. Not closed.
+- [EX-TC-GPIO-001-20261104-01](executions/EX-TC-GPIO-001-20261104-01.md),
+  **PASSED_PENDING_DOCUMENTATION**. Latest. Nine measured pairs, practice
+  excluded. Cleanup evidenced. Quiet-interval durations not instrumented.
+  Review NOT_REVIEWED. Not **CLOSED_PASSED**. Does not rewrite attempts
+  01–03.
 - [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md),
   **PASSED_PENDING_DOCUMENTATION**. Enumeration only. Not a WAV result.
 - [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md),
@@ -189,7 +194,7 @@ documentation branch.
 | Test | Executions | Status | Measured success | Notes |
 | --- | --- | --- | --- | --- |
 | TC-ENV-001 | [EX-TC-ENV-001-20261027-01](executions/EX-TC-ENV-001-20261027-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–5 met. Not closed. | Pi baseline only. No raw transcript. Review NOT_REVIEWED. `get_throttled` `0x50000` on 15 readings. |
-| TC-GPIO-001 | [EX-TC-GPIO-001-20261027-01](executions/EX-TC-GPIO-001-20261027-01.md); [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md); [EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md) | BLOCKED, then FAILED, then FAILED | Attempt 03: 9 measured presses and 9 releases, practice excluded, 3 pauses and 3 idles empty. Cleanup not verified. Not closed. | Attempt 01 stopped before `READY` (`OSError: [Errno 22] Invalid argument`). Attempt 02 omitted the practice action. Pause and idle intervals on attempt 02: not measured. Attempt 03 does not rewrite those results. Logs remain on the Pi. |
+| TC-GPIO-001 | [EX-TC-GPIO-001-20261027-01](executions/EX-TC-GPIO-001-20261027-01.md); [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md); [EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md); [EX-TC-GPIO-001-20261104-01](executions/EX-TC-GPIO-001-20261104-01.md) | BLOCKED, then FAILED, then FAILED, then PASSED_PENDING_DOCUMENTATION | Latest: 9 measured presses and 9 releases, practice excluded. Cleanup evidenced by `GPIO_CLOSED` and a later free GPIO17. Not closed. Review NOT_REVIEWED. | Attempts 01–03 stay BLOCKED, FAILED, and FAILED. Attempt 04 does not instrument pause and idle durations. Edge latency NOT MEASURED. |
 | TC-AUD-001 | [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–4 met. Not closed. | G435 in 3 of 3 plugged lists, absent while unplugged. Query: `G435 Wireless Gaming Headset: USB Audio (hw:2,0)`. Default rate 48000 Hz. Detection latency NOT MEASURED. Logs remain on the Pi. |
 | TC-AUD-002 | [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–4 and 6 met on 5/5 measured runs. Criterion 5 stores operator-reported hashes. Criterion 7 not triggered. Not closed. | Commit `88a95d5` on `fix/audio-capture-stream-shutdown` at the time of the run. Later `origin/develop` is `1b81442`, which merges that fix. The measured revision is unchanged. Device `voicestock_mic`. Duration error about −56.2 ms, tolerance **TO BE DEFINED**. `throttled=0x50005` at the later inventory. Review NOT_REVIEWED. WAV files remain on the Pi. |
 | TC-PTT-001 | [EX-TC-PTT-001-20261103-01](executions/EX-TC-PTT-001-20261103-01.md); [EX-TC-PTT-001-20261103-02](executions/EX-TC-PTT-001-20261103-02.md) | FAILED, then FAILED | Attempt 02: 3 measured WAV files, 1 channel, width 2, 16000 Hz, `RELEASED`, files retained. Operator heard all three. Not closed. | Attempt 01: microphone muted; listening not verified; not a demonstrated software defect. Attempt 02 phrase match and defect columns not separately confirmed. Both ran while [EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md) was **FAILED**. PC not contacted. `develop` at `1b81442`. |
@@ -269,8 +274,16 @@ file was opened.
 **FAILED** because cleanup after Ctrl+C was not verified. The measured
 press, release, pause, and idle observations are in that record. No
 incident file was opened. The missing cleanup lines are not recorded as a
-confirmed product defect. A later PTT execution does not change this
-status.
+  confirmed product defect. A later PTT execution does not change this
+  status.
+
+[EX-TC-GPIO-001-20261104-01](executions/EX-TC-GPIO-001-20261104-01.md) is
+**PASSED_PENDING_DOCUMENTATION**. It is the latest GPIO execution.
+Practice is excluded. Nine measured press/release pairs are in the
+transcript. `GPIO_CLOSED` was printed and a later check showed GPIO17
+unclaimed. Pause and idle durations were not instrumented. Review is
+NOT_REVIEWED. It is not **CLOSED_PASSED**. It does not change the three
+earlier GPIO results.
 
 [EX-TC-PTT-001-20261103-01](executions/EX-TC-PTT-001-20261103-01.md) is
 **FAILED** because the listening criterion was not met after the operator
@@ -514,6 +527,11 @@ What this summary can say now:
   Cleanup after Ctrl+C was not verified, so the execution is **FAILED**
   and is not closed. That attempt does not change the result of attempt
   01 or attempt 02;
+- TC-GPIO-001 attempt 04, on 4 November 2026, is
+  **PASSED_PENDING_DOCUMENTATION**. Nine measured pairs, practice
+  excluded, and cleanup after `close` are in that record. Pause and idle
+  durations were not instrumented. Review is NOT_REVIEWED. It does not
+  close attempts 01–03 and it does not accept TC-PTT-001;
 - whether `lgpio` belongs in the project dependency configuration is still
   open. The Pi virtual environment was changed outside the repository
   manifests;
@@ -533,8 +551,12 @@ What this summary can say now:
   was muted. Attempt 02 published three measured contract WAV files that
   the operator heard clearly. Phrase match and the defect columns were not
   separately confirmed. Both attempts ran while TC-GPIO-001 attempt 03 was
-  **FAILED**, so another PTT execution is still required after that
-  prerequisite is met. PC communication was not tested;
+  **FAILED**. Those two results stay **FAILED**.
+  [EX-TC-GPIO-001-20261104-01](executions/EX-TC-GPIO-001-20261104-01.md)
+  is later and is not **FAILED** or **BLOCKED**, so the written GPIO
+  prerequisite is met for a future PTT run. A new PTT execution is still
+  required before TC-PTT-001 can be accepted. PC communication was not
+  tested;
 - TC-PTT-002 has one execution on 3 November 2026. The three long holds
   stopped with one `MAX_DURATION` file each, and the three following holds
   printed `RELEASED`. The execution is **BLOCKED**, not closed, because

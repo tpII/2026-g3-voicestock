@@ -6,6 +6,7 @@ Filed executions:
 - [EX-TC-E2E-002-20261104-01.md](EX-TC-E2E-002-20261104-01.md) — **FAILED**. Real Groq path. N1 created a pending operation. Not **CLOSED_PASSED**. v0.5.0 decision for this test: `ACCEPTED_WITH_KNOWN_LIMITATIONS`.
 - [INC-EX-TC-E2E-002-20261104-01-01.md](INC-EX-TC-E2E-002-20261104-01-01.md) — **OPEN**. Ambiguous product command. Non-blocking for v0.5.0. Does not close the parent.
 - [EX-TC-ENV-001-20261027-01.md](EX-TC-ENV-001-20261027-01.md) — **PASSED_PENDING_DOCUMENTATION**. Not a closed pass.
+- [EX-TC-GPIO-001-20261104-01.md](EX-TC-GPIO-001-20261104-01.md) — **PASSED_PENDING_DOCUMENTATION**. Latest GPIO run. Nine measured pairs, practice excluded. `GPIO_CLOSED` and a later free GPIO17. Quiet-interval durations not instrumented. Review NOT_REVIEWED. Not **CLOSED_PASSED**. Does not rewrite the three earlier results.
 - [EX-TC-GPIO-001-20261027-01.md](EX-TC-GPIO-001-20261027-01.md) — **BLOCKED**. Constructor failed before any button action.
 - [EX-TC-GPIO-001-20261027-02.md](EX-TC-GPIO-001-20261027-02.md) — **FAILED**. Nine press and nine release callbacks in the supplied extract. Practice action omitted. Not a closed pass.
 - [EX-TC-GPIO-001-20261103-01.md](EX-TC-GPIO-001-20261103-01.md) — **FAILED**. Nine measured press/release pairs, practice excluded, pauses and idles empty. Ctrl+C cleanup not verified. Not a closed fail. Not a product-defect finding.

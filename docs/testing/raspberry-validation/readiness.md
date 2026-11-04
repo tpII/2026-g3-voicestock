@@ -61,7 +61,7 @@ need either that script or an explicit command deviation.
 
 | Case | Latest campaign result | Effect on later cases |
 | --- | --- | --- |
-| [TC-GPIO-001](test-cases/TC-GPIO-001.md) | Three executions. Latest [EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md) is **FAILED**: measured presses met, cleanup not verified. Not closed. | Not a passed GPIO baseline. |
+| [TC-GPIO-001](test-cases/TC-GPIO-001.md) | Four executions. Latest [EX-TC-GPIO-001-20261104-01](executions/EX-TC-GPIO-001-20261104-01.md) is **PASSED_PENDING_DOCUMENTATION**: 9 and 9 measured, cleanup evidenced, review NOT_REVIEWED. Attempts 01–03 stay **BLOCKED**, **FAILED**, and **FAILED**. | A future TC-PTT-001 run can cite the latest GPIO execution. The two existing PTT executions stay **FAILED** and still block FLOW and WEB-002. |
 | [TC-PTT-001](test-cases/TC-PTT-001.md) | Both executions **FAILED**. Attempt 02 met the WAV file contract and left the listening table incomplete. The GPIO prerequisite was unmet. Not closed. | [TC-FLOW-001](test-cases/TC-FLOW-001.md) and [TC-WEB-002](test-cases/TC-WEB-002.md) require a PTT result that is not **FAILED** or **BLOCKED**. That gate is not met. |
 | [TC-PTT-002](test-cases/TC-PTT-002.md) | [EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md) is **BLOCKED** because TC-PTT-001 is unmet. Functional max-duration notes in that record are not a pass. | Not a passed capture-limit result. |
 | [TC-COM-002](test-cases/TC-COM-002.md) | **PASSED_PENDING_DOCUMENTATION**, not closed. | WAV transport to the stub is evidenced. It is not contract generation. |

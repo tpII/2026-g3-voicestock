@@ -1,7 +1,7 @@
 # TC-GPIO-001 — Physical GPIO press and release
 
 - Status: DESIGNED
-- Executions: [EX-TC-GPIO-001-20261027-01](../executions/EX-TC-GPIO-001-20261027-01.md) (`BLOCKED`); [EX-TC-GPIO-001-20261027-02](../executions/EX-TC-GPIO-001-20261027-02.md) (`FAILED`, practice omitted, not closed); [EX-TC-GPIO-001-20261103-01](../executions/EX-TC-GPIO-001-20261103-01.md) (`FAILED`, measured presses and quiet intervals met, cleanup not verified, not closed)
+- Executions: [EX-TC-GPIO-001-20261027-01](../executions/EX-TC-GPIO-001-20261027-01.md) (`BLOCKED`); [EX-TC-GPIO-001-20261027-02](../executions/EX-TC-GPIO-001-20261027-02.md) (`FAILED`, practice omitted, not closed); [EX-TC-GPIO-001-20261103-01](../executions/EX-TC-GPIO-001-20261103-01.md) (`FAILED`, measured presses and quiet intervals met, cleanup not verified, not closed); [EX-TC-GPIO-001-20261104-01](../executions/EX-TC-GPIO-001-20261104-01.md) (latest; `PASSED_PENDING_DOCUMENTATION`; technical result PASSED; quiet-interval durations not instrumented; review NOT_REVIEWED; not `CLOSED_PASSED`)
 - Procedure version: 2
 
 ## Objective

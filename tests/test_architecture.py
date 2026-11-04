@@ -100,7 +100,7 @@ def test_pending_operation_does_not_import_web_libraries() -> None:
 
 
 def test_inventory_and_storage_stay_below_the_application() -> None:
-    """Stock and its database know nothing of HTTP, the cycle or the model.
+    """Stock, history and storage know nothing of HTTP, the cycle or the model.
 
     They are called by the confirmation executor and the web page, never the
     other way around, and the language model has no path to them.
@@ -120,7 +120,7 @@ def test_inventory_and_storage_stay_below_the_application() -> None:
     offending = {
         f"{name}: {module}"
         for name, modules in _imports_by_file().items()
-        if name.startswith(("pi/inventory/", "pi/storage/"))
+        if name.startswith(("pi/inventory/", "pi/movement_history/", "pi/storage/"))
         for module in modules
         if any(module == item or module.startswith(f"{item}.") for item in forbidden)
     }

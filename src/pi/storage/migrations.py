@@ -99,7 +99,90 @@ _INVENTORY_STOCK = Migration(
     ),
 )
 
-MIGRATIONS: tuple[Migration, ...] = (_CATALOG_PRODUCTS, _INVENTORY_STOCK)
+# Append-only history of stock movements. ``sequence`` is the total order:
+# the Pi has no real-time clock, so ``recorded_at`` can go backwards and is
+# never used to order. A movement carries its balance before and after and a
+# JSON snapshot of its cause, so it explains itself without reading stock or
+# the pending operation. ``causation_key`` makes a cause idempotent; for voice
+# it is the operation id, for other origins it is optional.
+_INVENTORY_MOVEMENTS = Migration(
+    version=3,
+    name="create_inventory_movements",
+    statements=(
+        """
+        CREATE TABLE inventory_movements (
+            sequence INTEGER PRIMARY KEY AUTOINCREMENT,
+            movement_id TEXT NOT NULL UNIQUE
+                CHECK (typeof(movement_id) = 'text'
+                       AND length(trim(movement_id)) > 0),
+            product_id TEXT NOT NULL,
+            delta INTEGER NOT NULL
+                CHECK (typeof(delta) = 'integer' AND delta <> 0),
+            unit TEXT NOT NULL,
+            quantity_before INTEGER NOT NULL
+                CHECK (typeof(quantity_before) = 'integer'
+                       AND quantity_before >= 0),
+            quantity_after INTEGER NOT NULL
+                CHECK (typeof(quantity_after) = 'integer'
+                       AND quantity_after >= 0),
+            origin TEXT NOT NULL
+                CHECK (origin IN
+                       ('voice_operation', 'manual_adjustment', 'initialization')),
+            operation_id TEXT
+                CHECK (operation_id IS NULL
+                       OR (typeof(operation_id) = 'text'
+                           AND length(trim(operation_id)) > 0)),
+            causation_key TEXT
+                CHECK (causation_key IS NULL
+                       OR (typeof(causation_key) = 'text'
+                           AND length(trim(causation_key)) > 0)),
+            recorded_at TEXT NOT NULL
+                CHECK (recorded_at GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]T'
+                                        || '[0-2][0-9]:[0-5][0-9]:[0-5][0-9].'
+                                        || '[0-9][0-9][0-9][0-9][0-9][0-9]Z'),
+            cause TEXT NOT NULL
+                CHECK (json_valid(cause) AND json_type(cause) = 'object'
+                       AND cause <> '{}'),
+            CHECK (quantity_after = quantity_before + delta),
+            CHECK ((origin = 'voice_operation') = (operation_id IS NOT NULL)),
+            CHECK (origin <> 'voice_operation' OR causation_key IS operation_id),
+            UNIQUE (origin, causation_key),
+            FOREIGN KEY (product_id, unit)
+                REFERENCES catalog_products (product_id, stock_unit)
+                ON UPDATE RESTRICT ON DELETE RESTRICT
+        )
+        """,
+        "CREATE INDEX inventory_movements_by_product "
+        "ON inventory_movements (product_id, sequence)",
+        "CREATE INDEX inventory_movements_by_operation "
+        "ON inventory_movements (operation_id, sequence) "
+        "WHERE operation_id IS NOT NULL",
+        "CREATE INDEX inventory_movements_by_origin "
+        "ON inventory_movements (origin, sequence)",
+        "CREATE INDEX inventory_movements_by_time "
+        "ON inventory_movements (recorded_at, sequence)",
+        """
+        CREATE TRIGGER inventory_movements_are_never_updated
+        BEFORE UPDATE ON inventory_movements
+        BEGIN
+            SELECT RAISE(ABORT, 'inventory movements are append-only');
+        END
+        """,
+        """
+        CREATE TRIGGER inventory_movements_are_never_deleted
+        BEFORE DELETE ON inventory_movements
+        BEGIN
+            SELECT RAISE(ABORT, 'inventory movements are append-only');
+        END
+        """,
+    ),
+)
+
+MIGRATIONS: tuple[Migration, ...] = (
+    _CATALOG_PRODUCTS,
+    _INVENTORY_STOCK,
+    _INVENTORY_MOVEMENTS,
+)
 
 
 def apply_migrations(

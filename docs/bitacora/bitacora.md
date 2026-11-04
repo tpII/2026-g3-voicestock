@@ -1535,7 +1535,7 @@ La persistencia del inventario no entra en esta versión. Ningún caso está
 fuera del repositorio. El informe de cierre es
 [el reporte de la campaña](../testing/raspberry-validation/v0.5.0-campaign-report.md).
 Las notas, todavía sin tag y sin GitHub Release, están en
-[v0.5.0](../releases/v0.5.0.md). `pyproject.toml` sigue en `0.1.0`.
+[v0.5.0](../releases/v0.5.0.md). `pyproject.toml` declara `0.5.0`.
 
 ### Limpieza y respaldo del hardware
 

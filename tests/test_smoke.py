@@ -12,4 +12,4 @@ def test_packages_can_be_imported() -> None:
 
 
 def test_distribution_is_installed() -> None:
-    assert version("voicestock") == "0.1.0"
+    assert version("voicestock") == "0.5.0"

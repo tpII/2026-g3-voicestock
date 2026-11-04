@@ -11,8 +11,8 @@ modifica: confirmar informa éxito y no persiste stock.
 
 El alcance aceptado para v0.5.0, con la limitación de productos ambiguos,
 está en [las notas de v0.5.0](docs/releases/v0.5.0.md). El servidor sigue
-arrancando en stub si no se elige `groq`. No hay tag ni GitHub Release
-todavía. `pyproject.toml` sigue en `0.1.0`.
+arrancando en stub si no se elige `groq`. El paquete declara `0.5.0`.
+Todavía no hay tag ni GitHub Release.
 
 ## Requisitos
 

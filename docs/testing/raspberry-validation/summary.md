@@ -7,16 +7,20 @@ push-to-talk executions, two maximum-duration executions, and three
 access-point executions are recorded, plus one connectivity execution and
 one reboot-persistence execution, one text-HTTP execution, one
 WAV-transfer execution, one client-error execution, one Pi web
-execution, one real end-to-end execution, and one
-contract-validation execution are recorded.
+execution, one real end-to-end execution, one
+contract-validation execution, and one integrated error-handling
+execution are recorded.
 TC-ENV-001, TC-GPIO-001, TC-AUD-001, TC-AUD-002, TC-PTT-001, TC-PTT-002,
 TC-NET-001, TC-NET-002, TC-NET-003, TC-COM-001, TC-COM-002, TC-COM-003, and
 TC-WEB-001 are not closed. TC-E2E-002 has one execution at **FAILED**,
 with the v0.5.0 decision `ACCEPTED_WITH_KNOWN_LIMITATIONS`. That decision
 does not close the case. TC-CON-001 has one execution at
 **PASSED_PENDING_DOCUMENTATION**. Its technical result is **PASSED**.
-Review is NOT_REVIEWED, so it is not **CLOSED_PASSED**. TC-FLOW-001 has no
-measurements. TC-WEB-002 and TC-E2E-001 were withdrawn without an
+Review is NOT_REVIEWED, so it is not **CLOSED_PASSED**. TC-FLOW-001 has
+[EX-TC-FLOW-001-20261104-01](executions/EX-TC-FLOW-001-20261104-01.md) at
+**PASSED_PENDING_DOCUMENTATION**. Its technical result is **PASSED**.
+Review is NOT_REVIEWED, so it is not **CLOSED_PASSED**. It does not close
+N1. TC-WEB-002 and TC-E2E-001 were withdrawn without an
 execution. The second access-point execution includes a `hostapd`
 diagnostic. That diagnostic is not TC-NET-002. The third access-point
 execution is **PASSED_PENDING_DOCUMENTATION**: the technical configuration
@@ -156,6 +160,12 @@ Recorded executions:
   stays **OPEN**. v0.5.0 decision for this test:
   `ACCEPTED_WITH_KNOWN_LIMITATIONS`. Not **CLOSED_PASSED**. Inventory
   persistence not tested. Does not close any other case.
+- [EX-TC-FLOW-001-20261104-01](executions/EX-TC-FLOW-001-20261104-01.md),
+  **PASSED_PENDING_DOCUMENTATION**. Procedure version 2. Ten physical
+  cycles on 2026-11-04. Stub rejection, closed port, hold-server accept,
+  and one stub recovery. Technical result **PASSED**. Release-to-idle
+  **NOT MEASURED**. Review NOT_REVIEWED. Not **CLOSED_PASSED**. Not Groq
+  and not inventory persistence. Does not close N1.
 - [EX-TC-CON-001-20261104-01](executions/EX-TC-CON-001-20261104-01.md),
   **PASSED_PENDING_DOCUMENTATION**. Technical result **PASSED** on the Pi
   at `c151db2`. Ten criteria matched three identical transcripts. Review
@@ -219,7 +229,7 @@ documentation branch.
 | TC-COM-003 | [EX-TC-COM-003-20261103-01](executions/EX-TC-COM-003-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | 3/3 `connection_failed` and 3/3 `timeout`. Not closed. Review NOT_REVIEWED. | Procedure version 1. Python listener instead of the `ncat` example. Not relabeled as version 2. Scenario A has no TCP-attempt trace. Port cleanup NOT RECORDED. Durations stay out of TC-COM-001. |
 | TC-WEB-001 | [EX-TC-WEB-001-20261103-01](executions/EX-TC-WEB-001-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | 10/10 health HTTP 200. Standalone 503. Three idle reads and pending HTTP 204. Not closed. Review NOT_REVIEWED. | Mean `curl` duration 86.2 ms. Budget **TO BE DEFINED**. `voicestock-pi` script absent. Exit status NOT RELIABLY RECORDED. Not a pending-operation resolution case. |
 | TC-CON-001 | [EX-TC-CON-001-20261104-01](executions/EX-TC-CON-001-20261104-01.md) | PASSED_PENDING_DOCUMENTATION | 10/10 criteria on 3 identical transcripts. Not closed. Review NOT_REVIEWED. | Fixtures were absent on `develop` and were provisioned externally. Not a product defect. Does not close N1. |
-| TC-FLOW-001 | none | DESIGNED | Procedure version 2 is the active text. It has no execution. Procedure version 1 was not executed. | |
+| TC-FLOW-001 | [EX-TC-FLOW-001-20261104-01](executions/EX-TC-FLOW-001-20261104-01.md) | PASSED_PENDING_DOCUMENTATION | 3/3 A, 3/3 B, 3/3 C, and R1 functionally satisfactory. Not closed. Review NOT_REVIEWED. | Procedure version 2. Release-to-idle **NOT MEASURED**. WAV mapping inferred from modification times. Not Groq. Does not close N1. Procedure version 1 was not executed. |
 | TC-E2E-002 | [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md) | FAILED | P1–P5 reported passed. N1 failed criteria 8 and 9. Not closed. | Release decision for this test: `ACCEPTED_WITH_KNOWN_LIMITATIONS`. Incident [INC-EX-TC-E2E-002-20261104-01-01](executions/INC-EX-TC-E2E-002-20261104-01-01.md) is OPEN. Inventory persistence not tested. |
 
 Callback hold for

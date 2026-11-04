@@ -1,7 +1,9 @@
 # Evidence
 
-No evidence has been filed. This directory explains where evidence goes
-when a run happens.
+No evidence file has been committed in this directory. External hashes for
+[EX-TC-FLOW-001-20261104-01](../executions/EX-TC-FLOW-001-20261104-01.md)
+stay in that execution record. The WAV files stay on the Pi. This
+directory explains where evidence goes when a run happens.
 
 ## What may be committed
 

@@ -51,7 +51,7 @@ need either that script or an explicit command deviation.
 | Case | Latest campaign result | Effect on later cases |
 | --- | --- | --- |
 | [TC-GPIO-001](test-cases/TC-GPIO-001.md) | Four executions. Latest [EX-TC-GPIO-001-20261104-01](executions/EX-TC-GPIO-001-20261104-01.md) is **PASSED_PENDING_DOCUMENTATION**: 9 and 9 measured, cleanup evidenced, quiet intervals not instrumented, review NOT_REVIEWED. Attempts 01–03 stay **BLOCKED**, **FAILED**, and **FAILED**. | Cited by [EX-TC-PTT-001-20261104-01](executions/EX-TC-PTT-001-20261104-01.md). The two November 3 PTT executions stay **FAILED**. |
-| [TC-PTT-001](test-cases/TC-PTT-001.md) | Three executions. Latest [EX-TC-PTT-001-20261104-01](executions/EX-TC-PTT-001-20261104-01.md) is **PASSED_PENDING_DOCUMENTATION**. Attempts 01 and 02 stay **FAILED**. | The written PTT status gate for TC-FLOW-001 procedure version 2 is met. That case is not executed. |
+| [TC-PTT-001](test-cases/TC-PTT-001.md) | Three executions. Latest [EX-TC-PTT-001-20261104-01](executions/EX-TC-PTT-001-20261104-01.md) is **PASSED_PENDING_DOCUMENTATION**. Attempts 01 and 02 stay **FAILED**. | The written PTT status gate for TC-FLOW-001 procedure version 2 was met before [EX-TC-FLOW-001-20261104-01](executions/EX-TC-FLOW-001-20261104-01.md). |
 | [TC-PTT-002](test-cases/TC-PTT-002.md) | Two executions. Latest [EX-TC-PTT-002-20261104-01](executions/EX-TC-PTT-002-20261104-01.md) is **PASSED_PENDING_DOCUMENTATION**. Attempt 01 stays **BLOCKED**. Second press **NOT APPLICABLE**. | Max-duration behavior is evidenced for this test setting. It is not closed and it is not the product default. |
 | [TC-COM-002](test-cases/TC-COM-002.md) | **PASSED_PENDING_DOCUMENTATION**, not closed. | WAV transport to the stub is evidenced. It is not contract generation. |
 | [TC-WEB-001](test-cases/TC-WEB-001.md) | [EX-TC-WEB-001-20261103-01](executions/EX-TC-WEB-001-20261103-01.md), **PASSED_PENDING_DOCUMENTATION**, not closed. | Idle page and health are evidenced. The generated `voicestock-pi` script was not the process under test. |
@@ -61,7 +61,7 @@ need either that script or an explicit command deviation.
 | Case | Code on `develop` | Fixture | Hardware seen in this campaign | Environment | Preconditions | Executed | Readiness |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [TC-CON-001](test-cases/TC-CON-001.md) | `OperationValidator` and `PcResponseInterpreter` are in the tree. | The three JSON files are on this branch. On the Pi `develop` checkout they were absent and were extracted to an external directory. Contents were reported unmodified. | Pi only. No button and no PC request from the script. | [EX-TC-CON-001-20261104-01](executions/EX-TC-CON-001-20261104-01.md) ran on Python 3.13.5 at `c151db2`. | No PC fixture. | Yes | **PASSED_PENDING_DOCUMENTATION.** Technical result **PASSED**. Review NOT_REVIEWED. External hashes were not recomputed in this workspace. Not **CLOSED_PASSED**. |
-| [TC-FLOW-001](test-cases/TC-FLOW-001.md) | Runtime, default stub, and a closed port are available. Scenario C needs a temporary hold server written in the procedure, stored outside git. Groq must stay off. | Not required. Procedure version 1 trial B is withdrawn and was not executed. | Button, G435, and the cell were used in other cases. | `voicestock-pi` script missing unless the operator repeats the direct `main` call and records it. | Written gate: TC-PTT-001, TC-COM-002, and TC-WEB-001 are not **FAILED** or **BLOCKED**. [EX-TC-PTT-001-20261104-01](executions/EX-TC-PTT-001-20261104-01.md) meets that wording. The two earlier PTT executions stay **FAILED**. | No | **Not executed.** The PTT status gate is met. The generated `voicestock-pi` script gap remains. Not a fixture case. Not a pass. |
+| [TC-FLOW-001](test-cases/TC-FLOW-001.md) | Runtime and the default stub were used. Scenario C used an external hold server. Groq was not the peer. | Not required. Procedure version 1 trial B was not executed. | Physical GPIO17, `voicestock_mic`, and the cell were used on 2026-11-04. | [EX-TC-FLOW-001-20261104-01](executions/EX-TC-FLOW-001-20261104-01.md) at `c151db2`, Pi Python 3.13.5. Startup argv **NOT RECORDED**. | Written gate met by the latest PTT, COM-002, and WEB-001 results, none of which is **CLOSED_PASSED**. | Yes | **PASSED_PENDING_DOCUMENTATION.** Technical result **PASSED**. Release-to-idle **NOT MEASURED**. Review NOT_REVIEWED. Not **CLOSED_PASSED**. Does not close N1. |
 
 ## Suggested sequence
 
@@ -74,15 +74,14 @@ need either that script or an explicit command deviation.
 3. TC-PTT-001 now has
    [EX-TC-PTT-001-20261104-01](executions/EX-TC-PTT-001-20261104-01.md).
    The technical result is **PASSED**. Review is still open. Attempts 01
-   and 02 stay **FAILED**. TC-FLOW-001 procedure version 2 is no longer
-   blocked by the PTT status gate. It is not executed. Do not point it at
-   `groq`.
+   and 02 stay **FAILED**.
 4. Install `hatchling` in the Pi environment, or otherwise create
    `.venv/bin/voicestock-pi`, before treating the generated command as
-   tested. Record the command that was actually used if the direct call
-   remains the only option.
-5. TC-FLOW-001 procedure version 2 can be scheduled without a
-   deterministic fixture. Scenario A starts the default stub. Scenario B
-   leaves the PC port closed. Scenario C uses the hold server in the
-   procedure. Do not treat this note as an execution.
-6. Each run needs its own execution record. This file is not one.
+   tested. [EX-TC-FLOW-001-20261104-01](executions/EX-TC-FLOW-001-20261104-01.md)
+   did not record the startup argv, so that run does not close the script
+   gap.
+5. TC-FLOW-001 procedure version 2 has
+   [EX-TC-FLOW-001-20261104-01](executions/EX-TC-FLOW-001-20261104-01.md).
+   The technical result is **PASSED**. Review is still open. It is not
+   **CLOSED_PASSED**. It does not close N1 and it is not a Groq run.
+6. Each later run needs its own execution record. This file is not one.

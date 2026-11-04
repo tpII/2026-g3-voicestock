@@ -1,10 +1,11 @@
 # TC-FLOW-001 — Integrated Error Handling and Recovery
 
 - Status: DESIGNED
-- Executions: none
+- Executions: [EX-TC-FLOW-001-20261104-01](../executions/EX-TC-FLOW-001-20261104-01.md) (`PASSED_PENDING_DOCUMENTATION`; technical result PASSED; review NOT_REVIEWED; not `CLOSED_PASSED`)
 - Procedure version: 2
 
-This case has not been executed. Nothing in this file is a measured result.
+Procedure version 2 is the text below. The execution record does not
+change these steps. Release-to-idle time in that run is **NOT MEASURED**.
 
 Procedure version 1 was not executed. It is preserved in
 [TC-FLOW-001 procedure version 1](TC-FLOW-001-procedure-v1.md). Version 2

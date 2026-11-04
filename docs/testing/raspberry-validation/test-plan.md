@@ -58,7 +58,7 @@ when their dependencies are already satisfied.
 | 12 | [TC-COM-003](test-cases/TC-COM-003.md) | Connection failure and timeout are reported by the client | Failure setup would contaminate the success samples of TC-COM-001. |
 | 13 | [TC-WEB-001](test-cases/TC-WEB-001.md) | `/health` and idle `system-status` on the Pi address | The page can be checked before a pending operation exists. |
 | 14 | [TC-CON-001](test-cases/TC-CON-001.md) | The Pi validator accepts and rejects the campaign payloads | The cycle trusts this module. It does not need the microphone. |
-| 15 | [TC-FLOW-001](test-cases/TC-FLOW-001.md) | Integrated error handling: invalid contract, connection failure, and response timeout | Procedure version 2. It does not wait on a deterministic contract fixture. It has no execution. |
+| 15 | [TC-FLOW-001](test-cases/TC-FLOW-001.md) | Integrated error handling: invalid contract, connection failure, and response timeout | Procedure version 2. [EX-TC-FLOW-001-20261104-01](executions/EX-TC-FLOW-001-20261104-01.md) is **PASSED_PENDING_DOCUMENTATION**, technical result **PASSED**, not **CLOSED_PASSED**. It does not wait on a deterministic contract fixture. |
 
 TC-CON-001 may run any time after TC-ENV-001. It is placed late so the
 hardware work is not blocked on a software check. TC-GPIO-001 and

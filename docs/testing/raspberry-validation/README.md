@@ -150,8 +150,13 @@ decision does not close the case and does not close any other case.
 at **PASSED_PENDING_DOCUMENTATION**. The technical result is **PASSED**.
 Review is NOT_REVIEWED, so it is not **CLOSED_PASSED**. It does not close
 the N1 incident.
+[TC-FLOW-001](test-cases/TC-FLOW-001.md) has
+[EX-TC-FLOW-001-20261104-01](executions/EX-TC-FLOW-001-20261104-01.md)
+at **PASSED_PENDING_DOCUMENTATION**. The technical result is **PASSED**.
+Review is NOT_REVIEWED, so it is not **CLOSED_PASSED**. It does not close
+the N1 incident and it does not exercise Groq.
 What is still open is in [readiness.md](readiness.md). None of these cases is
-**CLOSED_PASSED**. TC-FLOW-001 has no execution. TC-WEB-002 and TC-E2E-001
+**CLOSED_PASSED**. TC-WEB-002 and TC-E2E-001
 were withdrawn without an execution. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
 without evidence, are in the [test plan](test-plan.md#status-model).
 

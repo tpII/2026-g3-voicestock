@@ -6,11 +6,14 @@ one microphone-enumeration execution, one WAV-capture execution, two
 push-to-talk executions, one maximum-duration execution, and three
 access-point executions are recorded, plus one connectivity execution and
 one reboot-persistence execution, one text-HTTP execution, one
-WAV-transfer execution, one client-error execution, and one Pi web
-execution.
+WAV-transfer execution, one client-error execution, one Pi web
+execution, and one real end-to-end execution are recorded.
 TC-ENV-001, TC-GPIO-001, TC-AUD-001, TC-AUD-002, TC-PTT-001, TC-PTT-002,
 TC-NET-001, TC-NET-002, TC-NET-003, TC-COM-001, TC-COM-002, TC-COM-003, and
-TC-WEB-001 are not closed. The other cases have no measurements. The second access-point execution includes a `hostapd`
+TC-WEB-001 are not closed. TC-E2E-002 has one execution at **FAILED**,
+with the v0.5.0 decision `ACCEPTED_WITH_KNOWN_LIMITATIONS`. That decision
+does not close the case. TC-WEB-002, TC-CON-001, TC-FLOW-001, and
+TC-E2E-001 have no measurements. The second access-point execution includes a `hostapd`
 diagnostic. That diagnostic is not TC-NET-002. The third access-point
 execution is **PASSED_PENDING_DOCUMENTATION**: the technical configuration
 assessment is **PASSED**, the evidence archive and the formal review are
@@ -38,12 +41,14 @@ The application on `develop` at `c151db2` can also run the real path:
 physical push-to-talk, WAV upload, Groq Whisper, `openai/gpt-oss-20b`, Pi
 contract validation, one pending operation, confirm or cancel, and idle.
 The PC server defaults to the stub. `VOICESTOCK_AUDIO_PIPELINE=groq`
-selects that real path. Inventory is not persisted. That description is
-current product behavior. It is not a result of any execution in this
-file. v0.5.0 does not include a production accuracy guarantee for
-speech-to-text or interpretation, and it does not include more than one
-operation per command. No formal acceptance of the real path exists until
-a dedicated execution record does.
+selects that real path. Inventory is not persisted. v0.5.0 does not
+include a production accuracy guarantee for speech-to-text or
+interpretation, and it does not include more than one operation per
+command.
+[EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md) is the
+dedicated record. It is **FAILED** against the written N1 criterion. The
+v0.5.0 decision for that test is `ACCEPTED_WITH_KNOWN_LIMITATIONS`. It
+does not close the case and does not claim inventory persistence.
 
 ## 2. Method
 
@@ -125,20 +130,27 @@ Recorded executions:
   called `pi.runtime.main` because `voicestock-pi` was not installed.
   Runtime exit status NOT RELIABLY RECORDED. Not a button press or a
   pending operation. Review NOT_REVIEWED. Not **CLOSED_PASSED**.
+- [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md),
+  **FAILED**. Real Groq path on 2026-11-04. N1 created a pending
+  operation. Known limitation
+  [INC-EX-TC-E2E-002-20261104-01-01](executions/INC-EX-TC-E2E-002-20261104-01-01.md)
+  stays **OPEN**. v0.5.0 decision for this test:
+  `ACCEPTED_WITH_KNOWN_LIMITATIONS`. Not **CLOSED_PASSED**. Inventory
+  persistence not tested. Does not close any other case.
 
 ## 3. Scope
 
-Seventeen cases, TC-ENV-001 through TC-E2E-001, listed in the
+Eighteen cases, TC-ENV-001 through TC-E2E-002, listed in the
 [README](README.md#what-this-campaign-covers).
 
 ## 4. Exclusions
 
 | Topic | Where it has to be validated later |
 | --- | --- |
-| Speech-to-text accuracy guarantee | A speech-to-text campaign. Not TC-E2E-001. The Groq Whisper path can run and has no accepted execution here. |
-| Interpretation accuracy guarantee | [InterpretationService-04](https://app.clickup.com/t/86e3ev2v6). `openai/gpt-oss-20b` can run and has no accepted execution here. |
+| Speech-to-text accuracy guarantee | A speech-to-text campaign. Not TC-E2E-001 and not [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md). |
+| Interpretation accuracy guarantee | [InterpretationService-04](https://app.clickup.com/t/86e3ev2v6). The 2026-11-04 run does not close this task. |
 | More than one operation per voice command | Outside v0.5.0. The pipeline rejects a draft that does not contain exactly one operation. No campaign execution records that rejection. |
-| Real spoken command through STT and the model, then the web flow | [PendingOperationWeb-08](https://app.clickup.com/t/86e3evek6). The product path exists. This summary does not accept it. |
+| Closing PendingOperationWeb-08 | [PendingOperationWeb-08](https://app.clickup.com/t/86e3evek6). [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md) is **FAILED** on N1 and does not close the task. |
 | SQLite inventory | A persistence campaign, after an executor replaces `ProvisionalOperationExecutor`. Excluded from v0.5.0. |
 
 ## 5. Environment
@@ -184,6 +196,7 @@ documentation branch.
 | TC-CON-001 | none | DESIGNED | | |
 | TC-FLOW-001 | none | DESIGNED | | |
 | TC-E2E-001 | none | DESIGNED | | |
+| TC-E2E-002 | [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md) | FAILED | P1–P5 reported passed. N1 failed criteria 8 and 9. Not closed. | Release decision for this test: `ACCEPTED_WITH_KNOWN_LIMITATIONS`. Incident [INC-EX-TC-E2E-002-20261104-01-01](executions/INC-EX-TC-E2E-002-20261104-01-01.md) is OPEN. Inventory persistence not tested. |
 
 Callback hold for
 [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md).
@@ -576,12 +589,14 @@ What this summary can say now:
   or closes a network execution;
 - the default PC audio stub cannot create a pending operation;
 - `VOICESTOCK_AUDIO_PIPELINE=groq` can create one validated contract and
-  does not persist inventory. No execution in this summary accepts that
-  path;
+  does not persist inventory.
+  [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md)
+  records that path and is **FAILED** on N1. Its v0.5.0 decision is
+  `ACCEPTED_WITH_KNOWN_LIMITATIONS`. Persistence was not tested;
 - simulated end-to-end execution stays blocked on a fixture that is
   specified and not implemented. TC-E2E-001 is unchanged and has no
   execution;
-- PendingOperationWeb-08 remains open regardless of TC-E2E-001.
+- PendingOperationWeb-08 remains open. TC-E2E-002 does not close it.
 
 ## 10. Bitácora pointer
 

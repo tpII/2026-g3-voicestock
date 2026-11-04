@@ -35,13 +35,14 @@ those tasks.
 | [TC-CON-001](test-cases/TC-CON-001.md) | [OperationContractValidation-06](https://app.clickup.com/t/86e3ev73g) | Structural and catalog validation on the Pi interpreter. | not executed |
 | [TC-FLOW-001](test-cases/TC-FLOW-001.md) | [PendingOperationFlow-05](https://app.clickup.com/t/86e3evaer) | Phases, single pending operation, stub rejection, and transport failure. | not executed |
 | [TC-E2E-001](test-cases/TC-E2E-001.md) | **PENDING CLICKUP TASK CREATION** | Simulated Pi cycle with a contract fixture. | not executed |
+| [TC-E2E-002](test-cases/TC-E2E-002.md) | [PendingOperationWeb-08](https://app.clickup.com/t/86e3evek6) is related and is not closed by this row | Real Groq voice-to-web cycle on the Pi and the PC. | [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md): **FAILED**. P1–P5, N2, N3, and the valid N4 retry were reported as passed. N1 created a pending operation and fails criteria 8 and 9. Review NOT_REVIEWED. Not **CLOSED_PASSED**. v0.5.0 decision for this test: `ACCEPTED_WITH_KNOWN_LIMITATIONS`. Inventory persistence not tested. |
 
 ## Tasks this campaign does not close
 
 | ClickUp | Why no case closes it |
 | --- | --- |
 | [InterpretationService-04](https://app.clickup.com/t/86e3ev2v6) | Interpretation quality is out of scope. The fixture does not interpret speech. `VOICESTOCK_AUDIO_PIPELINE=groq` can call `openai/gpt-oss-20b`. That code is not an accepted execution and does not close this task. |
-| [PendingOperationWeb-08](https://app.clickup.com/t/86e3evek6) | That task expects a real end-to-end flow, including real speech-to-text and interpretation. TC-E2E-001 must not be used as the evidence that closes it. The Groq path is product behavior. No execution record accepts it. |
+| [PendingOperationWeb-08](https://app.clickup.com/t/86e3evek6) | That task expects a real end-to-end flow, including real speech-to-text and interpretation. TC-E2E-001 must not be used as the evidence that closes it. [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md) is **FAILED** on N1 and is not an acceptance of the task. |
 
 ## Supporting checks without a task
 
@@ -55,8 +56,10 @@ they ran on. Do not file a task only to fill this cell.
   excluded from v0.5.0.
 - The real v0.5.0 path is physical push-to-talk, WAV upload, Groq Whisper,
   `openai/gpt-oss-20b`, Pi contract validation, one pending operation,
-  confirm or cancel, and idle. The PC server defaults to the stub. This
-  matrix does not record that path as executed or accepted.
+  confirm or cancel, and idle. The PC server defaults to the stub.
+  [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md)
+  records one run of that path. The run is **FAILED** on N1 and is not an
+  acceptance of the path. Inventory persistence is not claimed.
 - A production accuracy guarantee for speech-to-text or interpretation is
   not mapped. More than one operation per command is outside v0.5.0 and
   has no execution here.

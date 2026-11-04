@@ -32,7 +32,7 @@ cell, that:
 | Software component on the Raspberry Pi | Does this module, running on the Pi, honor its contract when the neighboring hardware or service is held still? | TC-AUD-002, TC-CON-001, TC-WEB-001 |
 | Integration | Do two or more real components work together? | TC-PTT-001, TC-PTT-002, TC-COM-001, TC-COM-002, TC-COM-003, TC-WEB-002, TC-FLOW-001 |
 | Simulated end-to-end | Does the Pi runtime complete a cycle when only PC speech-to-text and interpretation are replaced by a deterministic contract? | TC-E2E-001 |
-| Full real end-to-end | Does one spoken command become a validated pending operation, then idle after confirm or cancel, without an inventory write? | Not in this campaign. The product path exists when `VOICESTOCK_AUDIO_PIPELINE=groq`. No execution record accepts it. A stock change is outside v0.5.0 because inventory persistence is not implemented. |
+| Full real end-to-end | Does one spoken command become a validated pending operation, then idle after confirm or cancel, without an inventory write? | [TC-E2E-002](test-cases/TC-E2E-002.md). [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md) is **FAILED** on the written N1 criterion and is not **CLOSED_PASSED**. Inventory persistence was not tested. A stock change stays outside v0.5.0. |
 
 A unit test that mocks GPIO or PortAudio does not satisfy a hardware case.
 A hardware case that never starts `voicestock-pi` does not satisfy

@@ -23,8 +23,10 @@ Pi then validates the contract. That mode does not persist inventory.
 There is still no separate entry point for the deterministic campaign
 fixture. `groq` is not that fixture: it calls a transcription API and a
 language model, and the contract depends on the WAV. Do not use it to pass
-TC-WEB-002, TC-FLOW-001 trial B, or TC-E2E-001. No execution record accepts
-the real path.
+TC-WEB-002, TC-FLOW-001 trial B, or TC-E2E-001.
+[EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md) records
+one real-path run. It is **FAILED** on N1 and does not accept those three
+cases.
 
 A later change, outside this documentation commit, needs a separate PC
 entry point that:

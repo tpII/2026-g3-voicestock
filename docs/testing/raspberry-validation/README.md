@@ -26,6 +26,7 @@ documents it cites. Session notes in the project log stay in Spanish; see
 | Operation contract on the Pi | [TC-CON-001](test-cases/TC-CON-001.md) |
 | Pending-operation cycle | [TC-FLOW-001](test-cases/TC-FLOW-001.md) |
 | Simulated end-to-end | [TC-E2E-001](test-cases/TC-E2E-001.md) |
+| Real hardware end-to-end | [TC-E2E-002](test-cases/TC-E2E-002.md) |
 
 The order, the reason each stage exists, and the simulated end-to-end
 strategy are in the [test plan](test-plan.md). How to measure is in the
@@ -48,7 +49,10 @@ transcribes with Groq Whisper, interprets with `openai/gpt-oss-20b`, and
 returns one version-1 contract. The Pi validates that contract and assigns
 `product_id`. Confirm and cancel return the cycle to idle.
 `ProvisionalOperationExecutor` does not persist inventory. That capability
-is not a campaign result. No execution record accepts it. A conversation
+is not, by itself, a campaign result.
+[EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md) records
+one hardware run. It is **FAILED** on N1 and is not **CLOSED_PASSED**.
+Its v0.5.0 decision is `ACCEPTED_WITH_KNOWN_LIMITATIONS`. A conversation
 or a demonstration is not **CLOSED_PASSED**.
 
 For the v0.5.0 claim, the intended path is physical push-to-talk capture,
@@ -125,8 +129,14 @@ was written afterward and is not applied to that run. It is not
 [TC-WEB-001](test-cases/TC-WEB-001.md) has
 [EX-TC-WEB-001-20261103-01](executions/EX-TC-WEB-001-20261103-01.md)
 at **PASSED_PENDING_DOCUMENTATION**. It is not **CLOSED_PASSED**.
+[TC-E2E-002](test-cases/TC-E2E-002.md) has
+[EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md)
+at **FAILED**. N1 did not meet the written rejection criterion. The
+v0.5.0 decision for that test is `ACCEPTED_WITH_KNOWN_LIMITATIONS`. That
+decision does not close the case and does not close any other case.
 What is still blocked is in [readiness.md](readiness.md). None of these cases is
-**CLOSED_PASSED**. The other cases are unexecuted. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
+**CLOSED_PASSED**. TC-WEB-002, TC-CON-001, TC-FLOW-001, and TC-E2E-001
+have no execution. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
 without evidence, are in the [test plan](test-plan.md#status-model).
 
 ## Layout

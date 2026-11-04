@@ -43,7 +43,13 @@ operation, confirm or cancel, and idle. It excludes inventory persistence,
 a production accuracy guarantee for speech-to-text, a production accuracy
 guarantee for interpretation, and more than one operation per command.
 Automated tests mock Groq. They are not a live API call. The Raspberry Pi
-validation campaign has no execution that accepts this path.
+validation campaign records one run in
+[EX-TC-E2E-002-20261104-01](../testing/raspberry-validation/executions/EX-TC-E2E-002-20261104-01.md).
+That run is **FAILED** on an ambiguous product command and is not
+**CLOSED_PASSED**. Its v0.5.0 decision is `ACCEPTED_WITH_KNOWN_LIMITATIONS`.
+The sentence above, that an ambiguous catalog description is a service error
+and not a guessed product, is the intended contract. The N1 observation did
+not meet it. The root cause is not identified here.
 [TC-E2E-001](../testing/raspberry-validation/test-cases/TC-E2E-001.md) remains
 a simulated fixture case and is not this path.
 
@@ -123,9 +129,11 @@ benchmark schema does not implement them.
 [SpeechToText-04](https://app.clickup.com/t/86e3euwhw) own the STT interface and
 adapter; [StructuredCommandInterpretation-04](https://app.clickup.com/t/86e3ev4cx)
 owns the real interpreter. The PC audio path now has that provider behind
-`VOICESTOCK_AUDIO_PIPELINE=groq`. A live Groq acceptance run and the physical
-button-to-UI run remain pending as formal test records. The code path is not
-that record.
+`VOICESTOCK_AUDIO_PIPELINE=groq`. A live Groq run and a physical
+button-to-UI run are recorded in
+[EX-TC-E2E-002-20261104-01](../testing/raspberry-validation/executions/EX-TC-E2E-002-20261104-01.md).
+That record is **FAILED** on N1. It is not an acceptance of this code path
+and it does not claim inventory persistence.
 
 ## Tooling and operation
 
@@ -156,6 +164,9 @@ WAVs and exercises that adapter remotely, then calls Groq from the PC. See
 execution is pending. The earlier diagram is the original plan. The PC HTTP
 server can now run the Groq audio pipeline: Groq Whisper, then
 `openai/gpt-oss-20b`, then Pi contract validation, without inventory
-persistence. No raspberry-validation execution accepts that physical cycle.
+persistence.
+[EX-TC-E2E-002-20261104-01](../testing/raspberry-validation/executions/EX-TC-E2E-002-20261104-01.md)
+records one physical cycle. It is **FAILED** on N1 and does not accept the
+cycle as **CLOSED_PASSED**.
 Connecting a recorded capture to this server and accepting it under test
 criteria remains pending.

@@ -1,0 +1,7 @@
+case_id,level,status,valid_json,schema_valid,correct_operation,correct_product,correct_quantity,exact_match,pi_stt_peak_mib,pc_api_client_peak_mib,error
+solo_agregar,basico,ok,True,True,True,True,True,True,343.1640625,30.59375,
+solo_restar,basico,ok,True,True,True,True,True,True,344.65625,30.6171875,
+restar_ambos,habitual,ok,True,True,False,False,False,False,345.15625,30.62890625,
+corregir_cantidad,habitual,ok,True,True,True,True,True,True,345.15625,30.640625,
+negar_agregacion,habitual,ok,True,True,True,True,True,True,347.53125,30.6796875,
+negar_restacion,habitual,ok,True,True,True,True,True,True,347.15234375,30.70703125,

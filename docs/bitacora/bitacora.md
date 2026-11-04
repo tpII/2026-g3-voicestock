@@ -1,0 +1,1563 @@
+# Bitácora
+
+Este documento registra el proceso de diseño, implementación, pruebas e iteraciones de VoiceStock: decisiones técnicas, dudas planteadas a la cátedra y problemas encontrados con sus soluciones, a lo largo del desarrollo.
+
+---
+
+## 01/09/2026
+
+### Avance
+
+Se creó el repositorio del proyecto **VoiceStock**, un sistema de gestión de inventario asistido por voz pensado para ejecutarse en una Raspberry Pi.
+
+---
+
+## 10/09/2026
+
+### Avance
+
+Se armó la base del monorepo, dejando preparado el entorno de desarrollo antes de escribir lógica de aplicación:
+
+- **Python 3.11+** como versión mínima, gestionado con un entorno virtual (`.venv`) creado por `scripts/setup.sh` (Linux / Raspberry Pi) y `scripts/setup.ps1` (Windows).
+- **Ruff** para lint y formateo (reglas `E`, `F`, `I`; `line-length = 88`; comillas dobles).
+- **Pytest** + **pytest-cov**, con un test de humo (`tests/test_smoke.py`) que valida que el paquete `voicestock` se pueda importar.
+- **pre-commit**, con hooks de `pre-commit-hooks` (trailing whitespace, end-of-file, YAML/TOML, detección de claves privadas, conflictos de merge) y de `ruff-pre-commit` (`ruff-check --fix`, `ruff-format`).
+- **CI en GitHub Actions** (`.github/workflows/ci.yml`): corre en pushes y Pull Requests hacia `main` y `develop`, instala el proyecto con `pip install -e ".[dev]"` y ejecuta `pre-commit run --all-files` y `pytest --cov=voicestock`. Todavía no hay un umbral mínimo de cobertura.
+- Se documentó el flujo de trabajo completo (branching `feature/*` / `fix/*` / `release/*` / `hotfix/*` desde `develop`, Conventional Commits, Squash and Merge) en `CONTRIBUTING.md` y `docs/development-workflow.md`.
+- Se dejó `docs/architecture.md` como documento vivo para registrar decisiones de arquitectura a medida que se tomen.
+- Se agregó `.env.example` con las variables previstas para la integración con el LLM (`LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL`), todavía sin valores porque el proveedor no está definido.
+
+### Decisiones técnicas
+
+- **Docker queda fuera del arranque inicial.** Las partes que dependen del hardware de la Raspberry Pi (por ejemplo el micrófono) se van a ejecutar de forma nativa al principio, para no sumar la complejidad de contenedores sobre dispositivos físicos. Se podría reconsiderar más adelante para servicios de software o para un LLM local, si aporta un beneficio concreto.
+- **SQLite** como motor de persistencia, acorde a un sistema pensado para correr en un único dispositivo (Raspberry Pi), sin necesidad de un servidor de base de datos separado.
+
+### Preguntas
+
+- **En cuanto a la alimentación del prototipo, ¿se busca que sea portable (alimentado por ejemplo a pilas o baterías) o un sistema fijo alimentado por una fuente de pared?**
+  La idea es que, al ser algo estático (sin movimiento) por ahora, puede ser alimentación fija. Como objetivo secundario, se puede contemplar que sea portable con powerbank o pilas.
+
+- **En la estructura pensada, la Raspberry Pi se encarga de servir la web, manejar la base de datos, capturar el audio del micrófono y pasarlo a texto, para luego enviarlo a un LLM que procese ese texto y genere un output formateado en JSON que se procesa en la placa (además de un string de confirmación que la placa traduce a audio para pedir confirmación al usuario). En cuanto al LLM, ¿recomiendan usar un modelo local corriendo en alguna de nuestras computadoras con acceso SSH, o utilizar una API de un modelo estilo GPT/Gemini?**
+  Ese trade-off se charla en la clase, porque es el corazón de la arquitectura del proyecto.
+
+- **¿Contamos con un parlante o con un buzzer? Con parlante se pediría la confirmación por audio; con buzzer simplemente se emitiría un sonido indicando que se registró y luego se pediría la confirmación por la web.**
+  En principio no sería necesario el parlante. Se deja como objetivo secundario.
+
+---
+
+## 17/09/2026
+
+### Avance
+
+Se realizó la guía de documentación del proyecto (disponible en [Guía de documentación](../guides/documentation-guide.md)). Además, se organizaron los archivos de documentación ya existentes en el lugar correspondiente del repositorio: el flujo de trabajo quedó en `docs/guides/development-workflow.md` y la bitácora en `docs/bitacora/bitacora.md`. Se comenzó a definir las tareas necesarias para las diferentes áreas del proyecto; se utilizará la plataforma ClickUp como centro de gestión y se adoptó la convención 1 tarea = 1 commit.
+
+---
+
+## 19/09/2026
+
+### Avance
+
+Se descompuso el sistema en features y se organizó el trabajo en ClickUp, separando tareas de **Raspberry Pi, PC, Web & DataBase, documentación y pruebas**.
+
+Se definieron como principales bloques: `PushToTalk`, `SpeechToText`, `RaspberryPiPCCommunication`, `InterpretationService`, `StructuredCommandInterpretation`, `OperationContractValidation`, `PendingOperationFlow` y `PendingOperationWeb`.
+
+---
+
+## 23/09/2026
+
+### Avance
+
+Se comenzaron la mayoría de las tareas iniciales de investigación definidas en ClickUp.
+
+Entre ellas:
+
+- alternativas de STT para Raspberry Pi 3;
+- comunicación Raspberry Pi–PC;
+- modelo local vs API externa para interpretación;
+- captura Push-to-Talk;
+- stack para servidor HTTP e interfaz web;
+- definición del contrato entre componentes.
+
+Se decidió mantener los módulos desacoplados mediante interfaces para poder reemplazar tecnologías sin modificar todo el sistema.
+
+---
+
+## 24/09/2026
+
+### Avance
+
+Se terminó de definir de forma preliminar el flujo principal:
+
+**pulsador → audio → STT → PC → interpretación → validación → operación pendiente → confirmación web**
+
+Se estableció que una interpretación válida **no modifica directamente el inventario**, sino que primero genera una operación pendiente que debe ser confirmada.
+
+También se comenzó a trabajar sobre un **contrato JSON versionado** con validación estructural y semántica.
+
+### Investigación de Push-to-Talk
+
+Se avanzó en la investigación del stack necesario para implementar la primera parte del flujo en la Raspberry Pi: detección del pulsador y captura de audio desde un micrófono USB.
+
+Para GPIO se compararon alternativas de acceso desde Python y se eligió **GPIO Zero**, utilizando un modelo orientado a eventos en lugar de polling. El pulsador se conectará entre un GPIO configurable y GND utilizando el pull-up interno de la Raspberry Pi.
+
+El estado eléctrico será:
+
+- pulsador liberado → GPIO HIGH;
+- pulsador presionado → GPIO LOW.
+
+GPIO Zero abstraerá estos niveles mediante eventos semánticos de pulsación y liberación.
+
+Se estableció además que los callbacks GPIO deben ser mínimos y no bloqueantes: únicamente notificarán cambios de estado. La captura de audio se ejecutará fuera de estos callbacks.
+
+### Investigación de audio
+
+Para la adquisición desde el micrófono USB se evaluaron alternativas como `arecord`, PyAudio y `python-sounddevice`.
+
+Se eligió **python-sounddevice** sobre PortAudio y ALSA, utilizando `RawInputStream` para disponer de control explícito sobre el inicio y finalización de la captura. `arecord` se conservará como herramienta de diagnóstico, pero no como backend de la aplicación.
+
+Se definió como contrato de audio para las siguientes etapas:
+
+- contenedor WAV;
+- PCM lineal sin compresión;
+- 16 kHz;
+- mono;
+- signed 16-bit.
+
+No se asumirá que cualquier micrófono USB soporte directamente esta configuración. La implementación deberá comprobar las capacidades del dispositivo seleccionado y fallar explícitamente si no puede cumplir el contrato. El resampling queda fuera del alcance inicial.
+
+---
+
+## 25/09/2026
+
+### Avance
+
+Se continuó refinando el backlog y las tareas de implementación en ClickUp.
+
+Se avanzó en la definición de:
+
+- comunicación cliente/servidor entre Raspberry Pi y PC;
+- `InterpretationService` desacoplado del proveedor;
+- validación de productos y operaciones;
+- estado `WAIT_CONFIRMATION`;
+- interfaz web para consultar, confirmar o cancelar operaciones pendientes.
+
+Como parte de la investigación del modelo local, se realizaron pruebas con **Qwen 3.5 4B** clasificando productos en categorías de supermercado.
+
+Los resultados fueron correctos en los casos probados, con un tiempo aproximado de **15 segundos por consulta**, por lo que se considera una alternativa viable para seguir evaluando frente al uso de APIs externas.
+
+### Implementación inicial de Push-to-Talk
+
+Se implementó la detección de pulsación y liberación mediante `PushToTalkButton`.
+
+El componente encapsula GPIO Zero y se limita a adaptar el hardware físico a dos eventos de aplicación: press y release. No contiene lógica de captura de audio, Speech-to-Text ni conocimiento del pipeline general.
+
+El pin BCM y el tiempo de debounce son configurables. La polaridad queda fijada mediante el pull-up interno (`pull_up=True`) y el pulsador conectado a GND.
+
+Se agregaron tests utilizando los mock pins de GPIO Zero para verificar:
+
+- pulsación;
+- liberación;
+- orden de los eventos;
+- ciclos repetidos;
+- debounce;
+- aceptación de una transición válida posterior al debounce;
+- liberación de recursos mediante `close()`.
+
+De esta forma, la lógica GPIO puede validarse automáticamente sin disponer de una Raspberry Pi física durante CI.
+
+---
+
+## 30/09/2026
+
+### Avance
+
+Se evaluaron las alternativas para la comunicación entre la Raspberry Pi y la PC
+en la red local aislada. La comparación incluyó HTTP, WebSocket, gRPC y un
+protocolo TCP propio, considerando simplicidad, recursos, latencia, manejo de
+errores, testabilidad y desacoplamiento respecto de `InterpretationService`.
+
+La investigación quedó registrada en
+[Raspberry Pi–PC communication protocol comparison](../research/raspberry-pi-pc-communication.md)
+y la decisión estable en
+[ADR-0001](../decisions/0001-use-http-json-for-pi-pc-communication.md).
+
+### Decisiones técnicas
+
+- Se eligió **HTTP/1.1 con JSON UTF-8** para el intercambio request/response del
+  MVP.
+- La Raspberry Pi actuará como cliente y la PC como servidor dentro de la red
+  local.
+- La capa de transporte será responsable únicamente de
+  `TransportEnvelope<T>`; el payload permanecerá opaco y podrá transportar
+  `ServiceResult<ContractPayload>` sin que la comunicación conozca su semántica.
+- El framework HTTP, el endpoint y el esquema ejecutable definitivo se
+  resolverán en la tarea de implementación del servidor.
+
+### Implementación
+
+Se implementó el primer servidor de comunicación de la PC con **FastAPI** y
+**Uvicorn**. El endpoint versionado `POST /api/v1/interpret` recibe texto
+reconocido, invoca un handler sustituible y devuelve un
+`TransportEnvelope<T>` sin inspeccionar la semántica del payload.
+
+El servidor incluye un stub ejecutable, configuración de host y puerto mediante
+variables de entorno y respuestas tipadas para JSON inválido, request inválido,
+tipo de contenido no soportado, fallos del handler y errores de serialización.
+
+Se agregaron 20 tests del nuevo módulo, además del test de humo existente. La
+suite completa alcanzó **21 tests aprobados** y **92 % de cobertura**. También se
+realizó una prueba HTTP real contra el servidor local, verificando una respuesta
+exitosa y el rechazo de un request inválido.
+
+### Implementación de captura de audio USB
+
+Se implementó la captura de audio desde micrófono USB, manteniéndola desacoplada tanto del GPIO como del futuro motor de Speech-to-Text.
+
+`AudioCapture` expone un ciclo explícito `start()` / `stop()` y depende de una interfaz `AudioInputBackend`. La implementación de producción utiliza `SoundDeviceBackend`, mientras que los tests pueden sustituirla por un backend simulado.
+
+La captura se realiza progresivamente, evitando mantener toda la grabación en memoria. Esto reduce el uso de RAM y resulta apropiado para la Raspberry Pi 3 utilizada por el proyecto.
+
+### Lifecycle del artifact
+
+Cada captura utiliza un identificador UUID y comienza escribiendo sobre un archivo temporal:
+
+`<uuid>.recording`
+
+Al detenerse la captura se finaliza el WAV, se validan sus parámetros y sólo entonces se publica mediante una operación atómica como:
+
+`<uuid>.wav`
+
+Por lo tanto, un archivo con extensión `.wav` representa un artifact correctamente finalizado.
+
+`AudioArtifact` mantiene un identificador independiente del path y expone `cleanup()` para que el propietario pueda eliminar el archivo cuando deje de necesitarlo.
+
+### Selección del micrófono
+
+El dispositivo de entrada se selecciona mediante una descripción configurable y no mediante un índice PortAudio persistente, ya que esos índices pueden cambiar al reiniciar o reconectar dispositivos.
+
+Se definieron errores específicos para distinguir:
+
+- dispositivo no encontrado;
+- selector ambiguo;
+- configuración de audio no soportada;
+- fallos del stream;
+- operaciones inválidas según el estado de la captura.
+
+Antes de abrir el stream se valida que el dispositivo seleccionado pueda utilizar el contrato actual de 16 kHz, mono y signed 16-bit. No se agregó resampling automático.
+
+---
+
+## 01/10/2026
+
+### Implementación
+
+Se implementó el núcleo de `InterpretationService`, independiente del proveedor
+que realice la interpretación. El servicio resuelve el proveedor activo desde un
+registro, le delega el texto reconocido y siempre devuelve un `ServiceResult`
+tipado, incluso cuando la entrada es inválida o el proveedor falla.
+
+La interfaz está documentada en
+[InterpretationService interface](../interfaces/interpretation-service.md).
+
+### Decisiones técnicas
+
+- Los proveedores implementan un único método `interpret(text)`. Un modelo
+  local y una API externa entran en el mismo puerto, porque cada proveedor
+  maneja su propia configuración, red y timeouts.
+- `ServiceResult` distingue éxito y tres categorías de error estables:
+  `invalid_input`, `provider_not_configured` y `provider_failure`. El campo
+  `detail` es solo diagnóstico.
+- Cualquier excepción inesperada del proveedor se informa como
+  `provider_failure` sin exponer el mensaje interno.
+- Un error del servicio es un resultado transportado con éxito: la capa HTTP no
+  lo convierte en error de transporte.
+- El proveedor activo se elige con `VOICESTOCK_INTERPRETATION_PROVIDER`
+  (por defecto `stub`). Un nombre vacío o no registrado no rompe el arranque:
+  cada llamada devuelve `provider_not_configured`.
+- El servicio todavía no está conectado al servidor HTTP; eso corresponde a
+  `InterpretationService-02`.
+
+### Pruebas
+
+Se agregaron 25 tests que usan solamente proveedores en memoria, sin acceso a
+red, incluyendo la sustitución de proveedor y un chequeo de imports que
+garantiza que el módulo no depende de HTTP ni de otro transporte. La suite
+completa alcanzó **46 tests aprobados** y **96 % de cobertura**.
+
+### Problemas encontrados
+
+- Al agregar `tests/interpretation/test_settings.py`, Pytest falló porque ya
+  existía un archivo con el mismo nombre en `tests/communication/` y las
+  carpetas de tests no son paquetes. Se resolvió usando nombres de archivo
+  únicos.
+- El servidor MCP oficial de ClickUp devolvió un error de límite de uso al
+  conectarlo desde Claude Code. Se optó por acceder a la API REST de ClickUp
+  con un token personal guardado fuera del repositorio.
+
+### Integración servidor–servicio
+
+Se conectó `InterpretationService` al servidor de comunicación de la PC. Ahora
+una solicitud `POST /api/v1/interpret` recorre el camino completo servidor →
+servicio → proveedor, y la respuesta tiene dos niveles:
+
+- el `TransportEnvelope` externo indica si el mensaje viajó correctamente;
+- el `ServiceResult` interno indica si el texto pudo interpretarse.
+
+Un error del servicio, como `provider_not_configured`, viaja dentro de un sobre
+exitoso con HTTP 200. Un error de transporte, como un texto vacío, se rechaza
+antes de llegar al servicio.
+
+La unión de ambas capas se hace en un único módulo nuevo,
+`src/voicestock/pc_server.py`, que pasa a ser el punto de entrada del comando
+`voicestock-pc-server`. Se eliminó el stub que vivía dentro de la capa de
+comunicación, que ahora no importa nada del paquete de interpretación.
+
+Se agregaron 7 tests del camino integrado, incluyendo chequeos de imports que
+verifican que la comunicación no conoce la interpretación y que no existe un
+segundo servidor HTTP. La suite alcanzó **53 tests aprobados** y **96 % de
+cobertura**. Además se levantó el servidor real y se verificó con `curl` un
+éxito, un rechazo de transporte (`422`) y un error de servicio dentro de un
+sobre exitoso (`200`).
+
+Tras actualizar el repositorio hay que reinstalar el paquete
+(`pip install -e ".[dev]"`), porque cambió el módulo del comando
+`voicestock-pc-server`.
+
+### Cliente de comunicación en la Raspberry Pi
+
+Se implementó el cliente que usa la Raspberry Pi para enviar el texto
+reconocido a la PC (`RaspberryPiPCCommunication-03`). Con él queda completo en
+código el viaje Raspberry → PC → Raspberry; falta probarlo en el hardware real.
+
+Decisiones:
+
+- El resto del sistema depende del protocolo `InterpretationClient`, con un
+  único método `interpret(text) -> TransportEnvelope`. No conoce HTTP, de modo
+  que el transporte se puede cambiar sin tocar a quien lo usa.
+- El cliente nunca lanza excepciones por problemas de comunicación: todo
+  resultado es un `TransportEnvelope`. Así aparece un tercer nivel de error,
+  detectado en la propia Raspberry cuando no llega una respuesta usable:
+  `timeout`, `connection_failed`, `unexpected_status`,
+  `invalid_response_encoding`, `invalid_envelope` y
+  `request_encoding_failure`. Estos códigos no se superponen con los del
+  servidor, y los errores que informa el servidor llegan sin cambios.
+- El cliente no valida el texto ni inspecciona el payload, y no hace
+  reintentos: esas decisiones corresponden a capas superiores.
+- Destino y timeout se configuran con `VOICESTOCK_PC_URL` (por defecto
+  `http://127.0.0.1:8000`) y `VOICESTOCK_PC_TIMEOUT` (por defecto 10 segundos).
+  La IP definitiva de la PC depende de `LocalNetworkInfra`, que todavía no fijó
+  el plan de direcciones.
+- `httpx` pasó de dependencia de desarrollo a dependencia de ejecución, porque
+  ahora la usa el cliente.
+
+### Pruebas del cliente
+
+Se agregaron tests con un transporte simulado (`httpx.MockTransport`) para cada
+respuesta rota posible, y tests con sockets reales en localhost: un viaje
+completo contra el servidor real, un puerto cerrado y un socket que acepta la
+conexión pero nunca responde, que debe terminar en `timeout`. La suite alcanzó
+**94 tests aprobados** y **97 % de cobertura**; el cliente tiene 100 %.
+
+Tras actualizar el repositorio hay que reinstalar el paquete
+(`pip install -e ".[dev]"`), porque `httpx` pasó a ser dependencia de
+ejecución.
+
+### Documentación de la comunicación Raspberry Pi–PC
+
+Se completó la documentación de la interfaz de comunicación
+(`RaspberryPiPCCommunication-04`) para que cualquier integrante pueda levantar
+servidor y cliente y reproducir el viaje completo solo con el repositorio:
+
+- Se agregó el comando `voicestock-pi-client "texto"`, que envía un texto a la
+  PC e imprime el `TransportEnvelope` resultante. Es el equivalente del lado de
+  la Raspberry a `voicestock-pc-server` y sirve para pruebas manuales.
+- Se documentó cómo operar en la red local: el servidor escuchando en
+  `0.0.0.0`, cómo obtener la IP de la PC y cómo apuntar el cliente desde la
+  Raspberry. La IP definitiva queda a cargo de `LocalNetworkInfra`.
+- Se armó un catálogo único de errores de comunicación (del servidor y del
+  cliente), con un comando para reproducir cada uno y la salida obtenida al
+  ejecutarlo. Los que el proveedor stub no puede provocar se enlazan a su test.
+- Se dejó explícito que la capa de comunicación no inspecciona operación,
+  producto, cantidad ni unidad.
+
+Queda pendiente la prueba física entre la PC y la Raspberry, que depende de la
+red de `LocalNetworkInfra`.
+
+### Reorganización del código en `pc`, `pi` y `shared`
+
+Siguiendo lo acordado en el equipo, se reorganizó `src/` según la máquina donde
+corre cada parte, en lugar del paquete único `voicestock` dividido por
+funcionalidad:
+
+- `src/pc`: servidor HTTP, `InterpretationService` y proveedores, y el comando
+  `voicestock-pc-server`.
+- `src/pi`: cliente de comunicación y el comando `voicestock-pi-client`. Más
+  adelante se sumarán Push-to-Talk, SpeechToText, operaciones pendientes, base
+  de datos y web.
+- `src/shared`: el contrato que intercambian ambas máquinas
+  (`TransportEnvelope`, `InterpretationRequest`), con una sola definición para
+  que la PC y la Raspberry no se desincronicen.
+
+Se eligió `src/pc` y `src/pi` como paquetes de primer nivel, tal como se había
+planteado, en lugar de `src/voicestock/pc`. La decisión, sus alternativas y sus
+consecuencias quedaron en el ADR-0002. Un nuevo test de arquitectura verifica
+que `pc` y `pi` no se importen entre sí y que `shared` no importe a ninguno. Los
+tests se reorganizaron con la misma división.
+
+No cambió el comportamiento: los comandos conservan su nombre y la suite pasó
+de 97 a **101 tests aprobados** (por los nuevos chequeos de imports), con
+**97 % de cobertura**. Tras actualizar el repositorio hay que reinstalar el
+paquete (`pip install -e ".[dev]"`).
+
+### Integración completa de Push-to-Talk
+
+Sobre la nueva estructura `pc`, `pi` y `shared`, se integraron los componentes
+de Push-to-Talk dentro del runtime de la Raspberry Pi:
+
+- `src/pi/input` contiene la adaptación del pulsador físico;
+- `src/pi/audio` contiene configuración, backend, captura y artifacts de audio;
+- `src/pi/push_to_talk` contiene la orquestación del gesto Push-to-Talk y el
+  resultado entregado al siguiente componente.
+
+Estos módulos permanecen dentro de `pi` y no en `shared`, ya que son
+responsabilidades específicas de la Raspberry Pi.
+
+`PushToTalkController` conecta los eventos del pulsador con `AudioCapture`.
+Los callbacks GPIO no realizan operaciones de audio directamente: `PRESSED`,
+`RELEASED` y los eventos de timeout ingresan a una cola y son procesados
+secuencialmente por un único worker.
+
+El flujo implementado queda:
+
+**pulsación → `PRESSED` → inicio de captura → liberación → `RELEASED` → finalización del WAV → `AudioCaptureResult`**
+
+`AudioCaptureResult` contiene el artifact generado, la duración real obtenida
+desde el WAV, el formato de audio y el motivo de finalización.
+
+### Duración máxima y máquina de estados
+
+Se incorporó una duración máxima configurable, con un valor por defecto de
+**60 segundos**, para evitar grabaciones indefinidas ante un pulsador trabado o
+una liberación no detectada.
+
+El controlador utiliza los estados:
+
+- `IDLE`;
+- `RECORDING`;
+- `WAITING_FOR_RELEASE`.
+
+Si vence el timeout mientras el botón continúa presionado, se finaliza la
+captura y se entrega un artifact válido con
+`TerminationReason.MAX_DURATION`. El controlador pasa entonces a
+`WAITING_FOR_RELEASE` y no permite comenzar otra captura hasta detectar la
+liberación física del pulsador.
+
+El timer no ejecuta `stop()` directamente: únicamente coloca el evento en la
+misma cola utilizada por el resto del controlador. Cada ciclo utiliza además
+una identificación interna para impedir que un timeout atrasado perteneciente
+a una grabación anterior detenga una captura posterior.
+
+### Ownership del audio
+
+Durante una grabación, `AudioCapture` es responsable del archivo temporal.
+
+Después de finalizar correctamente el WAV y construir `AudioArtifact`, el
+artifact se incorpora a `AudioCaptureResult` y se entrega mediante el callback
+de finalización.
+
+A partir de ese momento el ownership pertenece al consumidor. El controlador
+Push-to-Talk no elimina automáticamente artifacts entregados exitosamente.
+
+Esta separación permite que el futuro orquestador de Speech-to-Text decida
+cuándo procesar, conservar o eliminar el archivo sin acoplar esa política a la
+captura.
+
+### Pruebas de Push-to-Talk
+
+Se agregaron tests automatizados para los principales escenarios del
+controlador:
+
+- ciclo normal press–talk–release;
+- timeout por duración máxima;
+- eventos redundantes;
+- errores al iniciar la captura;
+- errores al detenerla;
+- carreras entre release y timeout;
+- timeouts atrasados pertenecientes a ciclos anteriores;
+- cierre durante una grabación activa;
+- excepciones producidas por el consumidor;
+- lifecycle y ownership del artifact.
+
+Los componentes GPIO y audio pueden sustituirse por implementaciones simuladas,
+por lo que la suite no requiere una Raspberry Pi, un pulsador ni un micrófono
+USB.
+
+### Documentación de Push-to-Talk
+
+Se completó la documentación estable de la feature.
+
+La decisión arquitectónica quedó registrada en el **ADR-0003**, documentando:
+
+- GPIO Zero con detección orientada a eventos;
+- callbacks GPIO mínimos;
+- cola y worker único para la orquestación;
+- `python-sounddevice` sobre PortAudio y ALSA;
+- `RawInputStream` para captura;
+- WAV PCM de 16 kHz, mono y 16 bits como contrato actual.
+
+La interfaz de Push-to-Talk documenta las responsabilidades de
+`PushToTalkButton`, `AudioCapture` y `PushToTalkController`, además de
+`AudioArtifact`, `AudioCaptureResult`, `AudioFormat`, `TerminationReason`, la
+máquina de estados y las reglas de ownership.
+
+También se agregó una guía de setup y prueba manual para conectar el pulsador,
+seleccionar el micrófono USB y ejecutar el nuevo comando:
+
+`voicestock-pi-ptt`
+
+El comando permite configurar pin BCM, debounce, dispositivo de entrada,
+directorio de salida y duración máxima.
+
+La guía incluye procedimientos para comprobar el WAV generado y reproducir el
+caso `MAX_DURATION`, además de diagnóstico para dispositivos inexistentes,
+selectores ambiguos, formatos no soportados y problemas de wiring o debounce.
+
+### Problemas encontrados en CI
+
+Al ejecutar la suite de Push-to-Talk en GitHub Actions, Pytest falló durante
+collection por imports internos de tests que utilizaban rutas del tipo
+`tests.pi...`.
+
+Estos imports funcionaban en el entorno local utilizado durante el desarrollo,
+pero dependían de que `tests` fuese importable como paquete raíz, condición que
+no estaba garantizada en un checkout limpio de CI.
+
+Se corrigió la organización/importación de los helpers de tests para eliminar
+esa dependencia del entorno local, sin modificar el workflow ni agregar
+`tests` artificialmente a `PYTHONPATH`.
+
+### Estado de Push-to-Talk
+
+Con la investigación, implementación, integración, tests y documentación
+completados, Push-to-Talk queda preparado a nivel de software para conectarse
+posteriormente con Speech-to-Text.
+
+Queda pendiente la validación física sobre la Raspberry Pi 3 del proyecto con
+el pulsador y el micrófono USB reales. Se deberá comprobar:
+
+- detección física de pulsación y liberación;
+- debounce con el pulsador real;
+- disponibilidad de PortAudio/ALSA en la imagen utilizada;
+- detección del micrófono USB;
+- soporte real de captura a 16 kHz, mono y 16 bits;
+- calidad del WAV resultante;
+- ciclo press–talk–release;
+- finalización por duración máxima.
+
+---
+
+## 04/10/2026
+
+### Red local: investigación (`LocalNetworkInfra-01`)
+
+Se reconsideró el enfoque original de usar la Raspberry Pi como punto de
+acceso Wi-Fi. La arquitectura elegida es un enlace Ethernet directo entre la
+PC y la Raspberry Pi 3. El Wi-Fi de la PC queda libre para Internet.
+
+El plan quedó así:
+
+- subred dedicada `192.168.50.0/24`;
+- Raspberry Pi en `192.168.50.1/24`;
+- PC en `192.168.50.2/24`;
+- direcciones estáticas;
+- sin puerta de enlace ni DNS en la Ethernet de VoiceStock;
+- sin DHCP, sin NAT y sin reenvío IP;
+- la Raspberry Pi no actúa como punto de acceso Wi-Fi.
+
+La decisión y sus motivos están en
+[estrategia de red local](../research/local-network-strategy.md).
+
+### Configuración Ethernet estática (`LocalNetworkInfra-02`)
+
+Se agregaron scripts reproducibles para aplicar esas direcciones en cada
+máquina. Se pueden ejecutar más de una vez. Cada script guarda la
+configuración con el mecanismo persistente de su sistema; el reinicio en el
+hardware real todavía no se probó.
+
+En la Raspberry Pi, `scripts/setup_pi_ethernet.sh` usa NetworkManager
+(`nmcli`). Crea o actualiza el perfil persistente `voicestock-ethernet` con
+`192.168.50.1/24`, sin puerta de enlace, sin DNS y con `ipv4.never-default`.
+Solo modifica la interfaz Ethernet elegida: si hay una sola, la usa; si hay
+más de una, hay que indicarla.
+
+En la PC, `scripts/setup_pc_ethernet.ps1` exige el `InterfaceAlias` exacto y
+no elige un adaptador por su cuenta. En ese adaptador deja `192.168.50.2/24`,
+desactiva el DHCP IPv4, no configura puerta de enlace y no modifica el Wi-Fi.
+
+Al revisar el script de Windows se corrigió el DNS. `ResetServerAddresses`
+volvía a los servidores que entrega DHCP. Ahora el adaptador dedicado guarda
+una lista DNS IPv4 estática y vacía, de modo que no queda ningún servidor DNS
+en esa interfaz.
+
+### Documentación operativa (`LocalNetworkInfra-03`)
+
+Se completó la guía de operación en
+[setup de la red Ethernet](../setup/local-network.md). Cubre la topología
+esperada, la preparación del hardware, la configuración de la Raspberry Pi y
+de Windows, la verificación local de direcciones y rutas, el orden de
+arranque, el diagnóstico de fallos habituales y una lista de comprobación
+antes de una demo.
+
+También se actualizó
+[la interfaz de comunicación Raspberry Pi–PC](../interfaces/pc-communication.md)
+para usar la dirección fija de la PC, `192.168.50.2`, y dejar de indicar el
+punto de acceso Wi-Fi que se había considerado antes.
+
+### Estado de LocalNetworkInfra
+
+- `LocalNetworkInfra-01` completada.
+- `LocalNetworkInfra-02` completada.
+- `LocalNetworkInfra-03` completada.
+- `LocalNetworkInfra-04` pendiente: falta la validación física con la PC, la
+  Raspberry Pi y el cable Ethernet reales. Todavía no se comprobó en hardware
+  la conectividad de punta a punta, el aislamiento de Internet ni que la
+  configuración sobreviva a un reinicio.
+
+
+
+---
+
+## 07/10/2026
+
+### Puertos de la operación pendiente (`PendingOperationWeb-02`)
+
+Se definió la frontera que va a usar la web para consultar y resolver la
+operación pendiente, sin implementar `PendingOperationFlow`. Esa feature sigue
+siendo la dueña futura de la operación y de la máquina de estados. Acá no se
+creó un segundo modelo de dominio ni una FSM paralela.
+
+El código quedó en `pi.pending_operation`:
+
+- `PendingOperationQueryPort.get_current()` devuelve un
+  `PendingOperationView` o nada;
+- `PendingOperationResolutionPort` expone `confirm(operation_id)` y
+  `cancel(operation_id)`, con `ResolutionResult` en lugar de un booleano;
+- `PendingOperationGateway` aplica esa política con un único lock;
+- `ProvisionalOperationExecutor` responde éxito y no toca inventario;
+- el estado real entra por `PendingOperationSlot`, que Flow tiene que
+  implementar.
+
+Confirmar solo cierra la pendiente después de una ejecución exitosa. Cancelar
+no ejecuta inventario. Un reintento de la misma acción devuelve
+`already_resolved` y no vuelve a ejecutar; la acción contraria devuelve
+`conflict`. Esa memoria es solo la resolución anterior en el proceso y se
+pierde al reiniciar.
+
+El registro para integrar Flow está en
+[pending operation web flow contract](../research/pending-operation-web-flow-contract.md).
+No se agregó un ADR nuevo: la topología y el rol de HTTP ya están en ADR-0004,
+y este contrato es el hand-off hasta que Flow exista.
+
+---
+
+## 08/10/2026
+
+### Servidor web inicial (`PendingOperationWeb-03`)
+
+Se agregó la capa `pi.web`: FastAPI en `create_app`, Uvicorn en `run_server`,
+y la página estática de marcador de posición. `GET /health` solo indica que
+el servidor HTTP responde. `GET /` sirve el HTML local, y `/static/*` los
+archivos CSS y JavaScript. No hay API de operación pendiente, CORS, HTTPS ni
+login.
+
+El comando `voicestock-pi-web` arranca ese servidor para desarrollo y
+validación. En la Raspberry Pi el default es `192.168.50.1:8000`. En otra
+máquina se puede usar `VOICESTOCK_WEB_HOST=127.0.0.1`. No es un segundo
+proceso productivo: ADR-0004 sigue pidiendo un único proceso cuando exista el
+orquestador. Cómo se componen ambos queda pendiente.
+
+La guía está en [servidor web de la Raspberry Pi](../setup/pi-web.md).
+Los frameworks HTTP siguen permitidos solo en el servidor de la PC y en
+`pi/web`.
+
+### API de la operación pendiente (`PendingOperationWeb-04`)
+
+Se agregó el API versionado en `pi.web`: `GET /api/v1/pending-operation`,
+`POST .../confirm` y `POST .../cancel`. Las rutas llaman a los puertos de
+aplicación y traducen `ResolutionResult` a HTTP. No hay body en confirm ni
+cancel. Un GET sin pendiente responde `204`. Un reintento de la misma acción
+responde `200` con `already_resolved`. Conflicto y id viejo responden `409`.
+Un fallo de ejecución responde `503` sin texto de excepción.
+
+Si `voicestock-pi-web` arranca sin puertos, `/health` sigue en `200` y el
+API responde `503` con `application_not_ready`. Un `operation_id` en blanco
+responde `422`.
+
+El contrato está en
+[API de la operación pendiente](../interfaces/pending-operation-web-api.md).
+No se creó un ADR: el mapeo es el contrato HTTP, y la decisión de que HTTP
+es un adaptador ya está en ADR-0004.
+
+### Interfaz de la operación pendiente (`PendingOperationWeb-05`)
+
+La página dejó de ser un marcador de posición. Muestra la frase de
+confirmación, los datos estructurados y el texto reconocido. Si no hay
+operación, pide usar el botón físico. Confirmar y cancelar llaman al API
+con el `operation_id` visible.
+
+La consulta se repite cerca de una vez por segundo, esperando a que termine
+la anterior. Un reintento exitoso se muestra como confirmación o
+cancelación, no como error. Si la operación cambió, la página se actualiza.
+Si la ejecución falla, la tarjeta sigue y se pueden reintentar los botones.
+Si la aplicación no está lista o se corta la red, el encabezado dice que no
+está disponible y sigue reintentando.
+
+El comportamiento está en
+[página de la operación pendiente](../interfaces/pending-operation-web-ui.md).
+
+### Documentación del servidor y de la página (`PendingOperationWeb-06`)
+
+Se consolidó la documentación de la feature sin agregar comportamiento. Cada
+tema quedó en un documento: la decisión en ADR-0004, el hand-off con
+`PendingOperationFlow` en el contrato de flujo, el arranque en la guía del
+servidor web, el HTTP en el contrato del API y la página en su interfaz.
+
+La guía deja explícito que `GET /health` solo indica que el servidor HTTP
+está vivo. El contrato de flujo registra que el executor de octubre no
+modifica inventario, que `last_resolution` no es idempotencia durable, y que
+un éxito de ejecución seguido de un fallo al resolver el slot queda para el
+executor real. Flow sigue siendo el dueño de la FSM y del slot.
+
+No se creó un ADR: no hay una decisión de arquitectura nueva.
+### Interpretación estructurada: experimentos y organización documental
+
+Se organizaron los scripts y resultados de los experimentos realizados en
+septiembre con Ollama, Groq y Gemini. El benchmark original evalúa extracción
+de productos y cantidades; el de precisión incorpora diez casos de operaciones,
+correcciones y cancelaciones. Los reportes preservan respuestas originales,
+exactitud y errores de solicitud.
+
+La [investigación de estrategias](../research/stock-interpretation-strategy-and-evaluation.md)
+registra resultados y limitaciones. Qwen 3 4B Instruct y GPT-OSS 20B completaron
+cada uno una corrida de precisión con 10/10. Gemini contestó nueve casos
+correctamente y tuvo un error de API; el caso restante se evaluó después con
+`contract.txt` en vez de `contract-copy.txt`. Se verificó que ambos archivos
+tienen contenido idéntico en el repositorio actual. Sus nombres distintos no
+implican instrucciones diferentes. Los resultados no garantizan precisión
+sobre frases nuevas. Los umbrales operativos se registran en la entrada del 09/10.
+
+Después de incorporar develop, se reservó
+[ADR-0004](../decisions/0004-use-api-provider-for-stock-interpretation.md)
+para la estrategia de interpretación, conservando los ADR existentes 0001–0003.
+El proveedor de producción todavía no está implementado.
+
+---
+
+## 09/10/2026
+
+### Estrategia inicial y límites operativos
+
+Se definió una API externa como primera opción (Groq o Gemini, configurable)
+y el modelo local como segunda opción. Se aceptan hasta 8 segundos por solicitud
+para API, y hasta 40 segundos y 3 GB RAM para local. No se exige fallback
+automático. Los límites se definieron después de los experimentos de septiembre.
+Las medias registradas están por debajo de los límites de latencia; falta
+comprobar el límite por solicitud y la RAM local, cuyo pico histórico fue
+aproximadamente 3,132 MB. La decisión sigue propuesta para revisión del equipo.
+
+---
+
+## 10/10/2026
+
+### Exploración de STT y pipeline de interpretación
+
+Se prepararon diez grabaciones en WAV PCM16 mono 16 kHz conservando originales
+y hashes, y se organizaron textos y audios en básico, habitual y exigente.
+Se compararon Vosk, Whisper Tiny/Base/Small Q5_1, Moonshine Tiny/Small y Kroko
+en PC, con calentamiento y tres repeticiones por audio. La revisión cualitativa
+separó sentido inequívoco, ambigüedad y pérdidas críticas de información.
+
+Se seleccionó Whisper Small Q5_1 como candidato principal para validar en
+Raspberry Pi 3. Moonshine Small y Kroko permanecen como candidatos comparativos.
+[ADR-0005](../decisions/0005-use-whisper-small-q5-for-offline-stt.md) queda propuesto.
+
+La cadena de seis audios básicos/habituales devolvió 6/6 JSON esperados con
+GPT OSS 20B vía Groq, 5/6 con Qwen local y cuatro correctos con Gemini 3.8 Flash
+más dos errores de API. Se actualizó ADR-0004 con GPT OSS 20B como LLM principal
+y Qwen como segunda opción. Los intentos de API fallidos se conservaron aparte.
+Las claves locales se cargan desde config/api-keys.env, ignorado por Git, con
+una plantilla vacía versionable y procedimiento documentado.
+
+[La investigación](../research/speech-to-text-engine-evaluation.md) conserva
+las limitaciones: referencias sin verificar escuchando, corpus pequeño,
+paralelismo distinto entre motores, hueco de RAM de la primera carga de Qwen
+y falta de aceptación de latencia/recursos. Quedan pendientes hardware real,
+interfaz/adaptador STT, proveedor de producción y flujo físico. No se modificó
+el estado de las tareas de ClickUp ni se considera cerrada la feature STT.
+
+### Preparación de la prueba distribuida por SSH
+
+Después de integrar el PR de exploración, se implementó el puerto SpeechToText
+y el adaptador secuencial Whisper en `src/pi/speech_to_text/`. Se agregó un
+nuevo coordinador que transfiere los seis WAV básicos/habituales a la Pi por
+SSH, recibe texto y métricas del worker remoto y llama a GPT OSS 20B vía Groq
+desde la PC. Las claves permanecen locales en la PC.
+
+Se documentaron [la interfaz](../interfaces/speech-to-text.md) y
+[la preparación y ejecución](../testing/raspberry-stt-ssh.md), incluyendo venv
+en la Raspberry sin requerir Conda, compilación para la arquitectura destino,
+transferencia de pesos, hashes y conservación de resultados parciales.
+Los tests y benchmarks anteriores quedaron intactos. Se verificó formato y
+lint; no se ejecutó la prueba SSH en hardware ni nuevos tests de contrato.
+Las tareas STT siguen pendientes de sus criterios de aceptación completos.
+---
+
+## 11/10/2026
+
+### Red local: del Ethernet al punto de acceso aislado
+
+Se revisó la arquitectura Ethernet de `LocalNetworkInfra` porque el montaje
+previsto no tiene el enlace cableado que esa decisión daba por existente. El
+trabajo Ethernet anterior queda en la bitácora y en el historial de Git. No
+se lo reescribe.
+
+La red pasa a un punto de acceso Wi-Fi aislado creado por la Raspberry Pi 3.
+La placa no se conecta a Internet ni entra como cliente de otra red: su
+interfaz Wi-Fi queda solo en modo access point, con el SSID `VoiceStock`.
+
+La PC de referencia es Arch Linux con NetworkManager. Usa dos interfaces
+Wi-Fi. Una sigue en la red de Internet, con su DHCP, su puerta de enlace, su
+DNS y la ruta por defecto. La otra se dedica a VoiceStock, con la dirección
+estática `192.168.50.2/24`. La Raspberry Pi queda en `192.168.50.1/24`. No hay
+DHCP, NAT, reenvío ni puente entre las dos redes.
+
+Se reemplazaron los scripts de Ethernet por
+`scripts/setup_pi_access_point.sh` y
+`scripts/setup_pc_voicestock_wifi.sh`. El de la PC exige el nombre de la
+interfaz VoiceStock y no elige ni modifica la interfaz de Internet. La
+contraseña de prototipo quedó en un solo archivo,
+`scripts/voicestock-network.conf`, a propósito para esta etapa académica.
+
+También se actualizaron la investigación, el ADR-0004, la guía de setup y la
+interfaz de comunicación Raspberry Pi–PC. Las direcciones que usa la
+aplicación no cambian.
+
+`LocalNetworkInfra-04` sigue pendiente. No se validó en hardware que la PC y
+la Raspberry se alcancen, que la PC conserve Internet, que VoiceStock no se
+vuelva la ruta por defecto, que la Raspberry no tenga Internet, que la
+configuración sobreviva a un reinicio, que el punto de acceso vuelva a
+levantarse, ni que la comunicación de la aplicación funcione sobre el enlace
+real.
+
+---
+
+## 17/10/2026
+
+### Puesta al día del entorno de trabajo
+
+Se retomó el trabajo sobre las tareas de interpretación y contrato. Antes se
+actualizó el entorno:
+
+- ClickUp se consulta ahora con el conector oficial (OAuth). Reemplaza el
+  acceso por API REST con token personal que se había usado el 01/10.
+- Se instaló Tailscale en la PC y se accedió a la Raspberry Pi, compartida desde
+  la cuenta de Martin. El acceso es por SSH con clave. La Raspberry solo aparece
+  en Tailscale cuando tiene Internet (modo mantenimiento). En operación es un
+  punto de acceso aislado y no se la puede alcanzar desde afuera.
+- El `.venv` local no tenía las dependencias del proyecto ni los hooks de
+  pre-commit instalados. Se instalaron con `pip install -e ".[dev]"` y
+  `pre-commit install`. El `.venv` local usa Python 3.14, mientras que el CI y
+  la Raspberry usan 3.11. Por eso el código que corre en la Raspberry también se
+  probó ahí.
+
+Se siguió la convención de una tarea de ClickUp por commit y por Pull Request,
+con Squash and Merge.
+
+### Fronteras del servicio de interpretación (`InterpretationService-03`)
+
+Se completó la
+[documentación del servicio](../interfaces/interpretation-service.md). Ya
+cubría `interpret(text) -> ServiceResult`, el puerto de proveedor y el
+`TransportEnvelope`. Se agregaron:
+
+- la cadena completa de capas: `InterpretationDraft` → `ContractPayload` →
+  `ServiceResult` → `TransportEnvelope` → validación en la Raspberry →
+  `ValidatedOperation` o `ValidationRejection` → `PendingOperation`, con el
+  dueño, la máquina y la especificación de cada una;
+- las fronteras con StructuredCommandInterpretation (no emite el contrato),
+  OperationContractValidation (el servicio no define ni valida el esquema) y
+  FaultHandlingRecovery (el servicio informa errores, no se recupera de ellos).
+
+### Política de identificación de productos (`OperationContractValidation-01`)
+
+Se registró la decisión en el
+[ADR-0006](../decisions/0006-identify-products-by-unique-attribute-match.md),
+en estado propuesto hasta la revisión del equipo:
+
+- El catálogo es la única autoridad de identidad. El contrato describe el
+  producto con atributos (`name` obligatorio; `brand`, `variant` y
+  `presentation` opcionales) y nunca lleva un identificador elegido por el
+  modelo.
+- Los atributos se normalizan de forma fija: sin acentos, sin distinguir
+  mayúsculas, con la puntuación convertida en espacios. No hay coincidencia
+  aproximada.
+- Si coincide exactamente un producto, queda identificado. Si no coincide
+  ninguno, es `unknown_product`; si coinciden varios, `ambiguous_product`, sin
+  desempate.
+- Todo producto del catálogo debe poder identificarse con sus propios
+  atributos.
+
+Se compararon la clave compuesta exacta, el subconjunto unívoco de atributos, la
+normalización y el identificador aportado por el modelo. Se descartaron también
+las coincidencias por distancia de edición, porque eligen candidatos con un
+umbral oculto.
+
+### Contrato versionado y validación estructural (`OperationContractValidation-02`)
+
+Se definió el `ContractPayload` versión 1 como modelo pydantic en
+`src/shared/operation_contract/`. Es la única definición del contrato, y la
+importan tanto el productor (PC) como el validador (Raspberry). En
+`src/pi/operation_contract/` se implementó la validación estructural, que
+devuelve el contrato o un `ValidationRejection` con un motivo distinguible.
+
+Decisiones acordadas para octubre:
+
+- `operations` es una lista, porque un comando hablado puede mencionar varios
+  productos y el intérprete ya devuelve una lista. Como la operación pendiente
+  es única, la Raspberry acepta exactamente una (`no_operations` y
+  `too_many_operations` en otro caso).
+- Las operaciones son `add_stock` y `remove_stock`, y la única unidad es
+  `unit`.
+- Los campos desconocidos se rechazan en todos los niveles y los tipos son
+  estrictos.
+- La versión se verifica antes que los campos, para que un contrato de otra
+  versión se informe como `unsupported_version`.
+- No se agregaron dependencias: pydantic ya venía con FastAPI y está instalado
+  en la Raspberry.
+
+Se agregaron 53 tests. Además se ejecutaron en la Raspberry Pi (Python 3.11.2),
+desde una copia temporal y sin modificar su instalación: los 53 pasaron.
+
+---
+
+## 19/10/2026
+
+### Commit de benchmark recuperado
+
+Un commit de Martin con la comparación del pipeline audio → Whisper (Groq) →
+GPT OSS 20B había quedado en la rama `feature/stt-ssh-integration` después del
+merge de su Pull Request, sin llegar a `develop`. Se lo incorporó con
+cherry-pick y sin cambios, conservando su autoría.
+
+### Mapper del contrato en la PC (`OperationContractValidation-04`)
+
+StructuredCommandInterpretation todavía no tiene un tipo `InterpretationDraft`.
+Hoy el draft es el JSON que devuelve el modelo en el benchmark de precisión:
+`{"operaciones": [{"operacion", "producto", "cantidad"}]}`. En `producto` el
+modelo usa el nombre exacto del catálogo (por ejemplo `Coca Cola Zero 2L`) y no
+devuelve unidad.
+
+Sobre esa base se implementó `map_draft` en `src/pc/operation_contract/`, el
+único productor del contrato:
+
+- `agregar_stock` y `restar_stock` pasan a `add_stock` y `remove_stock`;
+  `producto` pasa sin cambios a `product.name`, y la unidad es siempre `unit`.
+- Si falta o sobra un campo, la operación es desconocida, el producto está
+  vacío o la cantidad no es entera, falla con `DraftMappingError`. Nunca
+  completa datos.
+- No valida el dominio: cuántas operaciones se aceptan, el signo de la
+  cantidad y la existencia del producto se deciden en la Raspberry.
+
+Se agregaron 46 tests con golden fixtures tomados de las salidas esperadas del
+benchmark. Cada uno pasa por el mapper y por el validador estructural de la
+Raspberry. El mapper todavía no está conectado al servicio, porque el único
+proveedor registrado es el stub.
+
+### Identificación de productos y validación semántica (`OperationContractValidation-03`)
+
+Se implementó en la Raspberry la política del ADR-0006 y un único punto de
+entrada para PendingOperationFlow, `OperationValidator`. Recibe el contrato
+crudo y devuelve una `ValidatedOperation` (operación, `product_id` asignado por
+el catálogo, nombre para mostrar, cantidad y unidad) o un `ValidationRejection`.
+
+- Las etapas corren en orden: estructural, identificación y reglas semánticas
+  (cantidad positiva y unidad compatible con el producto). La primera que
+  falla decide el rechazo.
+- La identificación pasa por el puerto `ProductResolver`, que no depende de
+  SQLite. Su implementación en memoria verifica al cargarse que todo producto
+  sea identificable y que no haya identificadores repetidos.
+- Los tests del puerto están escritos para que cualquier implementación futura,
+  como ProductCatalog, tenga que pasarlos.
+- El catálogo de octubre es provisorio: los diez productos del benchmark, con
+  nombre completo. Se reemplaza por el fixture de
+  StructuredCommandInterpretation-02 sin cambiar el contrato.
+
+Con nombres completos, "Coca Cola" sola es `unknown_product` y no
+`ambiguous_product`, porque cada atributo se compara por igualdad. Se agregaron
+60 tests.
+
+### Documentación del contrato (`OperationContractValidation-05`)
+
+Se escribió la [interfaz del contrato de operación](../interfaces/operation-contract.md):
+
+- responsabilidades de cada componente;
+- campos, tipos y enumeraciones de la versión 1;
+- cómo producir el contrato en la PC y cómo validarlo en la Raspberry;
+- resumen de la política de identificación;
+- todos los motivos de rechazo, con ejemplos verificados contra el validador;
+- cómo introducir una versión 2;
+- qué queda fuera (catálogo SQLite, interfaz web y recuperación de fallos).
+
+Se publicó el JSON Schema en `docs/interfaces/schemas/`, con un test que falla
+si se desincroniza del modelo. Un test de integración recorre la cadena
+completa: draft → mapper → `ServiceResult` → `TransportEnvelope` → JSON →
+validador de la Raspberry con el catálogo de octubre. La suite quedó en **369
+tests aprobados**.
+
+### Problemas encontrados
+
+- El CI de un Pull Request falló antes de ejecutar los checks, por una descarga
+  de pip cortada en el runner de GitHub (`IncompleteRead`). Volver a ejecutar el
+  job alcanzó para que pasara.
+- La Raspberry no estaba en línea en Tailscale. La validación semántica no se
+  pudo probar en el hardware; queda cubierta por el CI con Python 3.11.
+- Después de los merges quedaban nueve ramas remotas ya integradas. Se
+  verificó que ninguna tuviera commits fuera de `develop` y se borraron.
+
+### Estado de OperationContractValidation
+
+Las cinco tareas están integradas en `develop`. Quedan pendientes:
+
+- conectar el mapper al servicio cuando exista el proveedor real de
+  StructuredCommandInterpretation-04;
+- reemplazar el catálogo provisorio por el de StructuredCommandInterpretation-02;
+- ejecutar la validación semántica en la Raspberry;
+- probar el viaje Raspberry → PC → Raspberry entre las dos máquinas físicas;
+- la revisión del ADR-0006 por el equipo.
+
+---
+
+## 22/10/2026
+
+### Prueba en la Raspberry reinstalada
+
+Se reinstaló la imagen de la Raspberry Pi 3: ahora corre Raspbian 13 (trixie)
+de 32 bits con Python 3.13, y en Tailscale aparece como un nodo nuevo. Se
+instalaron `git` y `libportaudio2`, se clonó el repositorio y se creó el
+entorno con `scripts/setup.sh`. Las dependencias se instalaron desde piwheels
+sin compilar nada.
+
+La suite completa pasó en la placa: **369 tests aprobados** en unos 12
+segundos. Con eso queda probada en hardware la validación semántica
+(`OperationContractValidation-03`), que el 19/10 no se pudo ejecutar porque la
+Raspberry no estaba en línea.
+
+### Primer viaje Raspberry → PC entre las dos máquinas
+
+Por primera vez el cliente de la Raspberry habló con el servidor corriendo en
+la PC. El camino directo no funcionó: la Raspberry está compartida desde otra
+tailnet, y ese share deja que la PC se conecte a la Raspberry pero no al
+revés. `tailscale ping` respondía, pero las conexiones TCP desde la Raspberry
+vencían por timeout. Se resolvió con un túnel SSH inverso abierto desde la PC,
+que lleva el puerto 8123 de la Raspberry hasta el servidor de la PC.
+
+Resultados:
+
+- un texto normal volvió como `success` en unos 3,2 segundos, casi todo el
+  arranque de Python en la Pi 3;
+- un texto vacío volvió como `invalid_request`;
+- el payload del stub fue rechazado por el validador como
+  `invalid_structure`, como se esperaba: el stub todavía no produce el
+  contrato;
+- un contrato v1 de ejemplo se validó como la `ValidatedOperation` de
+  `coca-cola-zero-2l`.
+
+Por ahora no se prueba el viaje por la red Wi-Fi aislada de
+LocalNetworkInfra.
+
+### STT pasa a la PC: transferencia de audio (`RaspberryPiPCAudioTransfer`)
+
+El compañero a cargo de SpeechToText informó que transcribir en la Raspberry
+era demasiado lento y que conviene hacerlo por API desde la PC. Eso cambia lo
+que viaja por la red: la Raspberry ya no envía texto reconocido sino el WAV que
+graba el push-to-talk. Como la tarea no existía, se creó en ClickUp la feature
+RaspberryPiPCAudioTransfer, con cinco tareas. El llamado a la API de
+transcripción queda a cargo de otro integrante; esta feature le deja preparado
+el punto donde conectarlo.
+
+- **01, decisión ([ADR-0007](../decisions/0007-send-push-to-talk-audio-as-raw-wav-over-http.md)):**
+  el WAV viaja tal cual como cuerpo de un `POST /api/v1/interpret-audio` con
+  `Content-Type: audio/wav`, y la respuesta es el mismo `TransportEnvelope` que
+  para texto. Se descartaron `multipart/form-data`, porque FastAPI necesita
+  una dependencia más para leerlo; JSON con base64, porque agranda el audio un
+  33 %; y el streaming, porque la API recibe el archivo completo. El límite es
+  de 4 MiB: una grabación de 60 segundos pesa unos 1,9 MB.
+- **02, servidor de la PC:** el endpoint lee el cuerpo con ese límite, verifica
+  que sea un WAV legible y se lo pasa a un handler de audio sustituible junto
+  con los datos del header. Los cuerpos vacíos, demasiado grandes, que no son
+  WAV o con otro media type tienen códigos de error distintos. Hoy el handler
+  es un stub que responde un `ServiceResult` con lo que llegó; la integración
+  real solo reemplaza esa función en `src/pc/main.py`.
+- **03, cliente de la Raspberry:** `interpret_audio(ruta)` envía el archivo y
+  devuelve un `TransportEnvelope` con los mismos códigos de error que el
+  cliente de texto, más `audio_read_failure` si el archivo no se puede leer.
+  Para probarlo desde la terminal está `voicestock-pi-client --audio x.wav`.
+- **04, push-to-talk → PC:** `RecordingSender` envía cada grabación terminada
+  y entrega la respuesta. Un error de comunicación no detiene el push-to-talk.
+  Si el WAV se conserva o se borra después del envío se decide explícitamente.
+  `voicestock-pi-ptt --send-to-pc` lo expone para la prueba manual.
+- **05, documentación:** la
+  [interfaz de audio Raspberry Pi–PC](../interfaces/pc-audio-communication.md)
+  explica el endpoint, los errores y cómo reproducirlos, cómo probar desde la
+  Raspberry y cómo conectar la transcripción por API sin tocar la
+  comunicación.
+
+La suite quedó en **418 tests aprobados**. Con el código del cliente, la suite
+también pasó en la Raspberry (412 tests). Por el mismo túnel se enviaron desde
+la placa dos grabaciones de prueba, de 8,6 y 51 segundos (1,6 MB): las dos
+llegaron completas en unos 3,5 segundos. Un archivo que no es WAV volvió como
+`invalid_audio`, uno inexistente como `audio_read_failure` y uno de 5 MB como
+`audio_too_large`.
+
+### Problemas encontrados
+
+- Los Pull Requests 2 a 4 de la feature dependían cada uno del anterior y se
+  abrieron apilados. Después de cada merge con squash hubo que rebasear el
+  siguiente sobre `develop`. Cambiar la base de un Pull Request no dispara el
+  CI, que corre con los push y los Pull Requests hacia `develop`, así que hubo
+  que volver a subir el commit para que corrieran los checks.
+- Instalar paquetes del sistema en la Raspberry requiere la contraseña de
+  `sudo`; esas instalaciones las hizo un integrante desde su terminal.
+
+### Estado de RaspberryPiPCAudioTransfer
+
+Las cinco tareas están integradas en `develop`. Quedan pendientes:
+
+- probar en la placa el recorrido botón → grabación → PC: la Raspberry no tenía
+  micrófono USB conectado;
+- conectar la transcripción por API como handler de audio en la PC;
+- revisar el timeout de la Raspberry (10 segundos por defecto) cuando la
+  respuesta incluya transcripción e interpretación.
+
+---
+
+## 23/10/2026
+
+### PendingOperationFlow: alcance en la Raspberry Pi
+
+Se revisó `develop` con el reconocimiento de voz ya trasladado a la PC. Lo
+que viaja desde la placa es el WAV del push-to-talk. El servidor de la PC
+sigue entregando ese audio a un handler provisional. La feature quedó en la
+orquestación de la Raspberry Pi: cuándo se puede grabar, qué hacer con la
+respuesta y cuándo volver a estar libre. No implementa captura, transcripción,
+el modelo de lenguaje, las reglas del contrato ni la base de inventario.
+
+### Implementación
+
+El ciclo entró en `8b817fa`, `feat(pending-operation): integrate Raspberry Pi
+operation workflow`.
+
+- `PendingOperation` guarda el `operation_id` generado en la Raspberry Pi, el
+  `recognized_text` que haya mandado la PC y la `ValidatedOperation`.
+- La máquina de estados de la aplicación tiene `IDLE`, `RECORDING`,
+  `PROCESSING` y `WAIT_CONFIRMATION`. Hay como máximo una operación pendiente,
+  y solo existe en `WAIT_CONFIRMATION`.
+- Una captura nueva solo arranca desde `IDLE`. Mientras el ciclo está abierto,
+  el botón no inicia otra.
+- Push-to-talk sigue grabando. El envío a la PC y la lectura de la respuesta
+  corren fuera del hilo del botón.
+- `PcResponseInterpreter` separa un fallo de transporte, un fallo del servicio
+  y el contrato. `OperationValidator` es el que acepta o rechaza ese contrato.
+- Confirmar y cancelar pasan por `PendingOperationGateway`, que ya tenía la
+  política de identificadores viejos y de resoluciones concurrentes.
+- El ejecutor es `ProvisionalOperationExecutor`: responde éxito y no modifica
+  inventario ni escribe historial. La operación vive solo en memoria.
+- `voicestock-pi` es el proceso que junta el botón, el micrófono, el cliente
+  HTTP, el validador, el flujo y la página. Los comandos `voicestock-pi-client`,
+  `voicestock-pi-ptt` y `voicestock-pi-web` siguen para diagnóstico.
+
+### Interfaz web
+
+La página dejó de adivinar el estado solo con la operación pendiente.
+
+- `GET /api/v1/system-status` publica la fase, los textos de esa fase y, si
+  corresponde, la operación.
+- En `idle` la pantalla queda lista para escuchar. En `recording` muestra que
+  está escuchando. En `processing`, que está procesando. En
+  `wait_confirmation` muestra la tarjeta.
+- Confirmar y cancelar siguen siendo los POST que ya existían. La página no
+  cambia la máquina de estados por su cuenta.
+
+El contrato está en la
+[API de la operación pendiente](../interfaces/pending-operation-web-api.md) y
+lo que se ve, en la
+[página de la operación pendiente](../interfaces/pending-operation-web-ui.md).
+
+### Correcciones
+
+`7b9d097`, `fix(pending-operation): handle unexpected capture errors and
+missing transcription`.
+
+- Si `AudioCapture.start()` lanza una excepción que no es `AudioCaptureError`,
+  el controlador la registra, avisa el fallo y vuelve a `IDLE`. El worker
+  sigue vivo. Antes, esa excepción podía dejar la máquina de estados en
+  `RECORDING`.
+- Si la PC no manda `recognized_text`, o viene vacío, la tarjeta no muestra
+  comillas vacías. Los datos validados y los botones siguen.
+
+### Documentación del flujo
+
+`9161fd6`, `docs(pending-operation): document Raspberry Pi operation workflow`.
+
+- [Arquitectura del ciclo](../architecture/pending-operation-flow.md), con el
+  diagrama de estados.
+- [Runtime integrado](../setup/pi-runtime.md).
+- Contratos de la API y de la página, enlazados arriba.
+- [ADR-0008](../decisions/0008-use-a-single-raspberry-pi-operation-workflow.md):
+  un solo orquestador en el proceso de la Raspberry Pi es el dueño del ciclo
+  y de la operación pendiente.
+
+El mismo día el trabajo entró a `develop` en `59c888a`, merge del pull
+request 32.
+
+### Estado
+
+El workflow está integrado en `develop`. Sigue pendiente una prueba física
+del recorrido completo. La PC todavía usa el handler provisional de audio.
+La operación pendiente no se persiste. Confirmar no modifica el inventario.
+La persistencia y una recuperación que sobreviva al reinicio del proceso
+quedan para otra feature.
+
+### Numeración de los ADR y red
+
+Tres decisiones distintas estaban archivadas como ADR-0004: el proveedor de
+interpretación (9 de octubre), FastAPI en el mismo proceso (6 de octubre) y
+el punto de acceso Wi-Fi (11 de octubre). Los ADR 0005 a 0008 no se
+renumeraron. El 0004 quedó en la decisión de interpretación, que ya se citaba
+así desde el README. FastAPI pasó a
+[ADR-0009](../decisions/0009-use-in-process-fastapi-and-static-web-ui.md). El
+punto de acceso pasó a
+[ADR-0010](../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md).
+
+Las entradas anteriores que dicen «ADR-0004» hablan del tema de esa fecha.
+No se reescribieron.
+
+Varias guías de la web y del runtime seguían dibujando un cable Ethernet
+como red vigente. La decisión actual de `LocalNetworkInfra` es el punto de
+acceso Wi-Fi aislado de la
+[guía de red local](../setup/local-network.md). Las direcciones
+`192.168.50.1` y `192.168.50.2` no cambian. Tailscale y el túnel SSH inverso
+del 22/10 quedan como camino de prueba, no como reemplazo de esa red. La
+validación física del punto de acceso sigue sin hacerse.
+
+### Campaña de validación en hardware
+
+El mismo día se escribió la campaña de la Raspberry Pi, en
+`docs/testing/raspberry-validation/`. Cada caso tiene un procedimiento, un
+criterio de aceptación y un identificador de ejecución. Un test automático
+o un mock no cuenta como prueba de GPIO, micrófono o red. Una ejecución
+que no cumple el criterio queda **FAILED** o **BLOCKED**; una posterior
+que sí lo cumple no reescribe la anterior.
+
+En ese momento la validación física del punto de acceso, del recorrido
+completo y del handler real de audio seguía pendiente. El handler de la PC
+seguía siendo el stub.
+
+---
+
+## 27/10/2026
+
+### Línea de base de la Raspberry Pi
+
+[EX-TC-ENV-001-20261027-01](../testing/raspberry-validation/executions/EX-TC-ENV-001-20261027-01.md)
+inventarió la placa tal como estaba: Raspberry Pi 3 Model B, Raspberry Pi
+OS 13, Python del entorno del proyecto. La PC no estaba en esa sesión. El
+registro no es un resultado de red ni de micrófono. Quedó
+**PASSED_PENDING_DOCUMENTATION**: el comportamiento pedido se vio, y la
+revisión formal sigue abierta. No es un cierre **CLOSED_PASSED**.
+
+### Pulsador: dos intentos, ninguno cerrado como éxito
+
+[EX-TC-GPIO-001-20261027-01](../testing/raspberry-validation/executions/EX-TC-GPIO-001-20261027-01.md)
+quedó **BLOCKED** antes de `READY`: el constructor no llegó a escuchar el
+botón. No es un defecto del pulsador físico.
+
+[EX-TC-GPIO-001-20261027-02](../testing/raspberry-validation/executions/EX-TC-GPIO-001-20261027-02.md)
+llegó a contar 9 pulsaciones y 9 liberaciones, pero se omitió la práctica
+prevista y no se midieron las pausas ni los intervalos en reposo. El caso
+quedó **FAILED**. Esas nueve parejas no se promocionan a aprobado.
+
+### Micrófono USB
+
+[EX-TC-AUD-001-20261027-01](../testing/raspberry-validation/executions/EX-TC-AUD-001-20261027-01.md)
+vio el Logitech G435 en las tres enumeraciones con el receptor conectado y
+dejó de verlo al desconectarlo. La consulta de PortAudio quedó registrada.
+No es una grabación a 16 kHz ni una prueba de escucha. El resultado técnico
+es satisfactorio y la revisión sigue abierta.
+
+---
+
+## 30/10/2026
+
+### Captura por callback
+
+La grabación bloqueante complicaba el cierre del stream. Se pasó a una
+captura dirigida por callback, con una cola PCM acotada y un cierre que
+separa la parada del worker del cierre del stream. Quedó en
+[ADR-0011](../decisions/0011-use-callback-driven-audio-capture-with-a-bounded-pcm-queue.md)
+y en el pull request 34 (`fix/audio-capture-stream-shutdown`), integrado el
+03/11. Ese día no hubo una ejecución de campaña: la prueba de los cinco WAV
+es la del 03/11.
+
+También se dejó un perfil ALSA reproducible para el micrófono de la placa.
+
+---
+
+## 03/11/2026
+
+Día de hardware. Los resultados de abajo son de las ejecuciones de esa
+fecha. Los documentos se escribieron el mismo día o al sincronizar la rama
+de campaña; la fecha del commit de documentación no cambia la fecha de la
+prueba.
+
+### Captura de audio
+
+[EX-TC-AUD-002-20261103-01](../testing/raspberry-validation/executions/EX-TC-AUD-002-20261103-01.md)
+publicó cinco WAV de cinco, a 16 kHz, mono y 16 bit, sobre el commit
+`88a95d5` de la rama del arreglo de audio. El error de duración quedó cerca
+de −56,2 ms y la tolerancia sigue **por definir**. No es una prueba de
+calidad de voz. El resultado técnico es satisfactorio; la revisión no está
+cerrada.
+
+### GPIO y push-to-talk: todavía no
+
+[EX-TC-GPIO-001-20261103-01](../testing/raspberry-validation/executions/EX-TC-GPIO-001-20261103-01.md)
+repitió 9 y 9 con la práctica excluida, pero no verificó el cierre después
+de Ctrl+C. Quedó **FAILED**. No se afirmó un defecto de `close()`.
+
+[EX-TC-PTT-001-20261103-01](../testing/raspberry-validation/executions/EX-TC-PTT-001-20261103-01.md)
+grabó con el botón, pero el micrófono estaba muteado y no se pudo escuchar.
+**FAILED**. No es un fallo de software.
+
+[EX-TC-PTT-001-20261103-02](../testing/raspberry-validation/executions/EX-TC-PTT-001-20261103-02.md)
+produjo tres WAV válidos que el operador escuchó. La tabla de frases no
+quedó confirmada por separado y el GPIO del que dependía seguía **FAILED**.
+El caso quedó **FAILED**.
+
+[EX-TC-PTT-002-20261103-01](../testing/raspberry-validation/executions/EX-TC-PTT-002-20261103-01.md)
+vio el corte por duración máxima y pulsaciones posteriores en `RELEASED`,
+pero el prerrequisito de PTT-001 no estaba cumplido. Quedó **BLOCKED**. La
+segunda pulsación mecánica no aplicaba. No es un fallo del límite de
+duración.
+
+### Red aislada: NetworkManager no armó el AP
+
+[EX-TC-NET-001-20261103-01](../testing/raspberry-validation/executions/EX-TC-NET-001-20261103-01.md)
+falló al preparar el punto de acceso. El script trataba `100 (connected)`
+como no administrado porque comparaba el estado con el patrón `10*`.
+Incidencia abierta:
+[INC-EX-TC-NET-001-20261103-01-01](../testing/raspberry-validation/executions/INC-EX-TC-NET-001-20261103-01-01.md).
+
+El pull request 35 corrigió esa detección. El segundo intento,
+[EX-TC-NET-001-20261103-02](../testing/raspberry-validation/executions/EX-TC-NET-001-20261103-02.md),
+pasó la detección y falló al activar WPA2 con NetworkManager en el chip
+Broadcom de la Pi 3: timeout del supplicant y, después de desactivar PMF a
+mano, diferencia de RSN. En la PC el perfil guardó una MAC transitoria.
+Una sesión manual de `hostapd` autenticó dos estaciones; ese diagnóstico no
+es un caso aprobado ni es TC-NET-002. Tres incidencias de ese intento
+siguen **OPEN**.
+
+### Migración a hostapd
+
+NetworkManager no produjo la celda WPA2 del proyecto. Se migró el punto de
+acceso a `hostapd` y a una dirección estática, sin DHCP, NAT ni puente. La
+topología de
+[ADR-0010](../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md)
+no cambia: SSID `VoiceStock`, Pi `192.168.50.1/24`, PC `192.168.50.2/24`.
+La decisión de usar `hostapd` es
+[ADR-0013](../decisions/0013-run-the-voicestock-access-point-with-hostapd.md).
+El pull request 36 entró a `develop` el mismo día. La evaluación previa
+sigue como
+[ADR-0012](../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md),
+en estado propuesto, y no se renumeró.
+
+[EX-TC-NET-001-20261103-03](../testing/raspberry-validation/executions/EX-TC-NET-001-20261103-03.md)
+es el primer intento del procedimiento nuevo. La configuración técnica
+pasó. No mide ICMP, aislamiento ni reinicio, y no cierra los dos intentos
+anteriores.
+
+[EX-TC-NET-002-20261103-01](../testing/raspberry-validation/executions/EX-TC-NET-002-20261103-01.md):
+10 de 10 ecos en cada sentido. Tras sacar Ethernet, la Pi no tenía ruta por
+defecto e `1.1.1.1` respondía `Network is unreachable`. La PC siguió saliendo
+a Internet por su otra interfaz. Los RTT que imprimió `ping`, de la PC hacia
+la Pi, fueron 0,808 / 4,407 / 5,545 / 1,272 ms (mínimo, media, máximo y
+mdev). De la Pi hacia la PC: 4,101 / 4,561 / 5,827 / 0,512 ms. El mdev no
+es el desvío muestral calculado aparte. No hay presupuesto de latencia ni
+de pérdida.
+
+[EX-TC-NET-003-20261103-01](../testing/raspberry-validation/executions/EX-TC-NET-003-20261103-01.md):
+después de reiniciar, `voicestock-hostapd.service`,
+`voicestock-ap-address.service` y el cliente volvieron sin correr de nuevo
+el script de instalación. El aislamiento IPv4 se mantuvo. No se midió el
+tiempo de arranque.
+
+### HTTP, WAV y errores del cliente
+
+Sobre esa celda:
+
+- [EX-TC-COM-001-20261103-01](../testing/raspberry-validation/executions/EX-TC-COM-001-20261103-01.md):
+  10 de 10 llamadas de texto al stub, con salida 0. Duración media de la
+  CLI: 3092,4 ms. Presupuesto **por definir**. No es reconocimiento de voz.
+- [EX-TC-COM-002-20261103-01](../testing/raspberry-validation/executions/EX-TC-COM-002-20261103-01.md):
+  5 de 5 WAV. El stub informó 59436 bytes y el mismo formato que el archivo
+  local. El SHA-256 local no cambió. No hay un digest del cuerpo recibido.
+- [EX-TC-COM-003-20261103-01](../testing/raspberry-validation/executions/EX-TC-COM-003-20261103-01.md):
+  3 de 3 `connection_failed` con el puerto cerrado y 3 de 3 `timeout` contra
+  un par que aceptaba y no respondía. El par silencioso fue un listener de
+  Python, no el ejemplo `ncat` del procedimiento. La limpieza del puerto no
+  quedó registrada.
+
+### Página en reposo
+
+[EX-TC-WEB-001-20261103-01](../testing/raspberry-validation/executions/EX-TC-WEB-001-20261103-01.md)
+sirvió `/health` 10 de 10 veces con HTTP 200. La media de `curl` fue 86,2 ms.
+El estado en reposo y la operación pendiente vacía (HTTP 204) coincidieron
+con la página. El ejecutable `voicestock-pi` no estaba instalado: el ensayo
+integrado llamó `pi.runtime.main`. No se confirmó ni se canceló nada. Esa
+parte de la interfaz queda para el recorrido del 04/11. El caso
+TC-WEB-002, que la hubiera probado contra un contrato fijo, se retiró el
+04/11 sin ejecutarse.
+
+### Pipeline Groq en la PC
+
+El pull request 37 integró el handler real de audio. Con
+`VOICESTOCK_AUDIO_PIPELINE=groq`, la PC transcribe con Groq Whisper
+(`whisper-large-v3-turbo`) y pide un solo borrador a `openai/gpt-oss-20b`.
+El stub sigue siendo el default. Confirmar sigue en
+`ProvisionalOperationExecutor` y no escribe inventario. El código quedó en
+`develop` como `c151db2`. La prueba de voz sobre hardware es la del día
+siguiente, no este merge.
+
+---
+
+## 04/11/2026
+
+### Recorrido real de voz
+
+[EX-TC-E2E-002-20261104-01](../testing/raspberry-validation/executions/EX-TC-E2E-002-20261104-01.md)
+usó el botón, el micrófono, la celda y el pipeline Groq. Los cinco comandos
+positivos llegaron a una tarjeta y volvieron a reposo al confirmar o
+cancelar. Los negativos previstos, salvo N1, se comportaron como estaba
+escrito. Cinco tiempos observados desde la liberación del botón hasta la
+tarjeta promedian 2,66 s (mediana 2,40 s, entre 1,71 s y 4,11 s). No es un
+presupuesto de latencia ni el tiempo solo de Groq. El primer positivo no
+tiene esa muestra.
+
+N1, «Agregá dos paquetes de arroz Marolio», no nombró el peso. El sistema
+propuso sumar 2 unidades de Arroz Marolio 1 kg
+(`0c9df2fe-da88-48e8-8d69-be4b3e8f5742`). El operador lo canceló. Cancelar
+evita guardar el error y no impide confirmar una propuesta incorrecta. Los
+criterios 8 y 9 fallan. El resultado experimental queda **FAILED**. La
+incidencia
+[INC-EX-TC-E2E-002-20261104-01-01](../testing/raspberry-validation/executions/INC-EX-TC-E2E-002-20261104-01-01.md)
+sigue **OPEN**. No se persiste inventario.
+
+La decisión de release de esa prueba es aparte:
+`ACCEPTED_WITH_KNOWN_LIMITATIONS`. No convierte el **FAILED** en aprobado.
+
+### Contrato en la placa
+
+[EX-TC-CON-001-20261104-01](../testing/raspberry-validation/executions/EX-TC-CON-001-20261104-01.md)
+corrió el validador tres veces, con la misma transcripción. Acepta el
+contrato válido y rechaza producto desconocido, cantidad, versión, unidad
+y campos de más. Con nombre Arroz, marca Marolio y presentación nula
+responde `ambiguous_product`. Eso muestra la regla del validador. No
+muestra el contrato que produjo N1 y no cierra la incidencia. Los fixtures
+no estaban en el checkout `develop` de la Pi; se extrajeron a un directorio
+externo sin modificar el contenido. Es una adaptación del entorno, no un
+defecto del producto.
+
+### GPIO y push-to-talk que sí cumplen el escrito
+
+[EX-TC-GPIO-001-20261104-01](../testing/raspberry-validation/executions/EX-TC-GPIO-001-20261104-01.md):
+9 y 9 medidos, práctica aparte, cierre con `GPIO_CLOSED` y el GPIO17 libre
+después. Las pausas no se instrumentaron. La latencia de flanco no se midió.
+Resultado técnico satisfactorio. Los tres intentos anteriores siguen
+**BLOCKED**, **FAILED** y **FAILED**.
+
+[EX-TC-PTT-001-20261104-01](../testing/raspberry-validation/executions/EX-TC-PTT-001-20261104-01.md):
+tres grabaciones medidas, formato del contrato y tabla de escucha. Los dos
+intentos del 03/11 siguen **FAILED**.
+
+[EX-TC-PTT-002-20261104-01](../testing/raspberry-validation/executions/EX-TC-PTT-002-20261104-01.md):
+con máximo de 2 s, tres cortes `MAX_DURATION` (cabecera 1,984 s, −16 ms) y
+tres `RELEASED`. La segunda pulsación mecánica no se generó: **no aplica**.
+Esos 2 s son un parámetro de la prueba, no el default del producto. El
+intento del 03/11 sigue **BLOCKED**. El margen de −16 ms queda **por
+definir**.
+
+### Errores integrados, sin Groq
+
+TC-E2E-001 y TC-WEB-002 se retiraron de la campaña activa. Pedían un
+fixture determinista que nunca se implementó y se solapaban con el
+recorrido real. Retirarlos no es un aprobado. El procedimiento 1 de
+TC-FLOW-001, que también dependía de ese fixture, no se ejecutó.
+
+[EX-TC-FLOW-001-20261104-01](../testing/raspberry-validation/executions/EX-TC-FLOW-001-20261104-01.md)
+es el procedimiento 2, el mismo proceso `voicestock-pi` para los diez
+ciclos, timeout de cliente de 5 s:
+
+- tres ciclos contra el stub: HTTP 200 y la frase de contrato inválido;
+- tres con el puerto 8000 cerrado: la frase de que no se pudo comunicar;
+- tres contra un servidor que aceptaba el POST y esperaba 30 s: la misma
+  frase de transporte, con una línea `ACCEPTED` en cada ciclo. El tiempo
+  desde soltar el botón hasta `idle` no se midió;
+- un ciclo de recuperación, otra vez contra el stub, sin reiniciar la Pi.
+
+No hubo operación pendiente. No es un éxito de inventario ni una prueba de
+Groq. El resultado técnico es satisfactorio y la revisión sigue abierta.
+El comando de arranque, con `--bounce-time 0.05` y el catálogo externo ya
+usado ese día, se anotó después desde la conversación de cierre, no desde
+un log de proceso.
+
+### Cierre de la campaña y de v0.5.0
+
+El equipo cerró las pruebas de esta versión. No se piden más mediciones.
+De los 16 casos activos, 15 tienen un último resultado técnico
+satisfactorio. TC-E2E-002 queda **FAILED** en el experimento y aceptado
+para el release con la limitación N1. Los productos ambiguos no se corrigen
+en v0.5.0; pasan a una feature futura. Las incidencias de red del 03/11
+siguen abiertas y no bloquean la publicación. No están marcadas como
+resueltas.
+
+La persistencia del inventario no entra en esta versión. Ningún caso está
+**CLOSED_PASSED**: falta la revisión formal y parte de la evidencia sigue
+fuera del repositorio. El informe de cierre es
+[el reporte de la campaña](../testing/raspberry-validation/v0.5.0-campaign-report.md).
+Las notas, todavía sin tag y sin GitHub Release, están en
+[v0.5.0](../releases/v0.5.0.md). `pyproject.toml` declara `0.5.0`.
+
+### Limpieza y respaldo del hardware
+
+Se exportó desde la Raspberry Pi hacia la PC Arch lo que no eran WAV:
+logs, manifiestos, fixtures y evidencias de texto. El archivo
+`pi-test-evidence.tar.gz` pesa unos 20 KB. Su SHA-256 es
+`6dcd2cca825464e2546ecac0ce4748fa14d65bc875f631b2bc453ec1d45391cd`.
+La verificación de integridad fue satisfactoria. Los WAV no forman parte
+de ese respaldo.
+
+Después se borraron las grabaciones, las evidencias locales ya copiadas y
+las cachés de prueba. El árbol de Git quedó limpio. El entorno virtual se
+conservó y seguía usable. `voicestock-hostapd.service` y
+`voicestock-ap-address.service` quedaron activos.
+
+### Qué queda para después
+
+- Rechazar o pedir aclaración cuando el pedido no distingue una
+  presentación del catálogo, en lugar de elegir una.
+- Reemplazar `ProvisionalOperationExecutor` por una escritura real de
+  inventario.
+- Cerrar formalmente los casos que hoy están pendientes de revisión, si una
+  versión posterior lo exige. Esta versión no lo exige para publicarse.
+- Publicar el tag y el GitHub Release cuando el número de versión y el
+  merge a `develop` estén hechos. Esta entrada no los hace.

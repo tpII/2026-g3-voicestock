@@ -6,7 +6,7 @@ El objetivo es mantener un repositorio consistente, entendible y fácil de mante
 
 Estas reglas deben ser respetadas por todos los integrantes del equipo.
 
-La guía práctica paso a paso (clonar, entorno, ramas, commits, Pull Requests y CI) está en [docs/development-workflow.md](docs/development-workflow.md).
+La guía práctica paso a paso (clonar, entorno, ramas, commits, Pull Requests y CI) está en [docs/guides/development-workflow.md](docs/guides/development-workflow.md).
 
 ---
 
@@ -247,7 +247,7 @@ pytest
 
 Después de clonar el repositorio hay que instalar los hooks de pre-commit **una vez**. Los scripts `scripts/setup.sh` y `scripts/setup.ps1` lo hacen. A partir de ese momento, cada `git commit` ejecuta formato, lint y validaciones básicas antes de crear el commit.
 
-Si pre-commit modifica archivos, hay que revisarlos, volver a hacer `git add` y commitear de nuevo. El detalle de ese ciclo está en [docs/development-workflow.md](docs/development-workflow.md).
+Si pre-commit modifica archivos, hay que revisarlos, volver a hacer `git add` y commitear de nuevo. El detalle de ese ciclo está en [docs/guides/development-workflow.md](docs/guides/development-workflow.md).
 
 ---
 
@@ -949,6 +949,14 @@ LLM_MODEL=
 
 ---
 
+Para las claves de los benchmarks, se versiona la plantilla vacía
+`config/api-keys.env.example`; la copia local `config/api-keys.env` está
+ignorada. Los nuevos scripts deben reutilizar el cargador compartido y respetar
+la prioridad de las variables del entorno. Ver
+[configuración de claves de API](docs/setup/api-keys.md) para el formato,
+la carga automática y cómo actualizar claves.
+
+
 # 26. Limpieza del repositorio
 
 No deberán subirse archivos generados localmente que no formen parte del proyecto.
@@ -980,7 +988,7 @@ La primera vez, después de clonar:
 ./scripts/setup.sh
 ```
 
-Eso crea `.venv`, instala el proyecto con las dependencias de desarrollo e instala los hooks de pre-commit.
+Eso usa el entorno Conda activo si existe; en caso contrario crea o reutiliza `.venv`. Instala el proyecto con las dependencias de desarrollo y los hooks de pre-commit. Para incluir Vosk, agregar `--stt` en Bash o `-Stt` en PowerShell.
 
 Actualizar `develop`:
 

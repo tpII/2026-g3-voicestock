@@ -1,0 +1,170 @@
+{
+  "provider": "gemini",
+  "llm_model": "gemini-3.8-flash",
+  "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.39",
+  "runs_per_case": 1,
+  "warmups": 0,
+  "retries": 0,
+  "manifest_sha256": "8b1686695640bc584ef3cc5d17c21974aed7d79819fa64c074e663d709e6ac04",
+  "whisper_sha256": "ae85e4a935d7a567bd102fe55afc16bb595bdb618e11b2fc7591bc08120411bb",
+  "threads_whisper": 4,
+  "contract_sha256": "6da3c4cdadc485dcb6d39b6eac3c825f2bd7edf11c2b839b1d4cca5ca4c087f5",
+  "settings": {
+    "temperature": 0,
+    "thinking_level": "low",
+    "response_mime_type": "application/json",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "operaciones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "operacion": {
+                "type": "string",
+                "enum": [
+                  "agregar_stock",
+                  "restar_stock"
+                ]
+              },
+              "producto": {
+                "type": "string",
+                "enum": [
+                  "Coca Cola 2L",
+                  "Coca Cola 1.5L",
+                  "Coca Cola Zero 2L",
+                  "Sprite 2L",
+                  "Sprite 1.5L",
+                  "Agua Villavicencio 1.5L",
+                  "Arroz Gallo 1kg",
+                  "Fideos Matarazzo 500g",
+                  "Detergente Magistral 750ml",
+                  "Leche La Serenísima 1L"
+                ]
+              },
+              "cantidad": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "operacion",
+              "producto",
+              "cantidad"
+            ]
+          }
+        }
+      },
+      "required": [
+        "operaciones"
+      ]
+    }
+  },
+  "audio_cases": [
+    {
+      "id": "solo_agregar",
+      "original": "originals/basico/solo_agregar.m4a",
+      "wav": "wav/basico/solo_agregar.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 8.576,
+      "original_sha256": "433e8d30e0dbc243cba46be1c7bc7b2ebd1de86689da8e24f5795cf80e628187",
+      "wav_sha256": "5d2c36972d6db24e4ca0a9d7db0b0ccda7dac08eb9e04ecd0dca67cfb2cb4857",
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros y cuatro Sprite comunes de 1,5 litros.",
+      "reference_verified_by_human": false,
+      "level": "basico",
+      "text_prompt": "scripts/benchmarks/prompts/precision/basico/solo_agregar.txt"
+    },
+    {
+      "id": "solo_restar",
+      "original": "originals/basico/solo_restar.m4a",
+      "wav": "wav/basico/solo_restar.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 4.992,
+      "original_sha256": "41d52801e43bdad7f834cf5910101c67a79d0af612217a6c2bc38b0d7e8486f3",
+      "wav_sha256": "24e6248d5ec7e3b031f2af2dadf48a449122e9e70b77c951d40421243c3588d3",
+      "expected_text": "Restá dos paquetes de arroz Gallo de 1 kg.",
+      "reference_verified_by_human": false,
+      "level": "basico",
+      "text_prompt": "scripts/benchmarks/prompts/precision/basico/solo_restar.txt"
+    },
+    {
+      "id": "restar_ambos",
+      "original": "originals/habitual/restar_ambos.m4a",
+      "wav": "wav/habitual/restar_ambos.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 8.448,
+      "original_sha256": "2e93c9fedc5d4d711b7247348ed93f4524db9acc540e54c12048fd75ed8f4939",
+      "wav_sha256": "a2775a73742d8c279fc098ecf71ff9d5bdb152f2f63e06eaff1e9cf234366695",
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros y cuatro envases de detergente Magistral de 750 ml.",
+      "reference_verified_by_human": false,
+      "level": "habitual",
+      "text_prompt": "scripts/benchmarks/prompts/precision/habitual/restar_ambos.txt"
+    },
+    {
+      "id": "corregir_cantidad",
+      "original": "originals/habitual/corregir_cantidad.m4a",
+      "wav": "wav/habitual/corregir_cantidad.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 8.064,
+      "original_sha256": "cb896dc77dacfeb1fcab3581cf2e2ba0b933aee47dc011f032472bd4bc920bc4",
+      "wav_sha256": "6bf0158324ae691b8926c445b91c42e76d9bf18464136372fec1cbef7f0b08fd",
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros. Perdón, eran dos.",
+      "reference_verified_by_human": false,
+      "level": "habitual",
+      "text_prompt": "scripts/benchmarks/prompts/precision/habitual/corregir_cantidad.txt"
+    },
+    {
+      "id": "negar_agregacion",
+      "original": "originals/habitual/negar_agregacion.m4a",
+      "wav": "wav/habitual/negar_agregacion.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 9.664,
+      "original_sha256": "01c995c0b7f68ab930245f6d78af81d30872bd1dcf59a92086277727fb8ca4ed",
+      "wav_sha256": "ba2f734234741787378d24abbd128fc4372886f4fa976ae55dfbd2a4e7e5ab22",
+      "expected_text": "Agregá cinco botellas de agua Villavicencio de 1,5 litros. Perdón, esas no llegaron; no las cargues.",
+      "reference_verified_by_human": false,
+      "level": "habitual",
+      "text_prompt": "scripts/benchmarks/prompts/precision/habitual/negar_agregacion.txt"
+    },
+    {
+      "id": "negar_restacion",
+      "original": "originals/habitual/negar_restacion.m4a",
+      "wav": "wav/habitual/negar_restacion.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 11.072,
+      "original_sha256": "b6ffd453c5ea7db87a8d5f6ace1b22b821aaa850eea681edeb4e922f007a6314",
+      "wav_sha256": "9deab639854c43375349f22acc9c0f5bd2c37d30590dc9e914b1fa6f4b316ee7",
+      "expected_text": "Restá cuatro envases de detergente Magistral de 750 ml. Perdón, no se vendieron; no los restes.",
+      "reference_verified_by_human": false,
+      "level": "habitual",
+      "text_prompt": "scripts/benchmarks/prompts/precision/habitual/negar_restacion.txt"
+    }
+  ],
+  "remote_model_ram": null,
+  "whisper_load_ram": {
+    "ram_base_mib": 0.265625,
+    "ram_peak_mib": 278.98046875,
+    "cpu_s": 0.18,
+    "cpu_pct": 93.4349698872545,
+    "request_wall_s": 0.19264735699835
+  }
+}

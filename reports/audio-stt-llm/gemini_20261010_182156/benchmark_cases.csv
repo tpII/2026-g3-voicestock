@@ -1,0 +1,7 @@
+case_id,level,status,whisper_peak_mib,api_client_peak_mib,remote_model_ram_mib,valid_json,schema_valid,correct_operation,correct_product,correct_quantity,exact_match
+solo_agregar,basico,error,344.75390625,,,,,,,,
+solo_restar,basico,ok,346.3125,73.203125,,True,True,True,True,True,True
+restar_ambos,habitual,ok,347.02734375,73.2890625,,True,True,True,True,True,True
+corregir_cantidad,habitual,error,347.02734375,,,,,,,,
+negar_agregacion,habitual,ok,347.02734375,73.34765625,,True,True,True,True,True,True
+negar_restacion,habitual,ok,349.47265625,73.3671875,,True,True,True,True,True,True

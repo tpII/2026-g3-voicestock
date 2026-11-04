@@ -1,0 +1,1294 @@
+{
+  "method": "Manual qualitative text comparison. Final intended operations and identity of surviving items. Cancelled item name errors alone do not prevent clear total cancellation. Digits/number words and equivalent units accepted. No audio listening or downstream parser validation. Vosk variants judged conservatively across all three measured runs.",
+  "source": "reports/stt-benchmark/comparison_20261010_173923/raw_transcriptions.json",
+  "source_sha256": "ab59e1fce00f5b9c5ced42d1812e670779ea434ece4b2b70e4ffa301fd821a3d",
+  "cases": [
+    {
+      "configuration": "vosk_full",
+      "case_id": "solo_agregar",
+      "level": "basico",
+      "assessment": "ambigua",
+      "reason": "Sprite deformado; en Kroko además termina en «li». Acción y cantidades conservadas.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros y cuatro Sprite comunes de 1,5 litros.",
+      "transcriptions": [
+        "agrega tres coca-cola comunes de dos litros y cuatro spray comunes de uno coma cinco litros"
+      ]
+    },
+    {
+      "configuration": "vosk_full",
+      "case_id": "solo_restar",
+      "level": "basico",
+      "assessment": "coherente",
+      "reason": "Resta de dos paquetes de arroz Gallo de un kilo reconocible.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos paquetes de arroz Gallo de 1 kg.",
+      "transcriptions": [
+        "resta dos paquetes de arroz gallo de un kilo"
+      ]
+    },
+    {
+      "configuration": "vosk_full",
+      "case_id": "restar_ambos",
+      "level": "habitual",
+      "assessment": "sentido_comprometido",
+      "reason": "Se pierde la cantidad dos o la acción, según modelo; Vosk tiene variantes medidas sin cantidad y Zero → serio.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros y cuatro envases de detergente Magistral de 750 ml.",
+      "transcriptions": [
+        "resta dos coca cola serio de dos litros y cuatro envases de detergente magistral de setecientos cincuenta mililitros",
+        "resta coca cola serio de dos litros y cuatro envases de detergente magistral de setecientos cincuenta mililitros"
+      ]
+    },
+    {
+      "configuration": "vosk_full",
+      "case_id": "corregir_cantidad",
+      "level": "habitual",
+      "assessment": "sentido_comprometido",
+      "reason": "Verbo inicial irreconocible (a great/Agree) y/o nombre deformado.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros. Perdón, eran dos.",
+      "transcriptions": [
+        "a great tres coca cola comunes de dos litros perdón eran dos",
+        "a great tres cola comunes de dos litros perdón eran dos"
+      ]
+    },
+    {
+      "configuration": "vosk_full",
+      "case_id": "negar_agregacion",
+      "level": "habitual",
+      "assessment": "ambigua",
+      "reason": "Razón de cancelación presente, pero instrucción final deformada, truncada o sin su no.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá cinco botellas de agua Villavicencio de 1,5 litros. Perdón, esas no llegaron; no las cargues.",
+      "transcriptions": [
+        "agrega cinco botellas de agua villavicencio de uno coma cinco litros perdón esas no llegar a no las carnes"
+      ]
+    },
+    {
+      "configuration": "vosk_full",
+      "case_id": "negar_restacion",
+      "level": "habitual",
+      "assessment": "ambigua",
+      "reason": "Cancelación final deformada (no lo agrestes); requiere interpretación.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá cuatro envases de detergente Magistral de 750 ml. Perdón, no se vendieron; no los restes.",
+      "transcriptions": [
+        "resta cuatro envases detergentes magistral de setecientos cincuenta mililitros perdón no se vendieron no lo agrestes"
+      ]
+    },
+    {
+      "configuration": "vosk_full",
+      "case_id": "negar_varias_agregaciones",
+      "level": "exigente",
+      "assessment": "ambigua",
+      "reason": "Artículo pendiente arroz Gallo deformado; no se puede garantizar identidad.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros, cuatro Sprite comunes de 1,5 litros y cinco paquetes de arroz Gallo de 1 kg. Me equivoque las Coca Cola comunes de 2 litros y las Sprite comunes de 1,5 no las cargues.",
+      "transcriptions": [
+        "agrega tres coca cola comunes de dos litros cuatro spray comunes de uno coma cinco litros y cinco paquete de ahorro gallo de un kilo medio que las coca colas comunes de dos litros y las esprit comunes de uno coma cinco no las cargues"
+      ]
+    },
+    {
+      "configuration": "vosk_full",
+      "case_id": "negar_varias_restaciones",
+      "level": "exigente",
+      "assessment": "sentido_comprometido",
+      "reason": "Restá → presta/Prestar: resta pendiente de detergente queda expresada como otra acción; Tiny además cambia 750 → 75 ml.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros, tres paquetes de arroz Gallo de 1 kg y cuatro envases de detergente Magistral de 750 ml. Las Coca Zero y el arroz no se vendieron; no los restes.",
+      "transcriptions": [
+        "presta dos coca-cola cero de dos litros tres paquetes arroyo de un kilo y cuatro en de detergente magistral de setecientos cincuenta mililitros las coca cero y el arroz no se vendieron no los prestes"
+      ]
+    },
+    {
+      "configuration": "vosk_full",
+      "case_id": "negar_agregacion_y_restacion",
+      "level": "exigente",
+      "assessment": "ambigua",
+      "reason": "Instrucción final no das/Novas/nuevas/no has y/o referencias de Sprite deformadas: requiere interpretación.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá cuatro Sprite comunes de 2 litros y restá dos paquetes de arroz Gallo de 1 kg. Perdón, las Sprite no llegaron y el arroz no se vendió; no hagas ninguna de esas dos operaciones.",
+      "transcriptions": [
+        "agrega cuatro spray comunes de dos litros y resta dos paquetes de arroz gallo de un kilo perdón la césped no llegaron y el arroz no se vendió nuevas ninguna de esas dos operaciones"
+      ]
+    },
+    {
+      "configuration": "vosk_full",
+      "case_id": "caso_integral",
+      "level": "exigente",
+      "assessment": "sentido_comprometido",
+      "reason": "Restá dos Sprite → resta doce; nombres y negaciones deformados.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros; perdón, eran dos. Agregá cuatro Sprite comunes de 1,5 litros y cinco botellas de agua Villavicencio de 1,5 litros; perdón, no llegó ninguno de esos dos productos, así que no los cargues. Restá dos paquetes de arroz Gallo de 1 kg y tres paquetes de fideos Matarazzo de 500 g. Restá cuatro Coca Cola Zero de 2 litros y cinco envases de detergente Magistral de 750 ml; perdón, ni las Coca Zero ni los detergentes se vendieron. No restes ninguno de esos dos productos. Agregá seis envases de leche La Serenísima de 1 litro y restá dos Sprite comunes de 2 litros. Perdón, la leche no llegó y esas Sprite no se vendieron; no cargues la leche ni restes esas Sprite.",
+      "transcriptions": [
+        "agrega tres cola comunes de dos litros perdón eran dos a great cuatro spray comunes de uno coma cinco litros y cinco botellas de agua villavicencio de uno coma cinco litros perdón no llegó ninguno de esos productos a siguen no los cargues resta dos paquetes de arroz gallo de un kilo y tres paquetes de fideos matarás al quinientos gramos resta cuatro coca cola cero de dos litros y cinco base detergente magistral de setecientos cincuenta mililitros perdón ni las co caserón y los detergente se vendieron no resta es ninguno de esos dos productos agrega seis envase de leche la serenísima de un litro y resta doce spray comunes de dos litros perdón la leche no llegó y esas express nace vendieron no es la leche ni reste cesase spray",
+        "agrega tres coca cola comunes de dos litros perdón eran dos a great cuatro spray comunes de uno coma cinco litros y cinco botellas de agua villavicencio de uno coma cinco litros perdón no llegó ninguno de esos productos a siguen no los cargues resta dos paquetes de arroz gallo de un kilo y tres paquetes de fideos matarás al quinientos gramos resta cuatro coca cola cero de dos litros y cinco base detergente magistral de setecientos cincuenta mililitros perdón ni las co caserón y los detergente se vendieron no resta es ninguno de esos dos productos agrega seis envase de leche la serenísima de un litro y resta doce spray comunes de dos litros perdón la leche no llegó y esas express nace vendieron no es la leche ni reste cesase spray"
+      ]
+    },
+    {
+      "configuration": "vosk_250ms",
+      "case_id": "solo_agregar",
+      "level": "basico",
+      "assessment": "ambigua",
+      "reason": "Sprite deformado; en Kroko además termina en «li». Acción y cantidades conservadas.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros y cuatro Sprite comunes de 1,5 litros.",
+      "transcriptions": [
+        "agrega tres coca-cola comunes de dos litros y cuatro spray comunes de uno coma cinco litros"
+      ]
+    },
+    {
+      "configuration": "vosk_250ms",
+      "case_id": "solo_restar",
+      "level": "basico",
+      "assessment": "coherente",
+      "reason": "Resta de dos paquetes de arroz Gallo de un kilo reconocible.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos paquetes de arroz Gallo de 1 kg.",
+      "transcriptions": [
+        "resta dos paquetes de arroz gallo de un kilo"
+      ]
+    },
+    {
+      "configuration": "vosk_250ms",
+      "case_id": "restar_ambos",
+      "level": "habitual",
+      "assessment": "sentido_comprometido",
+      "reason": "Se pierde la cantidad dos o la acción, según modelo; Vosk tiene variantes medidas sin cantidad y Zero → serio.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros y cuatro envases de detergente Magistral de 750 ml.",
+      "transcriptions": [
+        "resta dos coca cola serio de dos litros y cuatro envases de detergente magistral de setecientos cincuenta mililitros",
+        "resta coca cola serio de dos litros y cuatro envases de detergente magistral de setecientos cincuenta mililitros",
+        "resta tus coca cola serio de dos litros y cuatro envases de detergente magistral de setecientos cincuenta mililitros"
+      ]
+    },
+    {
+      "configuration": "vosk_250ms",
+      "case_id": "corregir_cantidad",
+      "level": "habitual",
+      "assessment": "sentido_comprometido",
+      "reason": "Verbo inicial irreconocible (a great/Agree) y/o nombre deformado.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros. Perdón, eran dos.",
+      "transcriptions": [
+        "a great tres coca cola comunes de dos litros perdón eran dos"
+      ]
+    },
+    {
+      "configuration": "vosk_250ms",
+      "case_id": "negar_agregacion",
+      "level": "habitual",
+      "assessment": "ambigua",
+      "reason": "Razón de cancelación presente, pero instrucción final deformada, truncada o sin su no.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá cinco botellas de agua Villavicencio de 1,5 litros. Perdón, esas no llegaron; no las cargues.",
+      "transcriptions": [
+        "agrega cinco botellas de agua villavicencio de uno coma cinco litros perdón esas no llegar a no las carnes"
+      ]
+    },
+    {
+      "configuration": "vosk_250ms",
+      "case_id": "negar_restacion",
+      "level": "habitual",
+      "assessment": "ambigua",
+      "reason": "Cancelación final deformada (no lo agrestes); requiere interpretación.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá cuatro envases de detergente Magistral de 750 ml. Perdón, no se vendieron; no los restes.",
+      "transcriptions": [
+        "resta cuatro envases detergentes magistral de setecientos cincuenta mililitros perdón no se vendieron no lo agrestes"
+      ]
+    },
+    {
+      "configuration": "vosk_250ms",
+      "case_id": "negar_varias_agregaciones",
+      "level": "exigente",
+      "assessment": "ambigua",
+      "reason": "Artículo pendiente arroz Gallo deformado; no se puede garantizar identidad.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros, cuatro Sprite comunes de 1,5 litros y cinco paquetes de arroz Gallo de 1 kg. Me equivoque las Coca Cola comunes de 2 litros y las Sprite comunes de 1,5 no las cargues.",
+      "transcriptions": [
+        "agrega tres cola comunes de dos litros cuatro spray comunes de uno coma cinco litros y cinco paquete de ahorro gallo de un kilo medio que las coca colas comunes de dos litros y las esprit comunes de uno coma cinco no las cargues"
+      ]
+    },
+    {
+      "configuration": "vosk_250ms",
+      "case_id": "negar_varias_restaciones",
+      "level": "exigente",
+      "assessment": "sentido_comprometido",
+      "reason": "Restá → presta/Prestar: resta pendiente de detergente queda expresada como otra acción; Tiny además cambia 750 → 75 ml.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros, tres paquetes de arroz Gallo de 1 kg y cuatro envases de detergente Magistral de 750 ml. Las Coca Zero y el arroz no se vendieron; no los restes.",
+      "transcriptions": [
+        "presta dos coca-cola cero de dos litros tres paquetes arroyo de un kilo y cuatro en de detergente magistral de setecientos cincuenta mililitros las coca cero y el arroz no se vendieron no los prestes"
+      ]
+    },
+    {
+      "configuration": "vosk_250ms",
+      "case_id": "negar_agregacion_y_restacion",
+      "level": "exigente",
+      "assessment": "ambigua",
+      "reason": "Instrucción final no das/Novas/nuevas/no has y/o referencias de Sprite deformadas: requiere interpretación.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá cuatro Sprite comunes de 2 litros y restá dos paquetes de arroz Gallo de 1 kg. Perdón, las Sprite no llegaron y el arroz no se vendió; no hagas ninguna de esas dos operaciones.",
+      "transcriptions": [
+        "agrega cuatro spray comunes de dos litros y resta dos paquetes de arroz gallo de un kilo perdón la césped no llegaron y el arroz no se vendió nuevas ninguna de esas dos operaciones"
+      ]
+    },
+    {
+      "configuration": "vosk_250ms",
+      "case_id": "caso_integral",
+      "level": "exigente",
+      "assessment": "sentido_comprometido",
+      "reason": "Restá dos Sprite → resta doce y omite cantidad tres de fideos.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros; perdón, eran dos. Agregá cuatro Sprite comunes de 1,5 litros y cinco botellas de agua Villavicencio de 1,5 litros; perdón, no llegó ninguno de esos dos productos, así que no los cargues. Restá dos paquetes de arroz Gallo de 1 kg y tres paquetes de fideos Matarazzo de 500 g. Restá cuatro Coca Cola Zero de 2 litros y cinco envases de detergente Magistral de 750 ml; perdón, ni las Coca Zero ni los detergentes se vendieron. No restes ninguno de esos dos productos. Agregá seis envases de leche La Serenísima de 1 litro y restá dos Sprite comunes de 2 litros. Perdón, la leche no llegó y esas Sprite no se vendieron; no cargues la leche ni restes esas Sprite.",
+      "transcriptions": [
+        "agrega tres coca comunes de dos litros perdón eran dos a great cuatro spray comunes de uno coma cinco litros y cinco botellas de agua villavicencio de uno coma cinco litros perdón no llegó ninguno de esos productos a siguen no los cargues resta dos paquetes de arroz gallo de un kilo y paquetes de fideos matarás al quinientos gramos resta cuatro coca cola cero de dos litros y cinco base detergente magistral de setecientos cincuenta mililitros perdón ni las co caserón y los detergente se vendieron no resta es ninguno de esos dos productos agrega seis envase de leche la serenísima de un litro y resta doce spray comunes de dos litros perdón la leche no llegó y esas express nace vendieron no es la leche ni reste cesase spray",
+        "agrega tres cola comunes de dos litros perdón eran dos a great cuatro spray comunes de uno coma cinco litros y cinco botellas de agua villavicencio de uno coma cinco litros perdón no llegó ninguno de esos productos así que no los cargues resta dos paquetes de arroz gallo de un kilo y paquetes de fideos matarás al quinientos gramos resta cuatro coca cola cero de dos litros y cinco base detergente magistral de setecientos cincuenta mililitros perdón ni las co caserón y los detergente se vendieron no reste es ninguno de esos dos productos agrega seis envase de leche la serenísima de un litro y resta doce spray comunes de dos litros perdón la leche no llegó y esas express nace vendieron no es la leche ni reste cesase spray",
+        "agrega tres coca cola comunes de dos litros perdón eran dos a great cuatro spray comunes de uno coma cinco litros y cinco botellas de agua villavicencio de uno coma cinco litros perdón no llegó ninguno de esos productos a siguen no los cargues resta dos paquetes de arroz gallo de un kilo y paquetes de fideos matarás al quinientos gramos resta cuatro coca cola cero de dos litros y cinco base detergente magistral de setecientos cincuenta mililitros perdón ni las co caserón y los detergente se vendieron no resta es ninguno de esos dos productos agrega seis envase de leche la serenísima de un litro y resta doce spray comunes de dos litros perdón la leche no llegó y esas express nace vendieron no es la leche ni reste cesase spray"
+      ]
+    },
+    {
+      "configuration": "whisper_tiny",
+      "case_id": "solo_agregar",
+      "level": "basico",
+      "assessment": "coherente",
+      "reason": "Acción, cantidades, nombres y unidades reconocibles.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros y cuatro Sprite comunes de 1,5 litros.",
+      "transcriptions": [
+        " agrega 3 Coca-Cola comunes de 2 litros y 4 sprite comunes de 1,5 litros"
+      ]
+    },
+    {
+      "configuration": "whisper_tiny",
+      "case_id": "solo_restar",
+      "level": "basico",
+      "assessment": "sentido_comprometido",
+      "reason": "Verbo → Prega y nombre deformado: operación no clara.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos paquetes de arroz Gallo de 1 kg.",
+      "transcriptions": [
+        " Prega 2 paquetes de arroz gashos de 1 kilo"
+      ]
+    },
+    {
+      "configuration": "whisper_tiny",
+      "case_id": "restar_ambos",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "Ambas restas y cantidades conservadas; cero/0 y unidades en palabras aceptados.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros y cuatro envases de detergente Magistral de 750 ml.",
+      "transcriptions": [
+        " Restar 2 Coca-Cola a 0 de 2 litros y 4 envases de detergente magistral de 750 ml."
+      ]
+    },
+    {
+      "configuration": "whisper_tiny",
+      "case_id": "corregir_cantidad",
+      "level": "habitual",
+      "assessment": "sentido_comprometido",
+      "reason": "Verbo inicial irreconocible (a great/Agree) y/o nombre deformado.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros. Perdón, eran dos.",
+      "transcriptions": [
+        " Agree, 3 cocacó la comune de 2 litros perdón, eran 2."
+      ]
+    },
+    {
+      "configuration": "whisper_tiny",
+      "case_id": "negar_agregacion",
+      "level": "habitual",
+      "assessment": "ambigua",
+      "reason": "Razón de cancelación presente, pero instrucción final deformada, truncada o sin su no.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá cinco botellas de agua Villavicencio de 1,5 litros. Perdón, esas no llegaron; no las cargues.",
+      "transcriptions": [
+        " Abrega 5 de agua visualicencia de 1,5 litros. Perdón, esas no llegaron a las carres."
+      ]
+    },
+    {
+      "configuration": "whisper_tiny",
+      "case_id": "negar_restacion",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "No se vendieron / no los restes conserva inequívocamente la cancelación total, aunque haya errores en el nombre o verbo inicial.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá cuatro envases de detergente Magistral de 750 ml. Perdón, no se vendieron; no los restes.",
+      "transcriptions": [
+        " Resta 4 en bases de 300 magistrales de 750 mililitros, pero no se vendieron, no los restes."
+      ]
+    },
+    {
+      "configuration": "whisper_tiny",
+      "case_id": "negar_varias_agregaciones",
+      "level": "exigente",
+      "assessment": "ambigua",
+      "reason": "Artículo pendiente arroz Gallo deformado; no se puede garantizar identidad.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros, cuatro Sprite comunes de 1,5 litros y cinco paquetes de arroz Gallo de 1 kg. Me equivoque las Coca Cola comunes de 2 litros y las Sprite comunes de 1,5 no las cargues.",
+      "transcriptions": [
+        " Abrega 3 Coca-Cola comunes de 2 litros, 4 sprite comunes de 1,5 litros y 5 pague de arrogayo de un kilo. Me guivo que las Coca-Cola comunes de 2 litros y las sprite comunes de 1,5 no las carres."
+      ]
+    },
+    {
+      "configuration": "whisper_tiny",
+      "case_id": "negar_varias_restaciones",
+      "level": "exigente",
+      "assessment": "sentido_comprometido",
+      "reason": "Restá → presta/Prestar: resta pendiente de detergente queda expresada como otra acción; Tiny además cambia 750 → 75 ml.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros, tres paquetes de arroz Gallo de 1 kg y cuatro envases de detergente Magistral de 750 ml. Las Coca Zero y el arroz no se vendieron; no los restes.",
+      "transcriptions": [
+        " presta 2 cocacola 0 de 2 litros, 3 paquetes de arroz vayo de un kilo y 4 en bases de de tergen de magistral de 75 mililitros. Las cocaceros y el arroz no se vendieron, no los restes."
+      ]
+    },
+    {
+      "configuration": "whisper_tiny",
+      "case_id": "negar_agregacion_y_restacion",
+      "level": "exigente",
+      "assessment": "ambigua",
+      "reason": "Instrucción final no das/Novas/nuevas/no has y/o referencias de Sprite deformadas: requiere interpretación.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá cuatro Sprite comunes de 2 litros y restá dos paquetes de arroz Gallo de 1 kg. Perdón, las Sprite no llegaron y el arroz no se vendió; no hagas ninguna de esas dos operaciones.",
+      "transcriptions": [
+        " Agrega, cuatro sprite comunes de dos litros y restados paquetes de arroz gallos de un kilo. Perdón, las especies no llegaron y el arroz no se vendió. No has ninguna de esas dos operaciones."
+      ]
+    },
+    {
+      "configuration": "whisper_tiny",
+      "case_id": "caso_integral",
+      "level": "exigente",
+      "assessment": "sentido_comprometido",
+      "reason": "Cambia 2 litros → 1/2 y 750 → 75 ml; deforma corrección y cancelaciones.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros; perdón, eran dos. Agregá cuatro Sprite comunes de 1,5 litros y cinco botellas de agua Villavicencio de 1,5 litros; perdón, no llegó ninguno de esos dos productos, así que no los cargues. Restá dos paquetes de arroz Gallo de 1 kg y tres paquetes de fideos Matarazzo de 500 g. Restá cuatro Coca Cola Zero de 2 litros y cinco envases de detergente Magistral de 750 ml; perdón, ni las Coca Zero ni los detergentes se vendieron. No restes ninguno de esos dos productos. Agregá seis envases de leche La Serenísima de 1 litro y restá dos Sprite comunes de 2 litros. Perdón, la leche no llegó y esas Sprite no se vendieron; no cargues la leche ni restes esas Sprite.",
+      "transcriptions": [
+        " Agrega, 3 cucacola con 1/2 litros, prón, el andos, agrega 4 prítcomunes de 1,5 litros y 5 tillas de agua visavicencia de 1,5 litros. Prón, no yo hago ni 1 de esos 2 productos, así lleno los carres, resta 2 paquetes de arroz gallo de 1 kilo y 3 paquetes de fíjidos matarasos y 500 gramos. Resta 4 cococola 0 de 2 litros y 5 en bases de de 3 gente magistral de 75 ml. Perdón, ni las cocacelen y los detergentes se vendieron, no resten 1 de esos 2 productos. Agrega 6 en bases de leche y la serenísima, de 1 litro y resta 2 spray comune de 2 litros. Perdón, la leche no llegó y esa se spray no se vendieron, no carrega la leche ni resta y se ases prítos."
+      ]
+    },
+    {
+      "configuration": "whisper_base",
+      "case_id": "solo_agregar",
+      "level": "basico",
+      "assessment": "coherente",
+      "reason": "Acción, cantidades, nombres y unidades reconocibles.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros y cuatro Sprite comunes de 1,5 litros.",
+      "transcriptions": [
+        " Agrega 3 Coca-Cola comunes de 2 litros y 4 sprite comunes de 1,5 litros."
+      ]
+    },
+    {
+      "configuration": "whisper_base",
+      "case_id": "solo_restar",
+      "level": "basico",
+      "assessment": "coherente",
+      "reason": "Resta de dos paquetes de arroz Gallo de un kilo reconocible.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos paquetes de arroz Gallo de 1 kg.",
+      "transcriptions": [
+        " resta 2 paquetes de arroz gallo de 1 kilo"
+      ]
+    },
+    {
+      "configuration": "whisper_base",
+      "case_id": "restar_ambos",
+      "level": "habitual",
+      "assessment": "sentido_comprometido",
+      "reason": "Se pierde la cantidad dos o la acción, según modelo; Vosk tiene variantes medidas sin cantidad y Zero → serio.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros y cuatro envases de detergente Magistral de 750 ml.",
+      "transcriptions": [
+        " Resta, toco cacola a 0 de 2 litros y 4 embases de detergente magistral de 750 ml."
+      ]
+    },
+    {
+      "configuration": "whisper_base",
+      "case_id": "corregir_cantidad",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "Acción reconocible y corrección tres → dos conservada.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros. Perdón, eran dos.",
+      "transcriptions": [
+        " Agrega, 3 coca-cola comunes de 2 litros, perdón, eran 2."
+      ]
+    },
+    {
+      "configuration": "whisper_base",
+      "case_id": "negar_agregacion",
+      "level": "habitual",
+      "assessment": "ambigua",
+      "reason": "Razón de cancelación presente, pero instrucción final deformada, truncada o sin su no.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá cinco botellas de agua Villavicencio de 1,5 litros. Perdón, esas no llegaron; no las cargues.",
+      "transcriptions": [
+        " Abrega 5 tallas de agua vizadiscencio de 1,5 litros. Perdón, esas no llegaron las cargues."
+      ]
+    },
+    {
+      "configuration": "whisper_base",
+      "case_id": "negar_restacion",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "No se vendieron / no los restes conserva inequívocamente la cancelación total, aunque haya errores en el nombre o verbo inicial.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá cuatro envases de detergente Magistral de 750 ml. Perdón, no se vendieron; no los restes.",
+      "transcriptions": [
+        " Restá 4 envases de detergentes magistral de 750 mililitros. Perdón, no se vendieron, no los restes."
+      ]
+    },
+    {
+      "configuration": "whisper_base",
+      "case_id": "negar_varias_agregaciones",
+      "level": "exigente",
+      "assessment": "ambigua",
+      "reason": "Artículo pendiente arroz Gallo deformado; no se puede garantizar identidad.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros, cuatro Sprite comunes de 1,5 litros y cinco paquetes de arroz Gallo de 1 kg. Me equivoque las Coca Cola comunes de 2 litros y las Sprite comunes de 1,5 no las cargues.",
+      "transcriptions": [
+        " A agregar 3 cocacolas comunes de 2 litros, 4 sprites comunes de 1,5 litros y 5 paquetes de rogallos de 1 kilo. Me equivoque las cocacolas comunes de 2 litros y las sprites comunes de 1,5 no las cargas."
+      ]
+    },
+    {
+      "configuration": "whisper_base",
+      "case_id": "negar_varias_restaciones",
+      "level": "exigente",
+      "assessment": "ambigua",
+      "reason": "Acción y cantidades reconocibles, pero detergente Magistral deformado; identidad incierta.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros, tres paquetes de arroz Gallo de 1 kg y cuatro envases de detergente Magistral de 750 ml. Las Coca Zero y el arroz no se vendieron; no los restes.",
+      "transcriptions": [
+        " Reesta 2 cocacolla 0 de 2 litros, 3 paquetes de arroz gallo de un kilo y 4 envases de terjén de magistral de 750 ml. Las coca 0 y el arroz no se vendieron, no los restes."
+      ]
+    },
+    {
+      "configuration": "whisper_base",
+      "case_id": "negar_agregacion_y_restacion",
+      "level": "exigente",
+      "assessment": "ambigua",
+      "reason": "Instrucción final no das/Novas/nuevas/no has y/o referencias de Sprite deformadas: requiere interpretación.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá cuatro Sprite comunes de 2 litros y restá dos paquetes de arroz Gallo de 1 kg. Perdón, las Sprite no llegaron y el arroz no se vendió; no hagas ninguna de esas dos operaciones.",
+      "transcriptions": [
+        " Agrega, cuatro sprites comunes de dos litros y resta dos paquetes de arroz gallos de un kilo. Perdón, las sprites no llegaron y el arroz no se vendió, no das ninguna de esas dos operaciones."
+      ]
+    },
+    {
+      "configuration": "whisper_base",
+      "case_id": "caso_integral",
+      "level": "exigente",
+      "assessment": "ambigua",
+      "reason": "Conserva corrección, cantidades y cancelaciones recuperables; arroz/fideos y marcas deformados.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros; perdón, eran dos. Agregá cuatro Sprite comunes de 1,5 litros y cinco botellas de agua Villavicencio de 1,5 litros; perdón, no llegó ninguno de esos dos productos, así que no los cargues. Restá dos paquetes de arroz Gallo de 1 kg y tres paquetes de fideos Matarazzo de 500 g. Restá cuatro Coca Cola Zero de 2 litros y cinco envases de detergente Magistral de 750 ml; perdón, ni las Coca Zero ni los detergentes se vendieron. No restes ninguno de esos dos productos. Agregá seis envases de leche La Serenísima de 1 litro y restá dos Sprite comunes de 2 litros. Perdón, la leche no llegó y esas Sprite no se vendieron; no cargues la leche ni restes esas Sprite.",
+      "transcriptions": [
+        " Agrega, tres cocacola comunes de dos litros, perdón, eran dos. Agrega, cuatro spray comunes de uno coma cinco litros y cinco dotellas de agua vizabicensio de uno coma cinco litros. Perdón, no llegó ni uno de esos dos productos, así que no en los carreras. Resta a dos paquetes de arroz gayo de un kilo y tres paquetes de fíjidos matarazo de 500 gramos. Resta a cuatro cocacola cero de dos litros y cinco envases de detergente magistral de 750 mililitros. Perdón, ni las cocaceron y los detergentes se vendieron, no restes ninguno de esos dos productos. Agrega, seis envases de leche y la serenísima, de un litro y restas dos spray comunes de dos litros. Perdón, la leche no llegó y esas spray no se vendieron, no carges la leche ni restes esas spray."
+      ]
+    },
+    {
+      "configuration": "whisper_small_q5_1",
+      "case_id": "solo_agregar",
+      "level": "basico",
+      "assessment": "coherente",
+      "reason": "Acción, cantidades, nombres y unidades reconocibles.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros y cuatro Sprite comunes de 1,5 litros.",
+      "transcriptions": [
+        " Agrega 3 Coca-Cola comunes de 2 litros y 4 Sprite comunes de 1,5 litros."
+      ]
+    },
+    {
+      "configuration": "whisper_small_q5_1",
+      "case_id": "solo_restar",
+      "level": "basico",
+      "assessment": "coherente",
+      "reason": "Resta de dos paquetes de arroz Gallo de un kilo reconocible.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos paquetes de arroz Gallo de 1 kg.",
+      "transcriptions": [
+        " Resta dos paquetes de arroz gallo de un kilo."
+      ]
+    },
+    {
+      "configuration": "whisper_small_q5_1",
+      "case_id": "restar_ambos",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "Ambas restas y cantidades conservadas; cero/0 y unidades en palabras aceptados.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros y cuatro envases de detergente Magistral de 750 ml.",
+      "transcriptions": [
+        " Resta 2 Coca-Cola 0 de 2 litros y 4 en bases de detergente magistral de 750 mililitros."
+      ]
+    },
+    {
+      "configuration": "whisper_small_q5_1",
+      "case_id": "corregir_cantidad",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "Acción reconocible y corrección tres → dos conservada.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros. Perdón, eran dos.",
+      "transcriptions": [
+        " Agrega 3 Coca-Cola comunes de 2 litros, perdón eran 2."
+      ]
+    },
+    {
+      "configuration": "whisper_small_q5_1",
+      "case_id": "negar_agregacion",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "Cancelación completa explícita; marca deformada no impide cancelar todas las operaciones de este caso.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá cinco botellas de agua Villavicencio de 1,5 litros. Perdón, esas no llegaron; no las cargues.",
+      "transcriptions": [
+        " Agrega 5 botellas de agua billa de licencia de 1,5 litros. Perdón, esas no llegaron, no las cargues."
+      ]
+    },
+    {
+      "configuration": "whisper_small_q5_1",
+      "case_id": "negar_restacion",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "No se vendieron / no los restes conserva inequívocamente la cancelación total, aunque haya errores en el nombre o verbo inicial.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá cuatro envases de detergente Magistral de 750 ml. Perdón, no se vendieron; no los restes.",
+      "transcriptions": [
+        " Resta 4 en bases de detergentes magistral de 750 mililitros. Perdón, no se vendieron, no los restes."
+      ]
+    },
+    {
+      "configuration": "whisper_small_q5_1",
+      "case_id": "negar_varias_agregaciones",
+      "level": "exigente",
+      "assessment": "sentido_comprometido",
+      "reason": "Falta verbo inicial de agregar: operación pendiente sobre arroz implícita.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros, cuatro Sprite comunes de 1,5 litros y cinco paquetes de arroz Gallo de 1 kg. Me equivoque las Coca Cola comunes de 2 litros y las Sprite comunes de 1,5 no las cargues.",
+      "transcriptions": [
+        " 3 Coca-Cola comunes de 2 litros 4 Sprite comunes de 1,5 litros y 5 paquetes de arroz gallo de 1 kilo. Me equivoque, las Coca-Cola comunes de 2 litros y Sprite comunes de 1,5 no las cargués."
+      ]
+    },
+    {
+      "configuration": "whisper_small_q5_1",
+      "case_id": "negar_varias_restaciones",
+      "level": "exigente",
+      "assessment": "sentido_comprometido",
+      "reason": "Restá → presta/Prestar: resta pendiente de detergente queda expresada como otra acción; Tiny además cambia 750 → 75 ml.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros, tres paquetes de arroz Gallo de 1 kg y cuatro envases de detergente Magistral de 750 ml. Las Coca Zero y el arroz no se vendieron; no los restes.",
+      "transcriptions": [
+        " Prestar 2 Coca-Cola 0 de 2 litros, 3 paquetes de arroz gallo de 1 kilo y 4 en base de detergente magistral de 750 mililitros. Las Coca-0 y el arroz no se vendieron, no los restes."
+      ]
+    },
+    {
+      "configuration": "whisper_small_q5_1",
+      "case_id": "negar_agregacion_y_restacion",
+      "level": "exigente",
+      "assessment": "coherente",
+      "reason": "Cancelación total explícita no hagas ninguna; nombres deformados no alteran el resultado de cancelar ambas.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá cuatro Sprite comunes de 2 litros y restá dos paquetes de arroz Gallo de 1 kg. Perdón, las Sprite no llegaron y el arroz no se vendió; no hagas ninguna de esas dos operaciones.",
+      "transcriptions": [
+        " Agrega 4 spray comunes de 2 litros y resta 2 paquetes de arroz gallo de 1 kilo. Perdón, las spray no llegaron y el arroz no se vendió, no hagas ninguna de esas 2 operaciones."
+      ]
+    },
+    {
+      "configuration": "whisper_small_q5_1",
+      "case_id": "caso_integral",
+      "level": "exigente",
+      "assessment": "sentido_comprometido",
+      "reason": "Omite Agregá y perdón eran dos: queda tres en lugar de dos en la operación inicial.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros; perdón, eran dos. Agregá cuatro Sprite comunes de 1,5 litros y cinco botellas de agua Villavicencio de 1,5 litros; perdón, no llegó ninguno de esos dos productos, así que no los cargues. Restá dos paquetes de arroz Gallo de 1 kg y tres paquetes de fideos Matarazzo de 500 g. Restá cuatro Coca Cola Zero de 2 litros y cinco envases de detergente Magistral de 750 ml; perdón, ni las Coca Zero ni los detergentes se vendieron. No restes ninguno de esos dos productos. Agregá seis envases de leche La Serenísima de 1 litro y restá dos Sprite comunes de 2 litros. Perdón, la leche no llegó y esas Sprite no se vendieron; no cargues la leche ni restes esas Sprite.",
+      "transcriptions": [
+        " 3 Coca-Cola comunes de 2 litros, 4 Sprite comunes de 1,5 litros y 5 botellas de agua viva visencio de 1,5 litros. No llegó ninguno de esos 2 productos, así que no los cargués. Resta 2 paquetes de arroz gallo de 1 kilo y 3 paquetes de fideos matarazos de 500 gramos. Resta 4 Coca-Cola 0 de 2 litros y 5 en bases de detergente magistral de 750 ml. Perdón, ni las Coca-cero ni los detergentes se vendieron, no restes ninguno de esos 2 productos. Agrega 6 en bases de leche lazerenísima de 1 litro y resta 2 Sprite comunes de 2 litros. Perdón, la leche no llegó y esas Sprite no se vendieron. No cargués la leche ni restes esa Sprite."
+      ]
+    },
+    {
+      "configuration": "moonshine_tiny_es",
+      "case_id": "solo_agregar",
+      "level": "basico",
+      "assessment": "ambigua",
+      "reason": "Sprite deformado; en Kroko además termina en «li». Acción y cantidades conservadas.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros y cuatro Sprite comunes de 1,5 litros.",
+      "transcriptions": [
+        "agrega tres coca cola comunes de dos litros y cuatro pryt comunes de uno coma cinco litros"
+      ]
+    },
+    {
+      "configuration": "moonshine_tiny_es",
+      "case_id": "solo_restar",
+      "level": "basico",
+      "assessment": "coherente",
+      "reason": "Resta de dos paquetes de arroz Gallo de un kilo reconocible.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos paquetes de arroz Gallo de 1 kg.",
+      "transcriptions": [
+        "resta dos paquetes de arroz gallo de un kilo"
+      ]
+    },
+    {
+      "configuration": "moonshine_tiny_es",
+      "case_id": "restar_ambos",
+      "level": "habitual",
+      "assessment": "sentido_comprometido",
+      "reason": "Se pierde la cantidad dos o la acción, según modelo; Vosk tiene variantes medidas sin cantidad y Zero → serio.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros y cuatro envases de detergente Magistral de 750 ml.",
+      "transcriptions": [
+        "resta tosco cacola cero de dos litros y cuatro envases de detergente magistral de setecientos cincuenta mililitros"
+      ]
+    },
+    {
+      "configuration": "moonshine_tiny_es",
+      "case_id": "corregir_cantidad",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "Acción reconocible y corrección tres → dos conservada.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros. Perdón, eran dos.",
+      "transcriptions": [
+        "agregad tres coca cola comunes de dos litros perdón eran dos"
+      ]
+    },
+    {
+      "configuration": "moonshine_tiny_es",
+      "case_id": "negar_agregacion",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "Cancelación completa explícita; marca deformada no impide cancelar todas las operaciones de este caso.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá cinco botellas de agua Villavicencio de 1,5 litros. Perdón, esas no llegaron; no las cargues.",
+      "transcriptions": [
+        "agrega cinco botellas de agua visualicencia de uno coma cinco litros perdón esas no llegaron no las cargues"
+      ]
+    },
+    {
+      "configuration": "moonshine_tiny_es",
+      "case_id": "negar_restacion",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "No se vendieron / no los restes conserva inequívocamente la cancelación total, aunque haya errores en el nombre o verbo inicial.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá cuatro envases de detergente Magistral de 750 ml. Perdón, no se vendieron; no los restes.",
+      "transcriptions": [
+        "restá cuatro envases de detergente magistral de setecientos cincuenta mililitros perdón no se vendieron no los restes"
+      ]
+    },
+    {
+      "configuration": "moonshine_tiny_es",
+      "case_id": "negar_varias_agregaciones",
+      "level": "exigente",
+      "assessment": "ambigua",
+      "reason": "Artículo pendiente arroz Gallo deformado; no se puede garantizar identidad.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros, cuatro Sprite comunes de 1,5 litros y cinco paquetes de arroz Gallo de 1 kg. Me equivoque las Coca Cola comunes de 2 litros y las Sprite comunes de 1,5 no las cargues.",
+      "transcriptions": [
+        "agregad tres coca cola comunes de dos litros cuatro sprite comunes de uno coma cinco litros y cinco paquetes de arroga sho de un kilo me equivoqué las coca colas comunes de dos litros y las sprite comunes de uno coma cinco no las cargues"
+      ]
+    },
+    {
+      "configuration": "moonshine_tiny_es",
+      "case_id": "negar_varias_restaciones",
+      "level": "exigente",
+      "assessment": "sentido_comprometido",
+      "reason": "Restá → presta/Prestar: resta pendiente de detergente queda expresada como otra acción; Tiny además cambia 750 → 75 ml.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros, tres paquetes de arroz Gallo de 1 kg y cuatro envases de detergente Magistral de 750 ml. Las Coca Zero y el arroz no se vendieron; no los restes.",
+      "transcriptions": [
+        "presta dos coca colas cero de dos litros tres paquetes de arroja sho de un kilo y cuatro envases de detergente magistral de setecientos cincuenta mililitros las cocas hero y el arroz no se vendieron no los restes"
+      ]
+    },
+    {
+      "configuration": "moonshine_tiny_es",
+      "case_id": "negar_agregacion_y_restacion",
+      "level": "exigente",
+      "assessment": "ambigua",
+      "reason": "Instrucción final no das/Novas/nuevas/no has y/o referencias de Sprite deformadas: requiere interpretación.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá cuatro Sprite comunes de 2 litros y restá dos paquetes de arroz Gallo de 1 kg. Perdón, las Sprite no llegaron y el arroz no se vendió; no hagas ninguna de esas dos operaciones.",
+      "transcriptions": [
+        "agrega cuatro spray comunes de dos litros y restad dos paquetes de arrojacho de un kilo perdón las spain no llegaron y el arroz no se vendió no das ninguna de esas dos operaciones"
+      ]
+    },
+    {
+      "configuration": "moonshine_tiny_es",
+      "case_id": "caso_integral",
+      "level": "exigente",
+      "assessment": "ambigua",
+      "reason": "Conserva corrección y prohibiciones finales; razón no se vendieron pierde no y arroz Gallo queda deformado.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros; perdón, eran dos. Agregá cuatro Sprite comunes de 1,5 litros y cinco botellas de agua Villavicencio de 1,5 litros; perdón, no llegó ninguno de esos dos productos, así que no los cargues. Restá dos paquetes de arroz Gallo de 1 kg y tres paquetes de fideos Matarazzo de 500 g. Restá cuatro Coca Cola Zero de 2 litros y cinco envases de detergente Magistral de 750 ml; perdón, ni las Coca Zero ni los detergentes se vendieron. No restes ninguno de esos dos productos. Agregá seis envases de leche La Serenísima de 1 litro y restá dos Sprite comunes de 2 litros. Perdón, la leche no llegó y esas Sprite no se vendieron; no cargues la leche ni restes esas Sprite.",
+      "transcriptions": [
+        "agrega tres coca cola comunes de dos litros perdón eran dos agrega cuatro spray comunes de uno coma cinco litros y cinco botellas de agua bishavicencia de uno coma cinco litros perdón no llego a ninguno de esos dos productos así que no los cargues resta a dos paquetes de arroga sho de un kilo y tres paquetes de fideos matarazos de quinientos gramos resta cuatro coca cola cero de dos litros y cinco envases de detergente magistral de setecientos cincuenta mililitros perdón ni las cocaseron ni los detergentes se vendieron no restes ninguno de esos dos productos agrega seis envases de leche la cerenísima un litro y restar dos spray comunes de dos litros perdón la leche nos llevó y esas espeñas se vendieron no cargues la leche ni restes esas sprite"
+      ]
+    },
+    {
+      "configuration": "moonshine_small_es",
+      "case_id": "solo_agregar",
+      "level": "basico",
+      "assessment": "ambigua",
+      "reason": "Sprite deformado; en Kroko además termina en «li». Acción y cantidades conservadas.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros y cuatro Sprite comunes de 1,5 litros.",
+      "transcriptions": [
+        "agrega tres coca cola comunes de dos litros y cuatro sprays comunes de uno coma cinco litros"
+      ]
+    },
+    {
+      "configuration": "moonshine_small_es",
+      "case_id": "solo_restar",
+      "level": "basico",
+      "assessment": "coherente",
+      "reason": "Resta de dos paquetes de arroz Gallo de un kilo reconocible.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos paquetes de arroz Gallo de 1 kg.",
+      "transcriptions": [
+        "resta dos paquetes de arroz gallo de un kilo"
+      ]
+    },
+    {
+      "configuration": "moonshine_small_es",
+      "case_id": "restar_ambos",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "Ambas restas y cantidades conservadas; cero/0 y unidades en palabras aceptados.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros y cuatro envases de detergente Magistral de 750 ml.",
+      "transcriptions": [
+        "resta dos coca cola cero de dos litros y cuatro envases de detergente magistral de setecientos cincuenta mililitros"
+      ]
+    },
+    {
+      "configuration": "moonshine_small_es",
+      "case_id": "corregir_cantidad",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "Acción reconocible y corrección tres → dos conservada.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros. Perdón, eran dos.",
+      "transcriptions": [
+        "agrega tres coca cola comunes de dos litros perdón eran dos"
+      ]
+    },
+    {
+      "configuration": "moonshine_small_es",
+      "case_id": "negar_agregacion",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "Cancelación completa explícita; marca deformada no impide cancelar todas las operaciones de este caso.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá cinco botellas de agua Villavicencio de 1,5 litros. Perdón, esas no llegaron; no las cargues.",
+      "transcriptions": [
+        "agrega cinco botellas de agua a visodicencio de uno coma cinco litros perdón esas no llegaron no las cargues"
+      ]
+    },
+    {
+      "configuration": "moonshine_small_es",
+      "case_id": "negar_restacion",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "No se vendieron / no los restes conserva inequívocamente la cancelación total, aunque haya errores en el nombre o verbo inicial.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá cuatro envases de detergente Magistral de 750 ml. Perdón, no se vendieron; no los restes.",
+      "transcriptions": [
+        "resta cuatro envases de detergentes magistral de setecientos cincuenta mililitros perdón no se vendieron no los restes"
+      ]
+    },
+    {
+      "configuration": "moonshine_small_es",
+      "case_id": "negar_varias_agregaciones",
+      "level": "exigente",
+      "assessment": "coherente",
+      "reason": "Verbo de agregar, arroz Gallo pendiente y cancelaciones conservados; Sprite deformado queda cancelado de manera consistente.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros, cuatro Sprite comunes de 1,5 litros y cinco paquetes de arroz Gallo de 1 kg. Me equivoque las Coca Cola comunes de 2 litros y las Sprite comunes de 1,5 no las cargues.",
+      "transcriptions": [
+        "agrega tres coca cola comunes de dos litros cuatro spray comunes de 1,5 litros y cinco paquetes de arroz gallo de un kilo me equivoqué las coca colas comunes de dos litros y las spray comunes de uno coma cinco no las cargues"
+      ]
+    },
+    {
+      "configuration": "moonshine_small_es",
+      "case_id": "negar_varias_restaciones",
+      "level": "exigente",
+      "assessment": "sentido_comprometido",
+      "reason": "Restá → presta/Prestar: resta pendiente de detergente queda expresada como otra acción; Tiny además cambia 750 → 75 ml.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros, tres paquetes de arroz Gallo de 1 kg y cuatro envases de detergente Magistral de 750 ml. Las Coca Zero y el arroz no se vendieron; no los restes.",
+      "transcriptions": [
+        "presta dos coca cola cero de dos litros tres paquetes de arroz gallo de un kilo y cuatro envases de detergente magistral de setecientos cincuenta mililitros las cocas cero y el arroz no se vendieron no los restes"
+      ]
+    },
+    {
+      "configuration": "moonshine_small_es",
+      "case_id": "negar_agregacion_y_restacion",
+      "level": "exigente",
+      "assessment": "ambigua",
+      "reason": "Instrucción final no das/Novas/nuevas/no has y/o referencias de Sprite deformadas: requiere interpretación.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá cuatro Sprite comunes de 2 litros y restá dos paquetes de arroz Gallo de 1 kg. Perdón, las Sprite no llegaron y el arroz no se vendió; no hagas ninguna de esas dos operaciones.",
+      "transcriptions": [
+        "agrega cuatro sprays comunes de dos litros y restad dos paquetes de arroz gallo de un kilo perdón las espéim no llegaron y el arroz no se vendió no das ninguna de esas dos operaciones"
+      ]
+    },
+    {
+      "configuration": "moonshine_small_es",
+      "case_id": "caso_integral",
+      "level": "exigente",
+      "assessment": "sentido_comprometido",
+      "reason": "Conserva corrección pero así que no los cargues → así lleno los cargues: pierde prohibición explícita.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros; perdón, eran dos. Agregá cuatro Sprite comunes de 1,5 litros y cinco botellas de agua Villavicencio de 1,5 litros; perdón, no llegó ninguno de esos dos productos, así que no los cargues. Restá dos paquetes de arroz Gallo de 1 kg y tres paquetes de fideos Matarazzo de 500 g. Restá cuatro Coca Cola Zero de 2 litros y cinco envases de detergente Magistral de 750 ml; perdón, ni las Coca Zero ni los detergentes se vendieron. No restes ninguno de esos dos productos. Agregá seis envases de leche La Serenísima de 1 litro y restá dos Sprite comunes de 2 litros. Perdón, la leche no llegó y esas Sprite no se vendieron; no cargues la leche ni restes esas Sprite.",
+      "transcriptions": [
+        "agrega tres coca cola comunes de dos litros perdón eran dos agrega cuatro spray comunes de uno coma cinco litros y cinco botellas de agua villavicencio de uno coma cinco litros perdón no llevo ninguno de esos dos productos así lleno los cargues restar dos paquetes de arroz gallo de un kilo y tres paquetes de fideos matarazos de 500 gramos resta cuatro coca cola cero de dos litros y cinco envases de detergente magistral de setecientos cincuenta mililitros perdón ni las coca cero ni los detergentes se vendieron no restes ninguno de esos dos productos agrega a seis envases de leche la serenísima en un litro y restar dos spray comunes de dos litros perdón la leche no llegó y esas espéi no se vendieron no cargues la leche ni restes esas spray"
+      ]
+    },
+    {
+      "configuration": "kroko_es",
+      "case_id": "solo_agregar",
+      "level": "basico",
+      "assessment": "ambigua",
+      "reason": "Sprite deformado; en Kroko además termina en «li». Acción y cantidades conservadas.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros y cuatro Sprite comunes de 1,5 litros.",
+      "transcriptions": [
+        "Agregar tres Coca-Cola comunes de dos litros y cuatro sprays comunes de uno coma cinco li"
+      ]
+    },
+    {
+      "configuration": "kroko_es",
+      "case_id": "solo_restar",
+      "level": "basico",
+      "assessment": "ambigua",
+      "reason": "Gallo → gaso: marca dudosa.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos paquetes de arroz Gallo de 1 kg.",
+      "transcriptions": [
+        "Resta dos paquetes de arroz gaso de un kilo"
+      ]
+    },
+    {
+      "configuration": "kroko_es",
+      "case_id": "restar_ambos",
+      "level": "habitual",
+      "assessment": "sentido_comprometido",
+      "reason": "Se pierde la cantidad dos o la acción, según modelo; Vosk tiene variantes medidas sin cantidad y Zero → serio.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros y cuatro envases de detergente Magistral de 750 ml.",
+      "transcriptions": [
+        "Coca-Cola cero de dos litros y cuatro envases de detergente magistral de setecientos cincuenta mililitros"
+      ]
+    },
+    {
+      "configuration": "kroko_es",
+      "case_id": "corregir_cantidad",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "Acción reconocible y corrección tres → dos conservada.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros. Perdón, eran dos.",
+      "transcriptions": [
+        "Agregar tres Coca-Cola comunes de dos litros, perdón, eran dos"
+      ]
+    },
+    {
+      "configuration": "kroko_es",
+      "case_id": "negar_agregacion",
+      "level": "habitual",
+      "assessment": "ambigua",
+      "reason": "Razón de cancelación presente, pero instrucción final deformada, truncada o sin su no.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá cinco botellas de agua Villavicencio de 1,5 litros. Perdón, esas no llegaron; no las cargues.",
+      "transcriptions": [
+        "Agrega cinco botellas de agua visuavicencio de uno coma cinco litros. Perdón, esas no llegaron, no las car"
+      ]
+    },
+    {
+      "configuration": "kroko_es",
+      "case_id": "negar_restacion",
+      "level": "habitual",
+      "assessment": "coherente",
+      "reason": "No se vendieron / no los restes conserva inequívocamente la cancelación total, aunque haya errores en el nombre o verbo inicial.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá cuatro envases de detergente Magistral de 750 ml. Perdón, no se vendieron; no los restes.",
+      "transcriptions": [
+        "Pero está cuatro envases de detergentes magistral de setecientos cincuenta mililitros. Perdón, no se vendieron, no los restes"
+      ]
+    },
+    {
+      "configuration": "kroko_es",
+      "case_id": "negar_varias_agregaciones",
+      "level": "exigente",
+      "assessment": "coherente",
+      "reason": "Verbo de agregar, arroz Gallo pendiente y cancelaciones conservados; Sprite deformado queda cancelado de manera consistente.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros, cuatro Sprite comunes de 1,5 litros y cinco paquetes de arroz Gallo de 1 kg. Me equivoque las Coca Cola comunes de 2 litros y las Sprite comunes de 1,5 no las cargues.",
+      "transcriptions": [
+        "Agrega tres Coca-Cola común es de dos litros, cuatro sprays comunes de uno comas cinco litros y cinco paquetes de arroz gallo de un kilo. Me equivoqué, las Coca-Colas comunes de dos litros y las spray comunes, de uno coma cinco, no las cargues"
+      ]
+    },
+    {
+      "configuration": "kroko_es",
+      "case_id": "negar_varias_restaciones",
+      "level": "exigente",
+      "assessment": "sentido_comprometido",
+      "reason": "Restá → presta/Prestar: resta pendiente de detergente queda expresada como otra acción; Tiny además cambia 750 → 75 ml.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Restá dos Coca Cola Zero de 2 litros, tres paquetes de arroz Gallo de 1 kg y cuatro envases de detergente Magistral de 750 ml. Las Coca Zero y el arroz no se vendieron; no los restes.",
+      "transcriptions": [
+        "Presta dos Coca-Cola cero de dos litros, tres paquetes de rosgallo de un kilo y cuatro envases de detergente magistral de setecientos cincuenta mililitros. Las cocas cero y el arroz no se vendieron, no los restes."
+      ]
+    },
+    {
+      "configuration": "kroko_es",
+      "case_id": "negar_agregacion_y_restacion",
+      "level": "exigente",
+      "assessment": "ambigua",
+      "reason": "Instrucción final no das/Novas/nuevas/no has y/o referencias de Sprite deformadas: requiere interpretación.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá cuatro Sprite comunes de 2 litros y restá dos paquetes de arroz Gallo de 1 kg. Perdón, las Sprite no llegaron y el arroz no se vendió; no hagas ninguna de esas dos operaciones.",
+      "transcriptions": [
+        "Agrega cuatro spys comunes de dos litros y resta dos paquetes de arroz gallo de un kilo. Perdón, las spike no llegaron y el arroz no se vendió. Novas ninguna de esas dos operaciones"
+      ]
+    },
+    {
+      "configuration": "kroko_es",
+      "case_id": "caso_integral",
+      "level": "exigente",
+      "assessment": "ambigua",
+      "reason": "Conserva corrección, cantidades y todas las cancelaciones explícitas; nombre activo Matarazzo → matarazos queda dudoso.",
+      "reviewed_runs": [
+        1,
+        2,
+        3
+      ],
+      "expected_text": "Agregá tres Coca Cola comunes de 2 litros; perdón, eran dos. Agregá cuatro Sprite comunes de 1,5 litros y cinco botellas de agua Villavicencio de 1,5 litros; perdón, no llegó ninguno de esos dos productos, así que no los cargues. Restá dos paquetes de arroz Gallo de 1 kg y tres paquetes de fideos Matarazzo de 500 g. Restá cuatro Coca Cola Zero de 2 litros y cinco envases de detergente Magistral de 750 ml; perdón, ni las Coca Zero ni los detergentes se vendieron. No restes ninguno de esos dos productos. Agregá seis envases de leche La Serenísima de 1 litro y restá dos Sprite comunes de 2 litros. Perdón, la leche no llegó y esas Sprite no se vendieron; no cargues la leche ni restes esas Sprite.",
+      "transcriptions": [
+        "Agrega tres Coca-Cola comunes de dos litros, perdón, eran dos. Agrega cuatro sprays comunes de uno coma cinco litros y cinco botellas de agua villavicencio de uno comas cinco litros. Perdón, no llegó ninguno de esos dos productos, así que no los cargués. Resta dos paquetes de arroz gallo de un kilo y tres paquetes de fideos matarazos de quinientos gramos. Resta cuatro Coca-Cola, cero de dos litros y cinco envases de detergente magistral de setecientos cincuenta mililitros. Perdón, ni las coca ceros ni los detergentes se vendieron, no restes ninguno de esos dos productos. Agrega seis envases de leche la serenísima, de un litro y resta dos spray comunes de dos litros. Perdón, la leche no llegó y esas sprays no se vendieron. No cargues la leche ni restes esas sprays."
+      ]
+    }
+  ]
+}

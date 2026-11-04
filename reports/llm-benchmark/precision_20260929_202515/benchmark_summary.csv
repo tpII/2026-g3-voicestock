@@ -1,0 +1,2 @@
+provider,model,cases,successful,request_success_pct,valid_json_pct,schema_valid_pct,correct_operation_pct,correct_product_pct,correct_quantity_pct,exact_match_pct,end_to_end_exact_pct,avg_latency_ms,median_latency_ms,avg_tokens_per_second
+ollama,qwen3:4b-instruct,10,10,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,4979.92,4345.96,15.619

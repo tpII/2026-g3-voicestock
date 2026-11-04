@@ -1,0 +1,7 @@
+case_id,level,status,valid_json,schema_valid,correct_operation,correct_product,correct_quantity,exact_match,pi_stt_peak_mib,pc_api_client_peak_mib,pi_stt_s,llm_api_s,pi_cpu_pct,error
+solo_agregar,basico,ok,True,True,True,True,True,True,254.66015625,30.79296875,42.947187196000414,0.7008647830007249,375.7871249249821,
+solo_restar,basico,ok,True,True,True,True,True,True,256.27734375,30.8125,41.711389180999504,0.44167904799905955,373.08755008065884,
+restar_ambos,habitual,ok,True,True,True,True,False,False,257.02734375,30.8203125,42.80588443800025,0.6892511590012873,375.0418946080299,
+corregir_cantidad,habitual,ok,True,True,True,True,True,True,257.02734375,30.83984375,42.36905344199931,0.541263817998697,371.8751947472468,
+negar_agregacion,habitual,ok,True,True,True,True,True,True,259.40234375,30.87109375,44.1579081130003,0.4470281079993583,370.9414847751281,
+negar_restacion,habitual,ok,True,True,True,True,True,True,258.2890625,30.90625,43.81701461499961,1.022587225001189,370.9974342805906,

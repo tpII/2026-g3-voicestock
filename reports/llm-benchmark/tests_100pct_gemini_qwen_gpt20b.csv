@@ -1,0 +1,84 @@
+case_id,gemini_provider,gemini_model,gemini_latency_ms,gemini_exact_match,gemini_expected_json,gemini_raw_response,qwen_provider,qwen_model,qwen_latency_ms,qwen_exact_match,qwen_expected_json,qwen_raw_response,gpt_20b_provider,gpt_20b_model,gpt_20b_latency_ms,gpt_20b_exact_match,gpt_20b_expected_json,gpt_20b_raw_response
+solo_agregar,gemini,gemini-3.6-flash,1353.5,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Coca Cola 2L"", ""cantidad"": 3}, {""operacion"": ""agregar_stock"", ""producto"": ""Sprite 1.5L"", ""cantidad"": 4}]}","{""operaciones"":[{""operacion"":""agregar_stock"",""producto"":""Coca Cola 2L"",""cantidad"":3},{""operacion"":""agregar_stock"",""producto"":""Sprite 1.5L"",""cantidad"":4}]}",ollama,qwen3:4b-instruct,6027.78,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Coca Cola 2L"", ""cantidad"": 3}, {""operacion"": ""agregar_stock"", ""producto"": ""Sprite 1.5L"", ""cantidad"": 4}]}","{
+  ""operaciones"": [
+    {
+      ""operacion"": ""agregar_stock"",
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 3
+    },
+    {
+      ""operacion"": ""agregar_stock"",
+      ""producto"": ""Sprite 1.5L"",
+      ""cantidad"": 4
+    }
+  ]
+}",groq,openai/gpt-oss-20b,558.45,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Coca Cola 2L"", ""cantidad"": 3}, {""operacion"": ""agregar_stock"", ""producto"": ""Sprite 1.5L"", ""cantidad"": 4}]}","{""operaciones"":[{""operacion"":""agregar_stock"",""producto"":""Coca Cola 2L"",""cantidad"":3},{""operacion"":""agregar_stock"",""producto"":""Sprite 1.5L"",""cantidad"":4}]}"
+solo_restar,gemini,gemini-3.6-flash,1104.52,True,"{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Arroz Gallo 1kg"", ""cantidad"": 2}]}","{""operaciones"":[{""operacion"":""restar_stock"",""producto"":""Arroz Gallo 1kg"",""cantidad"":2}]}",ollama,qwen3:4b-instruct,3734.93,True,"{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Arroz Gallo 1kg"", ""cantidad"": 2}]}","{
+  ""operaciones"": [
+    {
+      ""operacion"": ""restar_stock"",
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 2
+    }
+  ]
+}",groq,openai/gpt-oss-20b,565.38,True,"{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Arroz Gallo 1kg"", ""cantidad"": 2}]}","{""operaciones"":[{""operacion"":""restar_stock"",""producto"":""Arroz Gallo 1kg"",""cantidad"":2}]}"
+negar_agregacion,gemini,gemini-3.6-flash,975.2,True,"{""operaciones"": []}","{""operaciones"":[]}",ollama,qwen3:4b-instruct,2180.19,True,"{""operaciones"": []}","{
+  ""operaciones"": []
+}",groq,openai/gpt-oss-20b,499.17,True,"{""operaciones"": []}","{""operaciones"":[]}"
+negar_restacion,gemini,gemini-3.6-flash,8280.5,True,"{""operaciones"": []}","{""operaciones"":[]}",ollama,qwen3:4b-instruct,1938.07,True,"{""operaciones"": []}","{
+  ""operaciones"": []
+}",groq,openai/gpt-oss-20b,614.05,True,"{""operaciones"": []}","{""operaciones"": []}"
+restar_ambos,gemini,gemini-3.6-flash,1167.0,True,"{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Coca Cola Zero 2L"", ""cantidad"": 2}, {""operacion"": ""restar_stock"", ""producto"": ""Detergente Magistral 750ml"", ""cantidad"": 4}]}","{""operaciones"":[{""operacion"":""restar_stock"",""producto"":""Coca Cola Zero 2L"",""cantidad"":2},{""operacion"":""restar_stock"",""producto"":""Detergente Magistral 750ml"",""cantidad"":4}]}",ollama,qwen3:4b-instruct,6868.58,True,"{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Coca Cola Zero 2L"", ""cantidad"": 2}, {""operacion"": ""restar_stock"", ""producto"": ""Detergente Magistral 750ml"", ""cantidad"": 4}]}","{
+  ""operaciones"": [
+    {
+      ""operacion"": ""restar_stock"",
+      ""producto"": ""Coca Cola Zero 2L"",
+      ""cantidad"": 2
+    },
+    {
+      ""operacion"": ""restar_stock"",
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 4
+    }
+  ]
+}",groq,openai/gpt-oss-20b,602.11,True,"{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Coca Cola Zero 2L"", ""cantidad"": 2}, {""operacion"": ""restar_stock"", ""producto"": ""Detergente Magistral 750ml"", ""cantidad"": 4}]}","{""operaciones"":[{""operacion"":""restar_stock"",""producto"":""Coca Cola Zero 2L"",""cantidad"":2},{""operacion"":""restar_stock"",""producto"":""Detergente Magistral 750ml"",""cantidad"":4}]}"
+corregir_cantidad,gemini,gemini-3.6-flash,12783.36,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Coca Cola 2L"", ""cantidad"": 2}]}","{""operaciones"":[{""operacion"":""agregar_stock"",""producto"":""Coca Cola 2L"",""cantidad"":2}]}",ollama,qwen3:4b-instruct,4042.82,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Coca Cola 2L"", ""cantidad"": 2}]}","{
+  ""operaciones"": [
+    {
+      ""operacion"": ""agregar_stock"",
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 2
+    }
+  ]
+}",groq,openai/gpt-oss-20b,542.83,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Coca Cola 2L"", ""cantidad"": 2}]}","{""operaciones"":[{""operacion"":""agregar_stock"",""producto"":""Coca Cola 2L"",""cantidad"":2}]}"
+negar_agregacion_y_restacion,gemini,gemini-3.6-flash,1129.81,True,"{""operaciones"": []}","{""operaciones"":[]}",ollama,qwen3:4b-instruct,2855.59,True,"{""operaciones"": []}","{
+  ""operaciones"": []
+}",groq,openai/gpt-oss-20b,614.57,True,"{""operaciones"": []}","{""operaciones"": []}"
+negar_varias_restaciones,gemini,gemini-3.6-flash,1025.05,True,"{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Detergente Magistral 750ml"", ""cantidad"": 4}]}","{""operaciones"":[{""operacion"":""restar_stock"",""producto"":""Detergente Magistral 750ml"",""cantidad"":4}]}",ollama,qwen3:4b-instruct,4864.88,True,"{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Detergente Magistral 750ml"", ""cantidad"": 4}]}","{
+  ""operaciones"": [
+    {
+      ""operacion"": ""restar_stock"",
+      ""producto"": ""Detergente Magistral 750ml"",
+      ""cantidad"": 4
+    }
+  ]
+}",groq,openai/gpt-oss-20b,651.14,True,"{""operaciones"": [{""operacion"": ""restar_stock"", ""producto"": ""Detergente Magistral 750ml"", ""cantidad"": 4}]}","{""operaciones"":[{""operacion"":""restar_stock"",""producto"":""Detergente Magistral 750ml"",""cantidad"":4}]}"
+caso_integral,gemini,gemini-3.6-flash,1295.55,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Coca Cola 2L"", ""cantidad"": 2}, {""operacion"": ""restar_stock"", ""producto"": ""Arroz Gallo 1kg"", ""cantidad"": 2}, {""operacion"": ""restar_stock"", ""producto"": ""Fideos Matarazzo 500g"", ""cantidad"": 3}]}","{""operaciones"":[{""operacion"":""agregar_stock"",""producto"":""Coca Cola 2L"",""cantidad"":2},{""operacion"":""restar_stock"",""producto"":""Arroz Gallo 1kg"",""cantidad"":2},{""operacion"":""restar_stock"",""producto"":""Fideos Matarazzo 500g"",""cantidad"":3}]}",ollama,qwen3:4b-instruct,12637.28,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Coca Cola 2L"", ""cantidad"": 2}, {""operacion"": ""restar_stock"", ""producto"": ""Arroz Gallo 1kg"", ""cantidad"": 2}, {""operacion"": ""restar_stock"", ""producto"": ""Fideos Matarazzo 500g"", ""cantidad"": 3}]}","{
+  ""operaciones"": [
+    {
+      ""operacion"": ""agregar_stock"",
+      ""producto"": ""Coca Cola 2L"",
+      ""cantidad"": 2
+    },
+    {
+      ""operacion"": ""restar_stock"",
+      ""producto"": ""Arroz Gallo 1kg"",
+      ""cantidad"": 2
+    },
+    {
+      ""operacion"": ""restar_stock"",
+      ""producto"": ""Fideos Matarazzo 500g"",
+      ""cantidad"": 3
+    }
+  ]
+}",groq,openai/gpt-oss-20b,1039.32,True,"{""operaciones"": [{""operacion"": ""agregar_stock"", ""producto"": ""Coca Cola 2L"", ""cantidad"": 2}, {""operacion"": ""restar_stock"", ""producto"": ""Arroz Gallo 1kg"", ""cantidad"": 2}, {""operacion"": ""restar_stock"", ""producto"": ""Fideos Matarazzo 500g"", ""cantidad"": 3}]}","{""operaciones"":[{""operacion"":""agregar_stock"",""producto"":""Coca Cola 2L"",""cantidad"":2},{""operacion"":""restar_stock"",""producto"":""Arroz Gallo 1kg"",""cantidad"":2},{""operacion"":""restar_stock"",""producto"":""Fideos Matarazzo 500g"",""cantidad"":3}]}"

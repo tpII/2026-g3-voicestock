@@ -1,0 +1,510 @@
+[
+  {
+    "case_id": "solo_agregar",
+    "level": "basico",
+    "reference_text": "Agregá tres Coca Cola comunes de 2 litros y cuatro Sprite comunes de 1,5 litros.",
+    "expected_json": {
+      "operaciones": [
+        {
+          "operacion": "agregar_stock",
+          "producto": "Coca Cola 2L",
+          "cantidad": 3
+        },
+        {
+          "operacion": "agregar_stock",
+          "producto": "Sprite 1.5L",
+          "cantidad": 4
+        }
+      ]
+    },
+    "status": "ok",
+    "error": null,
+    "remote_stt": {
+      "case_id": "solo_agregar",
+      "status": "ok",
+      "text": "agregá, 3 Coca Cola comunes de 2 litros y 4 Sprite comunes de 1,5 litros.",
+      "audio_sha256": "5d2c36972d6db24e4ca0a9d7db0b0ccda7dac08eb9e04ecd0dca67cfb2cb4857",
+      "resources": {
+        "ram_base_mib": 187.75,
+        "ram_peak_mib": 289.73046875,
+        "cpu_s": 174.78,
+        "cpu_pct": 364.2640217281558,
+        "request_wall_s": 47.9816807520001
+      }
+    },
+    "transcription": "agregá, 3 Coca Cola comunes de 2 litros y 4 Sprite comunes de 1,5 litros.",
+    "llm_prompt": "Sos un sistema de interpretación de órdenes para un inventario.\n\nLeé el mensaje del usuario y devolvé únicamente un objeto JSON válido.\nNo saludes, no expliques, no agregues Markdown y no muestres razonamiento.\n\nEl JSON debe contener exactamente una propiedad llamada \"operaciones\".\n\"operaciones\" debe ser una lista. Cada elemento debe contener exactamente:\n- \"operacion\": \"agregar_stock\" o \"restar_stock\".\n- \"producto\": nombre exacto de la lista de productos.\n- \"cantidad\": número entero positivo.\n\nPRODUCTOS VÁLIDOS:\n- Nombre exacto: Coca Cola 2L; tipo: común; tamaño: 2 L\n- Nombre exacto: Coca Cola 1.5L; tipo: común; tamaño: 1,5 L\n- Nombre exacto: Coca Cola Zero 2L; tipo: Zero; tamaño: 2 L\n- Nombre exacto: Sprite 2L; tipo: común; tamaño: 2 L\n- Nombre exacto: Sprite 1.5L; tipo: común; tamaño: 1,5 L\n- Nombre exacto: Agua Villavicencio 1.5L; tipo: agua; tamaño: 1,5 L\n- Nombre exacto: Arroz Gallo 1kg; tipo: arroz Gallo; paquete de 1 kg\n- Nombre exacto: Fideos Matarazzo 500g; tipo: fideos Matarazzo; paquete de 500 g\n- Nombre exacto: Detergente Magistral 750ml; tipo: detergente Magistral; envase de 750 ml\n- Nombre exacto: Leche La Serenísima 1L; tipo: leche La Serenísima; envase de 1 L\n\nReglas:\n- Interpretá cantidades escritas con palabras.\n- \"agregá\", \"agrega\", \"sumá\", \"sumar\", \"llegaron\" y \"recibimos\" indican \"agregar_stock\".\n- \"sacá\", \"saca\", \"quitá\", \"quita\", \"restá\", \"resta\", \"vendimos\" y \"retirá\" indican \"restar_stock\".\n- La operación se determina por separado del producto y la cantidad.\n- Si se corrigen el producto o la cantidad pero no se menciona una nueva operación, conservá la operación anterior.\n- Solo cambiá la operación si el usuario la corrige explícitamente, por ejemplo: \"no restes, agregá\".\n- Respetá la última corrección expresada por el usuario.\n- Ignorá productos u operaciones que el usuario rechace o corrija.\n- Una negación cancela la operación mencionada; nunca la reemplaces por la operación contraria. \"No llegó; no lo cargues\" cancela \"agregar_stock\". \"No se vendió; no lo restes\" cancela \"restar_stock\".\n- Aplicá cada rechazo únicamente a los productos a los que se refiere. Eliminá esas operaciones y conservá sin cambios las demás operaciones válidas.\n- Cuando el usuario aclare que un grupo de productos mencionado antes no llegó, no se vendió o no debe procesarse, interpretá esa aclaración como el rechazo de las operaciones asociadas a ese grupo. Quitá esas operaciones de la lista final; no las conviertas en operaciones opuestas.\n- Si el usuario primero indica que ingresaron varios productos y después aclara que algunos de ellos finalmente no ingresaron, eliminá las agregaciones de todos los productos afectados. Conservá las agregaciones de los demás. Que un producto no haya ingresado no significa que haya salido del stock.\n- \"Cargá solamente el resto\" significa conservar las operaciones no rechazadas y eliminar todas las rechazadas.\n- Una corrección reemplaza la operación anterior; nunca agregues ambas versiones.\n- Incluí únicamente las operaciones que sigan siendo válidas al final del mensaje.\n- Si quedan varias operaciones válidas, incluí todas en la lista.\n- Si el usuario rechaza o cancela todas las operaciones, devolvé {\"operaciones\": []}.\n- No inventes productos.\n- Respondé únicamente con JSON válido y sin texto adicional.\n\nMENSAJE DEL USUARIO:\nagregá, 3 Coca Cola comunes de 2 litros y 4 Sprite comunes de 1,5 litros.",
+    "api_resources": {
+      "ram_base_mib": 27.79296875,
+      "ram_peak_mib": 30.75390625,
+      "cpu_s": 0.03999999999999998,
+      "cpu_pct": 6.003072630703992,
+      "request_wall_s": 0.6663254380000581
+    },
+    "raw_response": "{\"operaciones\":[{\"operacion\":\"agregar_stock\",\"producto\":\"Coca Cola 2L\",\"cantidad\":3},{\"operacion\":\"agregar_stock\",\"producto\":\"Sprite 1.5L\",\"cantidad\":4}]}",
+    "groq_response": {
+      "id": "chatcmpl-c90359db-6dd1-4435-ba31-153af2c5846c",
+      "object": "chat.completion",
+      "created": 1791679792,
+      "model": "openai/gpt-oss-20b",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "{\"operaciones\":[{\"operacion\":\"agregar_stock\",\"producto\":\"Coca Cola 2L\",\"cantidad\":3},{\"operacion\":\"agregar_stock\",\"producto\":\"Sprite 1.5L\",\"cantidad\":4}]}",
+            "reasoning": "We need to parse: \"agregá, 3 Coca Cola comunes de 2 litros y 4 Sprite comunes de 1,5 litros.\" So operation agregar_stock. Products: Coca Cola 2L, Sprite 1.5L. Quantities: 3 and 4. Output JSON."
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "queue_time": 0.272418915,
+        "prompt_tokens": 1151,
+        "prompt_time": 0.078170149,
+        "completion_tokens": 126,
+        "completion_time": 0.141727193,
+        "total_tokens": 1277,
+        "total_time": 0.219897342,
+        "completion_tokens_details": {
+          "reasoning_tokens": 64
+        }
+      },
+      "usage_breakdown": null,
+      "system_fingerprint": "fp_80501ff3a1",
+      "x_groq": {
+        "id": "req_01m4m700kreaj911dvd8ekhvvh",
+        "seed": 1421845008
+      },
+      "service_tier": "on_demand"
+    },
+    "evaluation": {
+      "valid_json": true,
+      "schema_valid": true,
+      "correct_operation": true,
+      "correct_product": true,
+      "correct_quantity": true,
+      "exact_match": true
+    }
+  },
+  {
+    "case_id": "solo_restar",
+    "level": "basico",
+    "reference_text": "Restá dos paquetes de arroz Gallo de 1 kg.",
+    "expected_json": {
+      "operaciones": [
+        {
+          "operacion": "restar_stock",
+          "producto": "Arroz Gallo 1kg",
+          "cantidad": 2
+        }
+      ]
+    },
+    "status": "ok",
+    "error": null,
+    "remote_stt": {
+      "case_id": "solo_restar",
+      "status": "ok",
+      "text": "Restá, dos paquetes de arroz gallo de un kilo.",
+      "audio_sha256": "24e6248d5ec7e3b031f2af2dadf48a449122e9e70b77c951d40421243c3588d3",
+      "resources": {
+        "ram_base_mib": 289.21875,
+        "ram_peak_mib": 291.21875,
+        "cpu_s": 169.51000000000005,
+        "cpu_pct": 375.6258923214622,
+        "request_wall_s": 45.12734703999922
+      }
+    },
+    "transcription": "Restá, dos paquetes de arroz gallo de un kilo.",
+    "llm_prompt": "Sos un sistema de interpretación de órdenes para un inventario.\n\nLeé el mensaje del usuario y devolvé únicamente un objeto JSON válido.\nNo saludes, no expliques, no agregues Markdown y no muestres razonamiento.\n\nEl JSON debe contener exactamente una propiedad llamada \"operaciones\".\n\"operaciones\" debe ser una lista. Cada elemento debe contener exactamente:\n- \"operacion\": \"agregar_stock\" o \"restar_stock\".\n- \"producto\": nombre exacto de la lista de productos.\n- \"cantidad\": número entero positivo.\n\nPRODUCTOS VÁLIDOS:\n- Nombre exacto: Coca Cola 2L; tipo: común; tamaño: 2 L\n- Nombre exacto: Coca Cola 1.5L; tipo: común; tamaño: 1,5 L\n- Nombre exacto: Coca Cola Zero 2L; tipo: Zero; tamaño: 2 L\n- Nombre exacto: Sprite 2L; tipo: común; tamaño: 2 L\n- Nombre exacto: Sprite 1.5L; tipo: común; tamaño: 1,5 L\n- Nombre exacto: Agua Villavicencio 1.5L; tipo: agua; tamaño: 1,5 L\n- Nombre exacto: Arroz Gallo 1kg; tipo: arroz Gallo; paquete de 1 kg\n- Nombre exacto: Fideos Matarazzo 500g; tipo: fideos Matarazzo; paquete de 500 g\n- Nombre exacto: Detergente Magistral 750ml; tipo: detergente Magistral; envase de 750 ml\n- Nombre exacto: Leche La Serenísima 1L; tipo: leche La Serenísima; envase de 1 L\n\nReglas:\n- Interpretá cantidades escritas con palabras.\n- \"agregá\", \"agrega\", \"sumá\", \"sumar\", \"llegaron\" y \"recibimos\" indican \"agregar_stock\".\n- \"sacá\", \"saca\", \"quitá\", \"quita\", \"restá\", \"resta\", \"vendimos\" y \"retirá\" indican \"restar_stock\".\n- La operación se determina por separado del producto y la cantidad.\n- Si se corrigen el producto o la cantidad pero no se menciona una nueva operación, conservá la operación anterior.\n- Solo cambiá la operación si el usuario la corrige explícitamente, por ejemplo: \"no restes, agregá\".\n- Respetá la última corrección expresada por el usuario.\n- Ignorá productos u operaciones que el usuario rechace o corrija.\n- Una negación cancela la operación mencionada; nunca la reemplaces por la operación contraria. \"No llegó; no lo cargues\" cancela \"agregar_stock\". \"No se vendió; no lo restes\" cancela \"restar_stock\".\n- Aplicá cada rechazo únicamente a los productos a los que se refiere. Eliminá esas operaciones y conservá sin cambios las demás operaciones válidas.\n- Cuando el usuario aclare que un grupo de productos mencionado antes no llegó, no se vendió o no debe procesarse, interpretá esa aclaración como el rechazo de las operaciones asociadas a ese grupo. Quitá esas operaciones de la lista final; no las conviertas en operaciones opuestas.\n- Si el usuario primero indica que ingresaron varios productos y después aclara que algunos de ellos finalmente no ingresaron, eliminá las agregaciones de todos los productos afectados. Conservá las agregaciones de los demás. Que un producto no haya ingresado no significa que haya salido del stock.\n- \"Cargá solamente el resto\" significa conservar las operaciones no rechazadas y eliminar todas las rechazadas.\n- Una corrección reemplaza la operación anterior; nunca agregues ambas versiones.\n- Incluí únicamente las operaciones que sigan siendo válidas al final del mensaje.\n- Si quedan varias operaciones válidas, incluí todas en la lista.\n- Si el usuario rechaza o cancela todas las operaciones, devolvé {\"operaciones\": []}.\n- No inventes productos.\n- Respondé únicamente con JSON válido y sin texto adicional.\n\nMENSAJE DEL USUARIO:\nRestá, dos paquetes de arroz gallo de un kilo.",
+    "api_resources": {
+      "ram_base_mib": 30.765625,
+      "ram_peak_mib": 30.7734375,
+      "cpu_s": 0.020000000000000018,
+      "cpu_pct": 2.1859230344837806,
+      "request_wall_s": 0.9149452969977574
+    },
+    "raw_response": "{\"operaciones\":[{\"operacion\":\"restar_stock\",\"producto\":\"Arroz Gallo 1kg\",\"cantidad\":2}]}",
+    "groq_response": {
+      "id": "chatcmpl-68f1a491-ac14-4144-abc4-cc51d369cb44",
+      "object": "chat.completion",
+      "created": 1791679838,
+      "model": "openai/gpt-oss-20b",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "{\"operaciones\":[{\"operacion\":\"restar_stock\",\"producto\":\"Arroz Gallo 1kg\",\"cantidad\":2}]}",
+            "reasoning": "We need restar_stock, producto \"Arroz Gallo 1kg\", cantidad 2."
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "queue_time": 0.304348835,
+        "prompt_tokens": 1139,
+        "prompt_time": 0.39743554,
+        "completion_tokens": 64,
+        "completion_time": 0.066177359,
+        "total_tokens": 1203,
+        "total_time": 0.463612899,
+        "prompt_tokens_details": {
+          "cached_tokens": 1024
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 21
+        }
+      },
+      "usage_breakdown": null,
+      "system_fingerprint": "fp_a8c584dda7",
+      "x_groq": {
+        "id": "req_01m4m71db9ejks3b9sqq5sn18w",
+        "seed": 1598447033
+      },
+      "service_tier": "on_demand"
+    },
+    "evaluation": {
+      "valid_json": true,
+      "schema_valid": true,
+      "correct_operation": true,
+      "correct_product": true,
+      "correct_quantity": true,
+      "exact_match": true
+    }
+  },
+  {
+    "case_id": "restar_ambos",
+    "level": "habitual",
+    "reference_text": "Restá dos Coca Cola Zero de 2 litros y cuatro envases de detergente Magistral de 750 ml.",
+    "expected_json": {
+      "operaciones": [
+        {
+          "operacion": "restar_stock",
+          "producto": "Coca Cola Zero 2L",
+          "cantidad": 2
+        },
+        {
+          "operacion": "restar_stock",
+          "producto": "Detergente Magistral 750ml",
+          "cantidad": 4
+        }
+      ]
+    },
+    "status": "ok",
+    "error": null,
+    "remote_stt": {
+      "case_id": "restar_ambos",
+      "status": "ok",
+      "text": "Restá, toco Coca Cola Zero de 2 litros y 4 envases de detergente Magistral de 750 mililitros.",
+      "audio_sha256": "a2775a73742d8c279fc098ecf71ff9d5bdb152f2f63e06eaff1e9cf234366695",
+      "resources": {
+        "ram_base_mib": 291.21875,
+        "ram_peak_mib": 291.71875,
+        "cpu_s": 175.29999999999995,
+        "cpu_pct": 374.0940313827603,
+        "request_wall_s": 46.85987620600099
+      }
+    },
+    "transcription": "Restá, toco Coca Cola Zero de 2 litros y 4 envases de detergente Magistral de 750 mililitros.",
+    "llm_prompt": "Sos un sistema de interpretación de órdenes para un inventario.\n\nLeé el mensaje del usuario y devolvé únicamente un objeto JSON válido.\nNo saludes, no expliques, no agregues Markdown y no muestres razonamiento.\n\nEl JSON debe contener exactamente una propiedad llamada \"operaciones\".\n\"operaciones\" debe ser una lista. Cada elemento debe contener exactamente:\n- \"operacion\": \"agregar_stock\" o \"restar_stock\".\n- \"producto\": nombre exacto de la lista de productos.\n- \"cantidad\": número entero positivo.\n\nPRODUCTOS VÁLIDOS:\n- Nombre exacto: Coca Cola 2L; tipo: común; tamaño: 2 L\n- Nombre exacto: Coca Cola 1.5L; tipo: común; tamaño: 1,5 L\n- Nombre exacto: Coca Cola Zero 2L; tipo: Zero; tamaño: 2 L\n- Nombre exacto: Sprite 2L; tipo: común; tamaño: 2 L\n- Nombre exacto: Sprite 1.5L; tipo: común; tamaño: 1,5 L\n- Nombre exacto: Agua Villavicencio 1.5L; tipo: agua; tamaño: 1,5 L\n- Nombre exacto: Arroz Gallo 1kg; tipo: arroz Gallo; paquete de 1 kg\n- Nombre exacto: Fideos Matarazzo 500g; tipo: fideos Matarazzo; paquete de 500 g\n- Nombre exacto: Detergente Magistral 750ml; tipo: detergente Magistral; envase de 750 ml\n- Nombre exacto: Leche La Serenísima 1L; tipo: leche La Serenísima; envase de 1 L\n\nReglas:\n- Interpretá cantidades escritas con palabras.\n- \"agregá\", \"agrega\", \"sumá\", \"sumar\", \"llegaron\" y \"recibimos\" indican \"agregar_stock\".\n- \"sacá\", \"saca\", \"quitá\", \"quita\", \"restá\", \"resta\", \"vendimos\" y \"retirá\" indican \"restar_stock\".\n- La operación se determina por separado del producto y la cantidad.\n- Si se corrigen el producto o la cantidad pero no se menciona una nueva operación, conservá la operación anterior.\n- Solo cambiá la operación si el usuario la corrige explícitamente, por ejemplo: \"no restes, agregá\".\n- Respetá la última corrección expresada por el usuario.\n- Ignorá productos u operaciones que el usuario rechace o corrija.\n- Una negación cancela la operación mencionada; nunca la reemplaces por la operación contraria. \"No llegó; no lo cargues\" cancela \"agregar_stock\". \"No se vendió; no lo restes\" cancela \"restar_stock\".\n- Aplicá cada rechazo únicamente a los productos a los que se refiere. Eliminá esas operaciones y conservá sin cambios las demás operaciones válidas.\n- Cuando el usuario aclare que un grupo de productos mencionado antes no llegó, no se vendió o no debe procesarse, interpretá esa aclaración como el rechazo de las operaciones asociadas a ese grupo. Quitá esas operaciones de la lista final; no las conviertas en operaciones opuestas.\n- Si el usuario primero indica que ingresaron varios productos y después aclara que algunos de ellos finalmente no ingresaron, eliminá las agregaciones de todos los productos afectados. Conservá las agregaciones de los demás. Que un producto no haya ingresado no significa que haya salido del stock.\n- \"Cargá solamente el resto\" significa conservar las operaciones no rechazadas y eliminar todas las rechazadas.\n- Una corrección reemplaza la operación anterior; nunca agregues ambas versiones.\n- Incluí únicamente las operaciones que sigan siendo válidas al final del mensaje.\n- Si quedan varias operaciones válidas, incluí todas en la lista.\n- Si el usuario rechaza o cancela todas las operaciones, devolvé {\"operaciones\": []}.\n- No inventes productos.\n- Respondé únicamente con JSON válido y sin texto adicional.\n\nMENSAJE DEL USUARIO:\nRestá, toco Coca Cola Zero de 2 litros y 4 envases de detergente Magistral de 750 mililitros.",
+    "api_resources": {
+      "ram_base_mib": 30.77734375,
+      "ram_peak_mib": 30.7890625,
+      "cpu_s": 0.010000000000000009,
+      "cpu_pct": 1.646154950444018,
+      "request_wall_s": 0.6074762280004506
+    },
+    "raw_response": "{\"operaciones\":[{\"operacion\":\"restar_stock\",\"producto\":\"Coca Cola Zero 2L\",\"cantidad\":1},{\"operacion\":\"restar_stock\",\"producto\":\"Detergente Magistral 750ml\",\"cantidad\":4}]}",
+    "groq_response": {
+      "id": "chatcmpl-6a8e7974-8184-425e-a70c-c9a895c567f4",
+      "object": "chat.completion",
+      "created": 1791679885,
+      "model": "openai/gpt-oss-20b",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "{\"operaciones\":[{\"operacion\":\"restar_stock\",\"producto\":\"Coca Cola Zero 2L\",\"cantidad\":1},{\"operacion\":\"restar_stock\",\"producto\":\"Detergente Magistral 750ml\",\"cantidad\":4}]}",
+            "reasoning": "We parse: \"Restá, toco Coca Cola Zero de 2 litros y 4 envases de detergente Magistral de 750 mililitros.\" Operation restar_stock. Products: Coca Cola Zero 2L, Detergente Magistral 750ml. Quantities: 1? \"toco\" implies 1 unit? \"4 envases\" for detergent. So operations: restar_stock Coca Cola Zero 2L cantidad 1; restar_stock Detergente Magistral 750ml cantidad 4."
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "queue_time": 0.202067652,
+        "prompt_tokens": 1155,
+        "prompt_time": 0.076154543,
+        "completion_tokens": 176,
+        "completion_time": 0.184589544,
+        "total_tokens": 1331,
+        "total_time": 0.260744087,
+        "completion_tokens_details": {
+          "reasoning_tokens": 111
+        }
+      },
+      "usage_breakdown": null,
+      "system_fingerprint": "fp_816fc87d18",
+      "x_groq": {
+        "id": "req_01m4m72w1eegwsw2kf0w8q9czd",
+        "seed": 2137775472
+      },
+      "service_tier": "on_demand"
+    },
+    "evaluation": {
+      "valid_json": true,
+      "schema_valid": true,
+      "correct_operation": true,
+      "correct_product": true,
+      "correct_quantity": false,
+      "exact_match": false
+    }
+  },
+  {
+    "case_id": "corregir_cantidad",
+    "level": "habitual",
+    "reference_text": "Agregá tres Coca Cola comunes de 2 litros. Perdón, eran dos.",
+    "expected_json": {
+      "operaciones": [
+        {
+          "operacion": "agregar_stock",
+          "producto": "Coca Cola 2L",
+          "cantidad": 2
+        }
+      ]
+    },
+    "status": "ok",
+    "error": null,
+    "remote_stt": {
+      "case_id": "corregir_cantidad",
+      "status": "ok",
+      "text": "Agrega, 3 Coca Cola Comunes de 2 litros, perdón, eran 2.",
+      "audio_sha256": "6bf0158324ae691b8926c445b91c42e76d9bf18464136372fec1cbef7f0b08fd",
+      "resources": {
+        "ram_base_mib": 291.71875,
+        "ram_peak_mib": 291.71875,
+        "cpu_s": 171.86,
+        "cpu_pct": 369.0757149898578,
+        "request_wall_s": 46.5649710939997
+      }
+    },
+    "transcription": "Agrega, 3 Coca Cola Comunes de 2 litros, perdón, eran 2.",
+    "llm_prompt": "Sos un sistema de interpretación de órdenes para un inventario.\n\nLeé el mensaje del usuario y devolvé únicamente un objeto JSON válido.\nNo saludes, no expliques, no agregues Markdown y no muestres razonamiento.\n\nEl JSON debe contener exactamente una propiedad llamada \"operaciones\".\n\"operaciones\" debe ser una lista. Cada elemento debe contener exactamente:\n- \"operacion\": \"agregar_stock\" o \"restar_stock\".\n- \"producto\": nombre exacto de la lista de productos.\n- \"cantidad\": número entero positivo.\n\nPRODUCTOS VÁLIDOS:\n- Nombre exacto: Coca Cola 2L; tipo: común; tamaño: 2 L\n- Nombre exacto: Coca Cola 1.5L; tipo: común; tamaño: 1,5 L\n- Nombre exacto: Coca Cola Zero 2L; tipo: Zero; tamaño: 2 L\n- Nombre exacto: Sprite 2L; tipo: común; tamaño: 2 L\n- Nombre exacto: Sprite 1.5L; tipo: común; tamaño: 1,5 L\n- Nombre exacto: Agua Villavicencio 1.5L; tipo: agua; tamaño: 1,5 L\n- Nombre exacto: Arroz Gallo 1kg; tipo: arroz Gallo; paquete de 1 kg\n- Nombre exacto: Fideos Matarazzo 500g; tipo: fideos Matarazzo; paquete de 500 g\n- Nombre exacto: Detergente Magistral 750ml; tipo: detergente Magistral; envase de 750 ml\n- Nombre exacto: Leche La Serenísima 1L; tipo: leche La Serenísima; envase de 1 L\n\nReglas:\n- Interpretá cantidades escritas con palabras.\n- \"agregá\", \"agrega\", \"sumá\", \"sumar\", \"llegaron\" y \"recibimos\" indican \"agregar_stock\".\n- \"sacá\", \"saca\", \"quitá\", \"quita\", \"restá\", \"resta\", \"vendimos\" y \"retirá\" indican \"restar_stock\".\n- La operación se determina por separado del producto y la cantidad.\n- Si se corrigen el producto o la cantidad pero no se menciona una nueva operación, conservá la operación anterior.\n- Solo cambiá la operación si el usuario la corrige explícitamente, por ejemplo: \"no restes, agregá\".\n- Respetá la última corrección expresada por el usuario.\n- Ignorá productos u operaciones que el usuario rechace o corrija.\n- Una negación cancela la operación mencionada; nunca la reemplaces por la operación contraria. \"No llegó; no lo cargues\" cancela \"agregar_stock\". \"No se vendió; no lo restes\" cancela \"restar_stock\".\n- Aplicá cada rechazo únicamente a los productos a los que se refiere. Eliminá esas operaciones y conservá sin cambios las demás operaciones válidas.\n- Cuando el usuario aclare que un grupo de productos mencionado antes no llegó, no se vendió o no debe procesarse, interpretá esa aclaración como el rechazo de las operaciones asociadas a ese grupo. Quitá esas operaciones de la lista final; no las conviertas en operaciones opuestas.\n- Si el usuario primero indica que ingresaron varios productos y después aclara que algunos de ellos finalmente no ingresaron, eliminá las agregaciones de todos los productos afectados. Conservá las agregaciones de los demás. Que un producto no haya ingresado no significa que haya salido del stock.\n- \"Cargá solamente el resto\" significa conservar las operaciones no rechazadas y eliminar todas las rechazadas.\n- Una corrección reemplaza la operación anterior; nunca agregues ambas versiones.\n- Incluí únicamente las operaciones que sigan siendo válidas al final del mensaje.\n- Si quedan varias operaciones válidas, incluí todas en la lista.\n- Si el usuario rechaza o cancela todas las operaciones, devolvé {\"operaciones\": []}.\n- No inventes productos.\n- Respondé únicamente con JSON válido y sin texto adicional.\n\nMENSAJE DEL USUARIO:\nAgrega, 3 Coca Cola Comunes de 2 litros, perdón, eran 2.",
+    "api_resources": {
+      "ram_base_mib": 30.80859375,
+      "ram_peak_mib": 30.81640625,
+      "cpu_s": 0.010000000000000009,
+      "cpu_pct": 1.9276161625871115,
+      "request_wall_s": 0.5187754799990216
+    },
+    "raw_response": "{\"operaciones\":[{\"operacion\":\"agregar_stock\",\"producto\":\"Coca Cola 2L\",\"cantidad\":2}]}",
+    "groq_response": {
+      "id": "chatcmpl-f3938146-7db4-4348-8e14-4d9ea8af1376",
+      "object": "chat.completion",
+      "created": 1791679932,
+      "model": "openai/gpt-oss-20b",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "{\"operaciones\":[{\"operacion\":\"agregar_stock\",\"producto\":\"Coca Cola 2L\",\"cantidad\":2}]}",
+            "reasoning": "We need to parse: \"Agrega, 3 Coca Cola Comunes de 2 litros, perdón, eran 2.\" Initially \"Agrega\" => agregar_stock. Product: Coca Cola 2L. Quantity: 3 then corrected to 2. So final operation: agregar_stock, Coca Cola 2L, 2."
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "queue_time": 0.18965552,
+        "prompt_tokens": 1147,
+        "prompt_time": 0.076297845,
+        "completion_tokens": 113,
+        "completion_time": 0.125762132,
+        "total_tokens": 1260,
+        "total_time": 0.202059977,
+        "completion_tokens_details": {
+          "reasoning_tokens": 71
+        }
+      },
+      "usage_breakdown": null,
+      "system_fingerprint": "fp_4a35f7bd1b",
+      "x_groq": {
+        "id": "req_01m4m74a4ne3rtx06s59254s9a",
+        "seed": 141418004
+      },
+      "service_tier": "on_demand"
+    },
+    "evaluation": {
+      "valid_json": true,
+      "schema_valid": true,
+      "correct_operation": true,
+      "correct_product": true,
+      "correct_quantity": true,
+      "exact_match": true
+    }
+  },
+  {
+    "case_id": "negar_agregacion",
+    "level": "habitual",
+    "reference_text": "Agregá cinco botellas de agua Villavicencio de 1,5 litros. Perdón, esas no llegaron; no las cargues.",
+    "expected_json": {
+      "operaciones": []
+    },
+    "status": "ok",
+    "error": null,
+    "remote_stt": {
+      "case_id": "negar_agregacion",
+      "status": "ok",
+      "text": "Agrega, 5 botellas de agua Villavicencio de 1,5 litros, perdón, esas no llegaron, no las carguez.",
+      "audio_sha256": "ba2f734234741787378d24abbd128fc4372886f4fa976ae55dfbd2a4e7e5ab22",
+      "resources": {
+        "ram_base_mib": 291.71875,
+        "ram_peak_mib": 293.0546875,
+        "cpu_s": 178.11,
+        "cpu_pct": 367.9907897770037,
+        "request_wall_s": 48.400667883001006
+      }
+    },
+    "transcription": "Agrega, 5 botellas de agua Villavicencio de 1,5 litros, perdón, esas no llegaron, no las carguez.",
+    "llm_prompt": "Sos un sistema de interpretación de órdenes para un inventario.\n\nLeé el mensaje del usuario y devolvé únicamente un objeto JSON válido.\nNo saludes, no expliques, no agregues Markdown y no muestres razonamiento.\n\nEl JSON debe contener exactamente una propiedad llamada \"operaciones\".\n\"operaciones\" debe ser una lista. Cada elemento debe contener exactamente:\n- \"operacion\": \"agregar_stock\" o \"restar_stock\".\n- \"producto\": nombre exacto de la lista de productos.\n- \"cantidad\": número entero positivo.\n\nPRODUCTOS VÁLIDOS:\n- Nombre exacto: Coca Cola 2L; tipo: común; tamaño: 2 L\n- Nombre exacto: Coca Cola 1.5L; tipo: común; tamaño: 1,5 L\n- Nombre exacto: Coca Cola Zero 2L; tipo: Zero; tamaño: 2 L\n- Nombre exacto: Sprite 2L; tipo: común; tamaño: 2 L\n- Nombre exacto: Sprite 1.5L; tipo: común; tamaño: 1,5 L\n- Nombre exacto: Agua Villavicencio 1.5L; tipo: agua; tamaño: 1,5 L\n- Nombre exacto: Arroz Gallo 1kg; tipo: arroz Gallo; paquete de 1 kg\n- Nombre exacto: Fideos Matarazzo 500g; tipo: fideos Matarazzo; paquete de 500 g\n- Nombre exacto: Detergente Magistral 750ml; tipo: detergente Magistral; envase de 750 ml\n- Nombre exacto: Leche La Serenísima 1L; tipo: leche La Serenísima; envase de 1 L\n\nReglas:\n- Interpretá cantidades escritas con palabras.\n- \"agregá\", \"agrega\", \"sumá\", \"sumar\", \"llegaron\" y \"recibimos\" indican \"agregar_stock\".\n- \"sacá\", \"saca\", \"quitá\", \"quita\", \"restá\", \"resta\", \"vendimos\" y \"retirá\" indican \"restar_stock\".\n- La operación se determina por separado del producto y la cantidad.\n- Si se corrigen el producto o la cantidad pero no se menciona una nueva operación, conservá la operación anterior.\n- Solo cambiá la operación si el usuario la corrige explícitamente, por ejemplo: \"no restes, agregá\".\n- Respetá la última corrección expresada por el usuario.\n- Ignorá productos u operaciones que el usuario rechace o corrija.\n- Una negación cancela la operación mencionada; nunca la reemplaces por la operación contraria. \"No llegó; no lo cargues\" cancela \"agregar_stock\". \"No se vendió; no lo restes\" cancela \"restar_stock\".\n- Aplicá cada rechazo únicamente a los productos a los que se refiere. Eliminá esas operaciones y conservá sin cambios las demás operaciones válidas.\n- Cuando el usuario aclare que un grupo de productos mencionado antes no llegó, no se vendió o no debe procesarse, interpretá esa aclaración como el rechazo de las operaciones asociadas a ese grupo. Quitá esas operaciones de la lista final; no las conviertas en operaciones opuestas.\n- Si el usuario primero indica que ingresaron varios productos y después aclara que algunos de ellos finalmente no ingresaron, eliminá las agregaciones de todos los productos afectados. Conservá las agregaciones de los demás. Que un producto no haya ingresado no significa que haya salido del stock.\n- \"Cargá solamente el resto\" significa conservar las operaciones no rechazadas y eliminar todas las rechazadas.\n- Una corrección reemplaza la operación anterior; nunca agregues ambas versiones.\n- Incluí únicamente las operaciones que sigan siendo válidas al final del mensaje.\n- Si quedan varias operaciones válidas, incluí todas en la lista.\n- Si el usuario rechaza o cancela todas las operaciones, devolvé {\"operaciones\": []}.\n- No inventes productos.\n- Respondé únicamente con JSON válido y sin texto adicional.\n\nMENSAJE DEL USUARIO:\nAgrega, 5 botellas de agua Villavicencio de 1,5 litros, perdón, esas no llegaron, no las carguez.",
+    "api_resources": {
+      "ram_base_mib": 30.83203125,
+      "ram_peak_mib": 30.8359375,
+      "cpu_s": 0.020000000000000018,
+      "cpu_pct": 1.7262058914687282,
+      "request_wall_s": 1.158610342998145
+    },
+    "raw_response": "{\"operaciones\": []}",
+    "groq_response": {
+      "id": "chatcmpl-0677b545-ec15-466f-b35b-d31bfe04b0be",
+      "object": "chat.completion",
+      "created": 1791679982,
+      "model": "openai/gpt-oss-20b",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "{\"operaciones\": []}",
+            "reasoning": "User says: \"Agrega, 5 botellas de agua Villavicencio de 1,5 litros, perdón, esas no llegaron, no las carguez.\" So initially add 5, then says they didn't arrive, cancel. So final empty."
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "queue_time": 0.189313537,
+        "prompt_tokens": 1157,
+        "prompt_time": 0.753402322,
+        "completion_tokens": 76,
+        "completion_time": 0.078246224,
+        "total_tokens": 1233,
+        "total_time": 0.831648546,
+        "prompt_tokens_details": {
+          "cached_tokens": 1024
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 54
+        }
+      },
+      "usage_breakdown": null,
+      "system_fingerprint": "fp_4a35f7bd1b",
+      "x_groq": {
+        "id": "req_01m4m75sz9era8r6sqqrwvrne5",
+        "seed": 1621406652
+      },
+      "service_tier": "on_demand"
+    },
+    "evaluation": {
+      "valid_json": true,
+      "schema_valid": true,
+      "correct_operation": true,
+      "correct_product": true,
+      "correct_quantity": true,
+      "exact_match": true
+    }
+  },
+  {
+    "case_id": "negar_restacion",
+    "level": "habitual",
+    "reference_text": "Restá cuatro envases de detergente Magistral de 750 ml. Perdón, no se vendieron; no los restes.",
+    "expected_json": {
+      "operaciones": []
+    },
+    "status": "ok",
+    "error": null,
+    "remote_stt": {
+      "case_id": "negar_restacion",
+      "status": "ok",
+      "text": "Restá, 4 envases de detergentes Magistral de 750 mililitros, perdón, no se vendieron, no los restes.",
+      "audio_sha256": "9deab639854c43375349f22acc9c0f5bd2c37d30590dc9e914b1fa6f4b316ee7",
+      "resources": {
+        "ram_base_mib": 291.01953125,
+        "ram_peak_mib": 293.89453125,
+        "cpu_s": 177.71000000000004,
+        "cpu_pct": 370.5387550464366,
+        "request_wall_s": 47.95989557900066
+      }
+    },
+    "transcription": "Restá, 4 envases de detergentes Magistral de 750 mililitros, perdón, no se vendieron, no los restes.",
+    "llm_prompt": "Sos un sistema de interpretación de órdenes para un inventario.\n\nLeé el mensaje del usuario y devolvé únicamente un objeto JSON válido.\nNo saludes, no expliques, no agregues Markdown y no muestres razonamiento.\n\nEl JSON debe contener exactamente una propiedad llamada \"operaciones\".\n\"operaciones\" debe ser una lista. Cada elemento debe contener exactamente:\n- \"operacion\": \"agregar_stock\" o \"restar_stock\".\n- \"producto\": nombre exacto de la lista de productos.\n- \"cantidad\": número entero positivo.\n\nPRODUCTOS VÁLIDOS:\n- Nombre exacto: Coca Cola 2L; tipo: común; tamaño: 2 L\n- Nombre exacto: Coca Cola 1.5L; tipo: común; tamaño: 1,5 L\n- Nombre exacto: Coca Cola Zero 2L; tipo: Zero; tamaño: 2 L\n- Nombre exacto: Sprite 2L; tipo: común; tamaño: 2 L\n- Nombre exacto: Sprite 1.5L; tipo: común; tamaño: 1,5 L\n- Nombre exacto: Agua Villavicencio 1.5L; tipo: agua; tamaño: 1,5 L\n- Nombre exacto: Arroz Gallo 1kg; tipo: arroz Gallo; paquete de 1 kg\n- Nombre exacto: Fideos Matarazzo 500g; tipo: fideos Matarazzo; paquete de 500 g\n- Nombre exacto: Detergente Magistral 750ml; tipo: detergente Magistral; envase de 750 ml\n- Nombre exacto: Leche La Serenísima 1L; tipo: leche La Serenísima; envase de 1 L\n\nReglas:\n- Interpretá cantidades escritas con palabras.\n- \"agregá\", \"agrega\", \"sumá\", \"sumar\", \"llegaron\" y \"recibimos\" indican \"agregar_stock\".\n- \"sacá\", \"saca\", \"quitá\", \"quita\", \"restá\", \"resta\", \"vendimos\" y \"retirá\" indican \"restar_stock\".\n- La operación se determina por separado del producto y la cantidad.\n- Si se corrigen el producto o la cantidad pero no se menciona una nueva operación, conservá la operación anterior.\n- Solo cambiá la operación si el usuario la corrige explícitamente, por ejemplo: \"no restes, agregá\".\n- Respetá la última corrección expresada por el usuario.\n- Ignorá productos u operaciones que el usuario rechace o corrija.\n- Una negación cancela la operación mencionada; nunca la reemplaces por la operación contraria. \"No llegó; no lo cargues\" cancela \"agregar_stock\". \"No se vendió; no lo restes\" cancela \"restar_stock\".\n- Aplicá cada rechazo únicamente a los productos a los que se refiere. Eliminá esas operaciones y conservá sin cambios las demás operaciones válidas.\n- Cuando el usuario aclare que un grupo de productos mencionado antes no llegó, no se vendió o no debe procesarse, interpretá esa aclaración como el rechazo de las operaciones asociadas a ese grupo. Quitá esas operaciones de la lista final; no las conviertas en operaciones opuestas.\n- Si el usuario primero indica que ingresaron varios productos y después aclara que algunos de ellos finalmente no ingresaron, eliminá las agregaciones de todos los productos afectados. Conservá las agregaciones de los demás. Que un producto no haya ingresado no significa que haya salido del stock.\n- \"Cargá solamente el resto\" significa conservar las operaciones no rechazadas y eliminar todas las rechazadas.\n- Una corrección reemplaza la operación anterior; nunca agregues ambas versiones.\n- Incluí únicamente las operaciones que sigan siendo válidas al final del mensaje.\n- Si quedan varias operaciones válidas, incluí todas en la lista.\n- Si el usuario rechaza o cancela todas las operaciones, devolvé {\"operaciones\": []}.\n- No inventes productos.\n- Respondé únicamente con JSON válido y sin texto adicional.\n\nMENSAJE DEL USUARIO:\nRestá, 4 envases de detergentes Magistral de 750 mililitros, perdón, no se vendieron, no los restes.",
+    "api_resources": {
+      "ram_base_mib": 30.875,
+      "ram_peak_mib": 30.8828125,
+      "cpu_s": 0.010000000000000009,
+      "cpu_pct": 1.8781916709823805,
+      "request_wall_s": 0.5324270229975809
+    },
+    "raw_response": "{\"operaciones\": []}",
+    "groq_response": {
+      "id": "chatcmpl-539a8632-921a-4bd9-b0ba-1cd6d8180673",
+      "object": "chat.completion",
+      "created": 1791680031,
+      "model": "openai/gpt-oss-20b",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "{\"operaciones\": []}",
+            "reasoning": "User says: \"Restá, 4 envases de detergentes Magistral de 750 mililitros, perdón, no se vendieron, no los restes.\" So initially restar 4, but then says they were not sold, do not rest. So cancel operation. Result empty list."
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "queue_time": 0.202263801,
+        "prompt_tokens": 1158,
+        "prompt_time": 0.072569229,
+        "completion_tokens": 86,
+        "completion_time": 0.089136994,
+        "total_tokens": 1244,
+        "total_time": 0.161706223,
+        "completion_tokens_details": {
+          "reasoning_tokens": 64
+        }
+      },
+      "usage_breakdown": null,
+      "system_fingerprint": "fp_f102a3179c",
+      "x_groq": {
+        "id": "req_01m4m77a0he32aakmd98kcvy5c",
+        "seed": 1023309196
+      },
+      "service_tier": "on_demand"
+    },
+    "evaluation": {
+      "valid_json": true,
+      "schema_valid": true,
+      "correct_operation": true,
+      "correct_product": true,
+      "correct_quantity": true,
+      "exact_match": true
+    }
+  }
+]

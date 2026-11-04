@@ -1,0 +1,2 @@
+configuration,load_s,load_ram_peak_mib,measured_runs,successful_runs,failed_runs,expected_measured_runs,wer_pct,cer_pct,exact_match_pct,mean_inference_s,median_inference_s,max_inference_s,mean_rtf,ram_peak_mib,mean_cpu_pct
+whisper_small_q5_1,0.185537,278.921875,30,30,0,30,26.80722891566265,16.75485008818342,0.0,5.866651,5.095815,12.8369,0.49364972108730043,397.2265625,399.6600775745836

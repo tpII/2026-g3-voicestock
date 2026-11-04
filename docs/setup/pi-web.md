@@ -1,0 +1,145 @@
+# Raspberry Pi web server
+
+How to start the operator web server and check that it answers. `/` is the
+pending-operation page. What it does with each HTTP result is the
+[pending operation page](../interfaces/pending-operation-web-ui.md).
+
+Why this stack exists is
+[ADR-0009](../decisions/0009-use-in-process-fastapi-and-static-web-ui.md).
+The cycle that owns the pending operation is
+[the operation workflow](../architecture/pending-operation-flow.md). The
+process that starts the page together with that cycle is the
+[integrated runtime](pi-runtime.md). The HTTP map is the
+[pending-operation web API](../interfaces/pending-operation-web-api.md).
+
+## What this command is
+
+`voicestock-pi-web` starts FastAPI under Uvicorn without the operation cycle.
+It is a development and validation entry point. The integrated process is
+`voicestock-pi`, documented in the [runtime guide](pi-runtime.md).
+
+This command does not create a second service, a systemd unit, or a channel
+to another process. It also does not start capture, the PC client, or
+`PendingOperationFlow`.
+
+## Network
+
+The browser runs on the PC. The server runs on the Raspberry Pi. They meet
+on the isolated VoiceStock Wi-Fi cell. How to bring that cell up is the
+[local network setup](local-network.md). This page does not repeat that
+procedure. The physical checks of the cell are still open; see that guide.
+
+```text
+Internet
+   |
+PC Wi-Fi #1
+   |
+  PC            192.168.50.2
+   |
+PC Wi-Fi #2
+   |
+VoiceStock Wi-Fi
+   |
+Raspberry Pi    192.168.50.1   access point, no Internet
+```
+
+The web server binds to `192.168.50.1` port `8000` unless the environment
+overrides it. The PC interpretation server also defaults to port `8000`, on
+the PC. They do not share a machine. On one computer, run only one of them
+on `8000`, or set `VOICESTOCK_WEB_PORT` / `VOICESTOCK_PC_PORT`.
+
+The page, its files, and the API are the same origin:
+`http://192.168.50.1:8000`. This increment has no HTTPS, no login, and no
+CORS. Those limits are
+[ADR-0009](../decisions/0009-use-in-process-fastapi-and-static-web-ui.md).
+
+## Install
+
+From the repository root, with the project virtualenv active. If this
+checkout was installed before `voicestock-pi-web` existed, install again so
+the command is registered:
+
+```bash
+pip install -e ".[dev]"
+```
+
+The setup scripts do that install. FastAPI and Uvicorn are already project
+dependencies. The page does not use a CDN, npm, or Node.js.
+
+## Run on the Raspberry Pi
+
+The VoiceStock address has to be configured first, as in the
+[local network setup](local-network.md). Then:
+
+```bash
+voicestock-pi-web
+```
+
+From the PC browser:
+
+```text
+http://192.168.50.1:8000/
+http://192.168.50.1:8000/health
+```
+
+`/` is the operator page. `GET /health` returns:
+
+```json
+{"status": "ok"}
+```
+
+That only means the HTTP server is alive and can respond. It does not mean
+that:
+
+- `PendingOperationFlow` is ready;
+- a pending operation exists;
+- the microphone works;
+- GPIO works;
+- the PC is reachable;
+- inventory works.
+
+`/health` is not a readiness check. Do not extend it into one.
+
+`/static/styles.css` and `/static/app.js` are served by the same process.
+
+`voicestock-pi-web` does not receive the pending-operation ports. `/health`
+stays `200`. The API then answers `503` with `application_not_ready` until a
+later runtime passes those ports into `create_app`. The contract is the
+[pending-operation web API](../interfaces/pending-operation-web-api.md).
+
+```text
+GET  /api/v1/system-status
+GET  /api/v1/pending-operation
+POST /api/v1/pending-operation/{operation_id}/confirm
+POST /api/v1/pending-operation/{operation_id}/cancel
+```
+
+## Run on a development machine
+
+The default host is the Pi address. A laptop usually does not have
+`192.168.50.1`, so bind localhost:
+
+```bash
+VOICESTOCK_WEB_HOST=127.0.0.1 voicestock-pi-web
+```
+
+Optional port:
+
+```bash
+VOICESTOCK_WEB_HOST=127.0.0.1 VOICESTOCK_WEB_PORT=8123 voicestock-pi-web
+```
+
+Then open `http://127.0.0.1:8123/` and `http://127.0.0.1:8123/health`.
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `VOICESTOCK_WEB_HOST` | `192.168.50.1` | Interface address to bind. |
+| `VOICESTOCK_WEB_PORT` | `8000` | TCP port. Must be an integer from 1 to 65535. |
+
+## What this command does not do
+
+`voicestock-pi-web` does not start `PendingOperationFlow`, and confirm does
+not update inventory. The single-process lifecycle is `voicestock-pi`. The
+real executor and durable idempotency are still outside the current
+workflow. See
+[the operation workflow](../architecture/pending-operation-flow.md#limits).

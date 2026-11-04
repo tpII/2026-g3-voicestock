@@ -1,0 +1,336 @@
+"""Record PCM from a backend into a published WAV file."""
+
+import os
+import threading
+import uuid
+import wave
+from enum import Enum
+from pathlib import Path
+
+from pi.audio.artifact import AudioArtifact
+from pi.audio.backend import AudioInputBackend
+from pi.audio.config import (
+    CHANNELS,
+    SAMPLE_RATE_HZ,
+    SAMPLE_WIDTH_BYTES,
+    AudioCaptureConfig,
+)
+from pi.audio.errors import (
+    AudioCaptureError,
+    AudioCaptureStateError,
+    AudioStreamError,
+)
+
+_WORKER_JOIN_TIMEOUT_SECONDS = 5.0
+
+
+class _State(Enum):
+    IDLE = "idle"
+    RECORDING = "recording"
+
+
+class AudioCapture:
+    """Start and stop one recording at a time.
+
+    Construction does not open a device. ``start`` asks the backend for PCM
+    and a worker writes each chunk to a temporary ``.recording`` file. The
+    worker keeps reading until ``read`` returns empty bytes, so PCM already
+    queued when ``stop`` runs is still written. The worker does not close the
+    backend. ``stop``, on the caller thread, joins that worker and only then
+    calls ``backend.close()``. The WAV is published after that close succeeds.
+    The caller then owns the file.
+    """
+
+    def __init__(
+        self,
+        config: AudioCaptureConfig,
+        backend: AudioInputBackend,
+    ) -> None:
+        self._config = config
+        self._backend = backend
+        self._state = _State.IDLE
+        self._lock = threading.Lock()
+        self._stop_event = threading.Event()
+        self._started_event = threading.Event()
+        self._stop_in_progress = False
+        self._worker: threading.Thread | None = None
+        self._startup_error: BaseException | None = None
+        self._worker_error: BaseException | None = None
+        self._cleanup_error: BaseException | None = None
+        self._wav: wave.Wave_write | None = None
+        self._file_lock = threading.Lock()
+        self._active_session = 0
+        self._recording_closed = False
+        self._orphaned_worker: threading.Thread | None = None
+        self._artifact_id: str | None = None
+        self._recording_path: Path | None = None
+        self._final_path: Path | None = None
+
+    def start(self) -> None:
+        """Begin a new recording.
+
+        Raises:
+            AudioCaptureStateError: a recording is already in progress.
+        """
+        with self._lock:
+            self._require_idle_locked()
+        # The previous worker has exited. Release a stream it did not close
+        # before the new worker can call ``start`` and touch PortAudio.
+        self._close_from_controller()
+        if self._cleanup_error is not None:
+            self._fail(self._cleanup_error)
+
+        with self._lock:
+            self._require_idle_locked()
+            try:
+                self._open_temp_file()
+            except Exception:
+                self._discard_temp()
+                raise
+            self._stop_event.clear()
+            self._started_event.clear()
+            self._startup_error = None
+            self._worker_error = None
+            self._cleanup_error = None
+            self._state = _State.RECORDING
+            worker = threading.Thread(
+                target=self._run,
+                name="voicestock-audio-capture",
+            )
+            self._worker = worker
+            worker.start()
+
+        if not self._started_event.wait(_WORKER_JOIN_TIMEOUT_SECONDS):
+            self._stop_event.set()
+            worker.join(_WORKER_JOIN_TIMEOUT_SECONDS)
+            if worker.is_alive() and self._started_event.is_set():
+                self._stop_backend()
+                worker.join(_WORKER_JOIN_TIMEOUT_SECONDS)
+            if worker.is_alive():
+                self._fail(AudioStreamError("audio capture did not start"))
+            self._close_from_controller()
+            self._fail(self._startup_failure())
+
+        if self._startup_error is not None:
+            worker.join(_WORKER_JOIN_TIMEOUT_SECONDS)
+            if worker.is_alive():
+                self._fail(self._startup_error)
+            self._close_from_controller()
+            self._fail(self._startup_failure())
+
+    def stop(self) -> AudioArtifact:
+        """Finish the recording and transfer the WAV to the caller.
+
+        Raises:
+            AudioCaptureStateError: there is no recording in progress.
+            AudioCaptureError: the recording failed before a valid WAV existed.
+        """
+        with self._lock:
+            if self._state is not _State.RECORDING or self._stop_in_progress:
+                raise AudioCaptureStateError(
+                    "cannot stop audio capture when it is idle"
+                )
+            self._stop_in_progress = True
+            worker = self._worker
+            self._stop_event.set()
+
+        self._stop_backend()
+        if worker is not None:
+            worker.join(_WORKER_JOIN_TIMEOUT_SECONDS)
+            if worker.is_alive():
+                self._fail(self._worker_timeout_error())
+
+        self._close_from_controller()
+        self._raise_recorded_errors()
+
+        try:
+            artifact = self._publish()
+        except AudioCaptureError as exc:
+            self._fail(exc)
+
+        with self._lock:
+            self._state = _State.IDLE
+            self._stop_in_progress = False
+            self._worker = None
+        return artifact
+
+    def _run(self) -> None:
+        session = self._active_session
+        try:
+            self._backend.start()
+        except Exception as exc:
+            if session == self._active_session:
+                self._startup_error = exc
+            self._started_event.set()
+            return
+
+        self._started_event.set()
+        try:
+            while True:
+                chunk = self._backend.read()
+                if not chunk:
+                    break
+                self._write_chunk(chunk, session)
+        except Exception as exc:
+            if session == self._active_session:
+                self._worker_error = exc
+
+    def _write_chunk(self, chunk: bytes, session: int) -> None:
+        frame_bytes = SAMPLE_WIDTH_BYTES * CHANNELS
+        if len(chunk) % frame_bytes != 0:
+            raise AudioStreamError(
+                "PCM chunk is not aligned to signed 16-bit mono frames"
+            )
+        with self._file_lock:
+            if session != self._active_session or self._wav is None:
+                if self._recording_closed or session != self._active_session:
+                    return
+                raise AudioStreamError("audio capture has no open recording")
+            self._wav.writeframes(chunk)
+
+    def _open_temp_file(self) -> None:
+        directory = self._config.output_directory
+        directory.mkdir(parents=True, exist_ok=True)
+        artifact_id = str(uuid.uuid4())
+        recording_path = directory / f"{artifact_id}.recording"
+        self._active_session += 1
+        self._recording_closed = False
+        self._artifact_id = artifact_id
+        self._recording_path = recording_path
+        self._final_path = directory / f"{artifact_id}.wav"
+        wav = wave.open(str(recording_path), "wb")
+        wav.setnchannels(CHANNELS)
+        wav.setsampwidth(SAMPLE_WIDTH_BYTES)
+        wav.setframerate(SAMPLE_RATE_HZ)
+        self._wav = wav
+
+    def _publish(self) -> AudioArtifact:
+        self._close_wav()
+        recording = self._recording_path
+        final = self._final_path
+        artifact_id = self._artifact_id
+        if recording is None or final is None or artifact_id is None:
+            raise AudioStreamError("audio capture has no recording to publish")
+        try:
+            _validate_wav(recording)
+            os.replace(recording, final)
+            _validate_wav(final)
+        except AudioCaptureError:
+            final.unlink(missing_ok=True)
+            recording.unlink(missing_ok=True)
+            raise
+        except Exception as exc:
+            final.unlink(missing_ok=True)
+            recording.unlink(missing_ok=True)
+            raise AudioStreamError("audio capture failed to publish") from exc
+        self._recording_path = None
+        self._final_path = None
+        self._artifact_id = None
+        return AudioArtifact(artifact_id, final)
+
+    def _fail(self, error: BaseException) -> None:
+        self._discard_temp()
+        with self._lock:
+            worker = self._worker
+            self._state = _State.IDLE
+            self._stop_in_progress = False
+            self._worker = None
+            if worker is not None and worker.is_alive():
+                self._orphaned_worker = worker
+            self._startup_error = None
+            self._worker_error = None
+            self._cleanup_error = None
+        if isinstance(error, AudioCaptureError):
+            raise error
+        raise AudioStreamError("audio capture failed") from error
+
+    def _reap_orphaned_worker(self) -> None:
+        orphan = self._orphaned_worker
+        if orphan is not None and not orphan.is_alive():
+            self._orphaned_worker = None
+
+    def _discard_temp(self) -> None:
+        self._close_wav()
+        recording = self._recording_path
+        final = self._final_path
+        self._recording_path = None
+        self._final_path = None
+        self._artifact_id = None
+        for path in (recording, final):
+            if path is not None:
+                path.unlink(missing_ok=True)
+
+    def _close_wav(self) -> None:
+        with self._file_lock:
+            wav = self._wav
+            self._wav = None
+            self._recording_closed = True
+            if wav is not None:
+                wav.close()
+
+    def _require_idle_locked(self) -> None:
+        if self._state is not _State.IDLE:
+            raise AudioCaptureStateError(
+                "cannot start audio capture while it is already recording"
+            )
+        self._reap_orphaned_worker()
+        if self._orphaned_worker is not None:
+            raise AudioStreamError("audio capture worker did not stop")
+
+    def _startup_failure(self) -> BaseException:
+        error = self._startup_error or AudioStreamError("audio capture did not start")
+        return self._with_cleanup_cause(error)
+
+    def _worker_timeout_error(self) -> BaseException:
+        return self._with_cleanup_cause(
+            AudioStreamError("audio capture worker did not stop")
+        )
+
+    def _with_cleanup_cause(self, error: BaseException) -> BaseException:
+        if self._cleanup_error is not None and error.__cause__ is None:
+            error.__cause__ = self._cleanup_error
+        return error
+
+    def _raise_recorded_errors(self) -> None:
+        if self._worker_error is not None:
+            self._fail(self._with_cleanup_cause(self._worker_error))
+        if self._cleanup_error is not None:
+            self._fail(self._cleanup_error)
+
+    def _stop_backend(self) -> None:
+        try:
+            self._backend.stop()
+        except Exception as exc:
+            if self._cleanup_error is None:
+                self._cleanup_error = exc
+
+    def _close_from_controller(self) -> None:
+        """Close the backend on the thread that is orchestrating shutdown.
+
+        Call this only after the capture worker has left the backend, or
+        before that worker has been started. A worker that is still inside
+        ``start``, ``read``, or a previous close must not be raced.
+        """
+        try:
+            self._backend.close()
+        except Exception as exc:
+            if self._cleanup_error is None:
+                self._cleanup_error = exc
+
+
+def _validate_wav(path: Path) -> None:
+    try:
+        with wave.open(str(path), "rb") as wav:
+            channels = wav.getnchannels()
+            sample_width = wav.getsampwidth()
+            sample_rate = wav.getframerate()
+    except wave.Error as exc:
+        raise AudioStreamError("captured audio is not a valid WAV file") from exc
+    if (
+        channels != CHANNELS
+        or sample_width != SAMPLE_WIDTH_BYTES
+        or sample_rate != SAMPLE_RATE_HZ
+    ):
+        raise AudioStreamError(
+            "captured audio does not match the 16 kHz mono 16-bit PCM contract"
+        )

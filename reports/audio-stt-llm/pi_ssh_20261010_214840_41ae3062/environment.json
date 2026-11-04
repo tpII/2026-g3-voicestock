@@ -1,0 +1,201 @@
+{
+  "host": "g3-voicestock@100.71.26.47",
+  "remote_repo": "/home/g3-voicestock/2026-g3-voicestock",
+  "remote_inputs": "/home/g3-voicestock/2026-g3-voicestock/.cache/integration/pi_ssh_20261010_214840_41ae3062",
+  "llm_model": "openai/gpt-oss-20b",
+  "stt_model": "ggml-base.bin",
+  "stt_prompt_files": [
+    {
+      "path": "scripts/benchmarks/prompts/contexto-stt.txt",
+      "sha256": "ad2510eaccdb2e7282a8bd559a8efb46c9078328e44f9874cbbfe717ab08d24c"
+    },
+    {
+      "path": "scripts/benchmarks/prompts/productos-stt.txt",
+      "sha256": "b6f4012d1921c53c2955ac7a9a9a08148d5d06757ac37d75c13cd076b040e3fa"
+    }
+  ],
+  "stt_prompt_text": "Registro de movimientos de stock de un comercio, en espa\u00f1ol argentino.\nSe mencionan cantidades, marcas y tama\u00f1os de envases.\nVocabulario habitual: agreg\u00e1, rest\u00e1, paquetes, botellas, envases, litros, mililitros, kilos, perd\u00f3n, no los restes, no las cargues.\n\nCoca Cola, Coca Cola Zero, Sprite, agua Villavicencio, arroz Gallo, fideos Matarazzo, detergente Magistral, leche La Seren\u00edsima.\n",
+  "stt_prompt_sha256": "efaca48d1d248a14392592617704e63cf3e1fac4a575793e9a6de0b98a78390a",
+  "runs_per_case": 1,
+  "warmups": 0,
+  "retries": 0,
+  "manifest_sha256": "8b1686695640bc584ef3cc5d17c21974aed7d79819fa64c074e663d709e6ac04",
+  "local_model_sha256": "60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe",
+  "contract_sha256": "6da3c4cdadc485dcb6d39b6eac3c825f2bd7edf11c2b839b1d4cca5ca4c087f5",
+  "groq_settings": {
+    "temperature": 0,
+    "reasoning_effort": "low",
+    "max_completion_tokens": 1000,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "operaciones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "operacion": {
+                "type": "string",
+                "enum": [
+                  "agregar_stock",
+                  "restar_stock"
+                ]
+              },
+              "producto": {
+                "type": "string",
+                "enum": [
+                  "Coca Cola 2L",
+                  "Coca Cola 1.5L",
+                  "Coca Cola Zero 2L",
+                  "Sprite 2L",
+                  "Sprite 1.5L",
+                  "Agua Villavicencio 1.5L",
+                  "Arroz Gallo 1kg",
+                  "Fideos Matarazzo 500g",
+                  "Detergente Magistral 750ml",
+                  "Leche La Seren\u00edsima 1L"
+                ]
+              },
+              "cantidad": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "operacion",
+              "producto",
+              "cantidad"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "operaciones"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "audio_cases": [
+    {
+      "id": "solo_agregar",
+      "original": "originals/basico/solo_agregar.m4a",
+      "wav": "wav/basico/solo_agregar.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 8.576,
+      "original_sha256": "433e8d30e0dbc243cba46be1c7bc7b2ebd1de86689da8e24f5795cf80e628187",
+      "wav_sha256": "5d2c36972d6db24e4ca0a9d7db0b0ccda7dac08eb9e04ecd0dca67cfb2cb4857",
+      "expected_text": "Agreg\u00e1 tres Coca Cola comunes de 2 litros y cuatro Sprite comunes de 1,5 litros.",
+      "reference_verified_by_human": false,
+      "level": "basico",
+      "text_prompt": "scripts/benchmarks/prompts/precision/basico/solo_agregar.txt"
+    },
+    {
+      "id": "solo_restar",
+      "original": "originals/basico/solo_restar.m4a",
+      "wav": "wav/basico/solo_restar.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 4.992,
+      "original_sha256": "41d52801e43bdad7f834cf5910101c67a79d0af612217a6c2bc38b0d7e8486f3",
+      "wav_sha256": "24e6248d5ec7e3b031f2af2dadf48a449122e9e70b77c951d40421243c3588d3",
+      "expected_text": "Rest\u00e1 dos paquetes de arroz Gallo de 1 kg.",
+      "reference_verified_by_human": false,
+      "level": "basico",
+      "text_prompt": "scripts/benchmarks/prompts/precision/basico/solo_restar.txt"
+    },
+    {
+      "id": "restar_ambos",
+      "original": "originals/habitual/restar_ambos.m4a",
+      "wav": "wav/habitual/restar_ambos.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 8.448,
+      "original_sha256": "2e93c9fedc5d4d711b7247348ed93f4524db9acc540e54c12048fd75ed8f4939",
+      "wav_sha256": "a2775a73742d8c279fc098ecf71ff9d5bdb152f2f63e06eaff1e9cf234366695",
+      "expected_text": "Rest\u00e1 dos Coca Cola Zero de 2 litros y cuatro envases de detergente Magistral de 750 ml.",
+      "reference_verified_by_human": false,
+      "level": "habitual",
+      "text_prompt": "scripts/benchmarks/prompts/precision/habitual/restar_ambos.txt"
+    },
+    {
+      "id": "corregir_cantidad",
+      "original": "originals/habitual/corregir_cantidad.m4a",
+      "wav": "wav/habitual/corregir_cantidad.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 8.064,
+      "original_sha256": "cb896dc77dacfeb1fcab3581cf2e2ba0b933aee47dc011f032472bd4bc920bc4",
+      "wav_sha256": "6bf0158324ae691b8926c445b91c42e76d9bf18464136372fec1cbef7f0b08fd",
+      "expected_text": "Agreg\u00e1 tres Coca Cola comunes de 2 litros. Perd\u00f3n, eran dos.",
+      "reference_verified_by_human": false,
+      "level": "habitual",
+      "text_prompt": "scripts/benchmarks/prompts/precision/habitual/corregir_cantidad.txt"
+    },
+    {
+      "id": "negar_agregacion",
+      "original": "originals/habitual/negar_agregacion.m4a",
+      "wav": "wav/habitual/negar_agregacion.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 9.664,
+      "original_sha256": "01c995c0b7f68ab930245f6d78af81d30872bd1dcf59a92086277727fb8ca4ed",
+      "wav_sha256": "ba2f734234741787378d24abbd128fc4372886f4fa976ae55dfbd2a4e7e5ab22",
+      "expected_text": "Agreg\u00e1 cinco botellas de agua Villavicencio de 1,5 litros. Perd\u00f3n, esas no llegaron; no las cargues.",
+      "reference_verified_by_human": false,
+      "level": "habitual",
+      "text_prompt": "scripts/benchmarks/prompts/precision/habitual/negar_agregacion.txt"
+    },
+    {
+      "id": "negar_restacion",
+      "original": "originals/habitual/negar_restacion.m4a",
+      "wav": "wav/habitual/negar_restacion.wav",
+      "source_audio": {
+        "rate": 16000,
+        "layout": "mono"
+      },
+      "duration_s": 11.072,
+      "original_sha256": "b6ffd453c5ea7db87a8d5f6ace1b22b821aaa850eea681edeb4e922f007a6314",
+      "wav_sha256": "9deab639854c43375349f22acc9c0f5bd2c37d30590dc9e914b1fa6f4b316ee7",
+      "expected_text": "Rest\u00e1 cuatro envases de detergente Magistral de 750 ml. Perd\u00f3n, no se vendieron; no los restes.",
+      "reference_verified_by_human": false,
+      "level": "habitual",
+      "text_prompt": "scripts/benchmarks/prompts/precision/habitual/negar_restacion.txt"
+    }
+  ],
+  "remote_environment": {
+    "event": "ready",
+    "load": {
+      "load_s": 1.78491
+    },
+    "load_resources": {
+      "ram_base_mib": 0.25,
+      "ram_peak_mib": 187.75,
+      "cpu_s": 0.9099999999999999,
+      "cpu_pct": 50.62505191114918,
+      "request_wall_s": 1.7975290210015373
+    },
+    "platform": "Linux-6.6.51+rpt-rpi-v8-aarch64-with-glibc2.36",
+    "machine": "aarch64",
+    "python": "3.11.2 (main, Sep 14 2024, 03:00:30) [GCC 12.2.0]",
+    "logical_cpus": 4,
+    "system_ram_mib": 907.265625,
+    "model_sha256": "60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe",
+    "stt_model": "ggml-base.bin",
+    "stt_prompt_sha256": "efaca48d1d248a14392592617704e63cf3e1fac4a575793e9a6de0b98a78390a",
+    "worker_sha256": "a36ecb7cad5be4aee61da89dbe5abd76eae12addbd37ae0f6f4b4e003db5047b",
+    "threads": 4,
+    "remote_repo": "/home/g3-voicestock/2026-g3-voicestock"
+  }
+}

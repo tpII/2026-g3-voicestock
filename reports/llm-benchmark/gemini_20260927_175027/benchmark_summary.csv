@@ -1,0 +1,6 @@
+model,params,successful_runs,avg_ttft_ms,median_ttft_ms,avg_total_latency_ms,median_total_latency_ms,min_total_latency_ms,max_total_latency_ms,avg_tokens_per_second,avg_ollama_total_duration_ms,avg_load_duration_ms,avg_prompt_eval_duration_ms,avg_eval_duration_ms,avg_inference_duration_ms,ram_peak_mb,valid_json_pct,schema_valid_pct,correct_products_pct,correct_quantities_pct,exact_match_pct
+gemini:gemini-3.8-flash,cloud,3,2063.03,1969.29,2338.64,2244.55,2128.82,2642.56,314.65,,,,,,,100.0,100.0,100.0,100.0,100.0
+gemini:gemini-3.7-flash,cloud,1,3111.36,3111.36,3305.4,3305.4,3305.4,3305.4,489.57,,,,,,,100.0,100.0,100.0,100.0,100.0
+gemini:gemini-3.6-flash,cloud,4,4360.01,4460.12,4810.0,4860.99,4029.29,5488.73,172.19,,,,,,,100.0,100.0,100.0,100.0,100.0
+gemini:gemini-3.5-flash,cloud,4,5586.96,4645.43,6003.18,5125.88,4101.57,9659.38,217.0,,,,,,,100.0,100.0,100.0,100.0,100.0
+gemini:gemini-3.5-flash-lite,cloud,5,760.57,678.75,1235.48,1166.65,1092.23,1605.77,488.87,,,,,,,100.0,100.0,100.0,100.0,100.0

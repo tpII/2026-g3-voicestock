@@ -78,7 +78,12 @@ it.
 
 ## Status
 
-Campaign status: **IN_PROGRESS**.
+Campaign status: **closed for v0.5.0**. Release decision:
+`ACCEPTED_WITH_KNOWN_LIMITATIONS`. No further execution is planned for this
+version. Individual results are unchanged: no case is **CLOSED_PASSED**,
+historical **FAILED** and **BLOCKED** executions stay, and TC-E2E-002 stays
+experimentally **FAILED** on N1. The closeout is
+[v0.5.0-campaign-report.md](v0.5.0-campaign-report.md).
 
 The procedures are **DESIGNED**. [TC-ENV-001](test-cases/TC-ENV-001.md) has
 one execution, [EX-TC-ENV-001-20261027-01](executions/EX-TC-ENV-001-20261027-01.md),

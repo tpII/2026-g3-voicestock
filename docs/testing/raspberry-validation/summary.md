@@ -28,7 +28,10 @@ assessment is **PASSED**, the evidence archive and the formal review are
 still open, and it is not **CLOSED_PASSED**. It does not claim ICMP,
 IPv4 isolation, reboot, service recovery, or long-term reliability.
 
-Campaign status: **IN_PROGRESS**.
+Campaign status: **closed for v0.5.0**. Release decision:
+`ACCEPTED_WITH_KNOWN_LIMITATIONS`. See
+[v0.5.0-campaign-report.md](v0.5.0-campaign-report.md). The sentences below
+are the experimental record. They are not regraded by the release decision.
 
 Specification revision: the git commit that contains this file on
 `docs/raspberry-validation-campaign`. Record that commit in each execution.

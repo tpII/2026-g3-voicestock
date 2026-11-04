@@ -1,8 +1,11 @@
 # Remaining-case readiness
 
-This note records what can be run next. It does not change any execution
-status and it does not approve a case. Historical executions keep the
-commits written in those records. The latest checkout named by those
+v0.5.0 testing is closed. This note no longer schedules another run.
+Historical execution statuses stay as written. A
+**PASSED_PENDING_DOCUMENTATION** result is not **CLOSED_PASSED**. The
+release decision is `ACCEPTED_WITH_KNOWN_LIMITATIONS` in
+[v0.5.0-campaign-report.md](v0.5.0-campaign-report.md).
+Historical executions keep the commits written in those records. The latest checkout named by those
 records is `develop` at `485559c04a71ce634170372c78a7dc1bc4e1dbc7`. This
 documentation branch now also contains `develop` at `c151db2`. That commit
 adds the selectable Groq audio pipeline. It does not add an execution, and
@@ -61,7 +64,7 @@ need either that script or an explicit command deviation.
 | Case | Code on `develop` | Fixture | Hardware seen in this campaign | Environment | Preconditions | Executed | Readiness |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [TC-CON-001](test-cases/TC-CON-001.md) | `OperationValidator` and `PcResponseInterpreter` are in the tree. | The three JSON files are on this branch. On the Pi `develop` checkout they were absent and were extracted to an external directory. Contents were reported unmodified. | Pi only. No button and no PC request from the script. | [EX-TC-CON-001-20261104-01](executions/EX-TC-CON-001-20261104-01.md) ran on Python 3.13.5 at `c151db2`. | No PC fixture. | Yes | **PASSED_PENDING_DOCUMENTATION.** Technical result **PASSED**. Review NOT_REVIEWED. External hashes were not recomputed in this workspace. Not **CLOSED_PASSED**. |
-| [TC-FLOW-001](test-cases/TC-FLOW-001.md) | Runtime and the default stub were used. Scenario C used an external hold server. Groq was not the peer. | Not required. Procedure version 1 trial B was not executed. | Physical GPIO17, `voicestock_mic`, and the cell were used on 2026-11-04. | [EX-TC-FLOW-001-20261104-01](executions/EX-TC-FLOW-001-20261104-01.md) at `c151db2`, Pi Python 3.13.5. Startup argv **NOT RECORDED**. | Written gate met by the latest PTT, COM-002, and WEB-001 results, none of which is **CLOSED_PASSED**. | Yes | **PASSED_PENDING_DOCUMENTATION.** Technical result **PASSED**. Release-to-idle **NOT MEASURED**. Review NOT_REVIEWED. Not **CLOSED_PASSED**. Does not close N1. |
+| [TC-FLOW-001](test-cases/TC-FLOW-001.md) | Runtime and the default stub were used. Scenario C used an external hold server. Groq was not the peer. | Not required. Procedure version 1 trial B was not executed. | Physical GPIO17, `voicestock_mic`, and the cell were used on 2026-11-04. | [EX-TC-FLOW-001-20261104-01](executions/EX-TC-FLOW-001-20261104-01.md) at `c151db2`, Pi Python 3.13.5. Startup command supplied later in the closure conversation, not from an archived log. | Written gate met by the latest PTT, COM-002, and WEB-001 results, none of which is **CLOSED_PASSED**. | Yes | **PASSED_PENDING_DOCUMENTATION.** Technical result **PASSED**. Release-to-idle **NOT MEASURED**. Review NOT_REVIEWED. Not **CLOSED_PASSED**. Does not close N1. |
 
 ## Suggested sequence
 
@@ -75,11 +78,12 @@ need either that script or an explicit command deviation.
    [EX-TC-PTT-001-20261104-01](executions/EX-TC-PTT-001-20261104-01.md).
    The technical result is **PASSED**. Review is still open. Attempts 01
    and 02 stay **FAILED**.
-4. Install `hatchling` in the Pi environment, or otherwise create
-   `.venv/bin/voicestock-pi`, before treating the generated command as
-   tested. [EX-TC-FLOW-001-20261104-01](executions/EX-TC-FLOW-001-20261104-01.md)
-   did not record the startup argv, so that run does not close the script
-   gap.
+4. [EX-TC-WEB-001-20261103-01](executions/EX-TC-WEB-001-20261103-01.md)
+   did not start the generated `voicestock-pi` script.
+   [EX-TC-FLOW-001-20261104-01](executions/EX-TC-FLOW-001-20261104-01.md)
+   names that script, including `--bounce-time 0.05`, from the closure
+   conversation rather than from an archived log. That note does not close
+   the WEB-001 deviation.
 5. TC-FLOW-001 procedure version 2 has
    [EX-TC-FLOW-001-20261104-01](executions/EX-TC-FLOW-001-20261104-01.md).
    The technical result is **PASSED**. Review is still open. It is not

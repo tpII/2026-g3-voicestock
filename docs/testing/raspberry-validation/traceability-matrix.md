@@ -1,6 +1,8 @@
 # Traceability matrix
 
-Campaign status: **IN_PROGRESS**. TC-ENV-001 has one execution and is not
+Campaign status: **closed for v0.5.0**. Release decision:
+`ACCEPTED_WITH_KNOWN_LIMITATIONS`. Individual execution statuses are
+unchanged. TC-ENV-001 has one execution and is not
 closed. TC-GPIO-001 has four executions and is not closed. The latest,
 [EX-TC-GPIO-001-20261104-01](executions/EX-TC-GPIO-001-20261104-01.md), is
 **PASSED_PENDING_DOCUMENTATION**. The three earlier results stay

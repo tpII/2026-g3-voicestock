@@ -5,9 +5,11 @@
 Accepted. Renumbered from ADR-0004 on 23 October 2026. That number is kept by
 the interpretation-provider decision. The network decision itself is unchanged.
 
-[ADR-0012](0012-run-the-voicestock-access-point-with-hostapd.md) names
+[ADR-0013](0013-run-the-voicestock-access-point-with-hostapd.md) names
 `hostapd` as the access-point process. It does not change the topology in
-this record.
+this record. The earlier evaluation remains
+[ADR-0012](0012-evaluate-hostapd-for-the-voicestock-access-point.md) and
+stays **Proposed**.
 
 ## Context
 

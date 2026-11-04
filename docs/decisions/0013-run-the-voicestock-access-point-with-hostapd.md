@@ -1,8 +1,14 @@
-# ADR-0012: Run the VoiceStock access point with hostapd
+# ADR-0013: Run the VoiceStock access point with hostapd
 
 ## Status
 
-Accepted. This does not supersede
+Accepted. Numbered ADR-0013 on 4 November 2026. This file was first added
+as a second ADR-0012, beside the historical evaluation
+[ADR-0012](0012-evaluate-hostapd-for-the-voicestock-access-point.md), which
+stays **Proposed**. The decision, the rationale, and the consequences below
+are otherwise unchanged.
+
+This does not supersede
 [ADR-0010](0010-use-isolated-raspberry-pi-wifi-access-point.md). The isolated
 cell is unchanged: SSID `VoiceStock`, Raspberry Pi `192.168.50.1/24`, PC
 `192.168.50.2/24`, no DHCP, DNS, gateway, NAT, forwarding, or bridge.

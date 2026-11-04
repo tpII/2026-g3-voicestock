@@ -2,17 +2,17 @@
 
 Sistema de gestión de inventario asistido por voz, pensado para ejecutarse en una Raspberry Pi.
 
-La Raspberry Pi captura audio y lo envía a la PC. El reconocimiento de voz y
-la interpretación con un modelo de lenguaje corren, conceptualmente, en la PC.
-La Raspberry Pi valida el contrato, mantiene una sola operación pendiente en
-memoria y muestra la página para confirmarla o cancelarla. El inventario en
-SQLite todavía no se modifica.
+La Raspberry Pi captura audio con un botón y lo envía a la PC. Con
+`VOICESTOCK_AUDIO_PIPELINE=groq`, la PC transcribe el WAV con Groq Whisper
+y pide un borrador a `openai/gpt-oss-20b`. La Raspberry Pi valida el
+contrato, mantiene una sola operación pendiente en memoria y muestra la
+página para confirmarla o cancelarla. El inventario en SQLite no se
+modifica: confirmar informa éxito y no persiste stock.
 
-El proyecto ya incluye la captura push-to-talk, el cliente HTTP, el ciclo
-`PendingOperationFlow`, el comando `voicestock-pi` y la página de
-confirmación. El servidor de la PC sigue usando un handler de audio
-provisional. Confirmar en la página no modifica el inventario. El recorrido
-completo de voz, desde el micrófono hasta un contrato real, no está cerrado.
+El alcance aceptado para v0.5.0, con la limitación de productos ambiguos,
+está en [las notas de v0.5.0](docs/releases/v0.5.0.md). El servidor sigue
+arrancando en stub si no se elige `groq`. No hay tag ni GitHub Release
+todavía. `pyproject.toml` sigue en `0.1.0`.
 
 ## Requisitos
 
@@ -69,9 +69,10 @@ pytest
 ### Servidor de comunicación de la PC
 
 El servidor recibe por HTTP texto, que pasa al servicio de interpretación, y
-grabaciones WAV del push-to-talk, que pasa a un handler de audio sustituible
-(hoy un stub, después la transcripción por API). Por defecto usa el proveedor
-`stub` y escucha solamente en localhost:
+grabaciones WAV del push-to-talk. Por defecto el handler de audio es el stub
+(`received_audio`) y el proceso escucha solamente en localhost. El modo
+`groq` está en la
+[guía del pipeline de audio](docs/setup/pc-audio-pipeline.md).
 
 ```bash
 voicestock-pc-server
@@ -158,7 +159,8 @@ Con `voicestock-pi`, la página queda en el mismo proceso. En la Raspberry Pi
 escucha en `192.168.50.1:8000`. Desde la PC: `http://192.168.50.1:8000/`.
 Esas direcciones son las de la red Wi-Fi aislada; el procedimiento está en
 la [guía de red local](docs/setup/local-network.md). La validación física de
-esa red sigue pendiente.
+esa red sigue pendiente. El plan para hacerla, todavía sin ejecuciones, está
+en la [campaña de validación de la Raspberry Pi](docs/testing/raspberry-validation/README.md).
 
 `voicestock-pi-web` sigue disponible para abrir la página sin el ciclo. En
 ese caso `GET /health` responde y el API dice que la aplicación no está
@@ -219,6 +221,7 @@ no persiste stock.
 - [API de la operación pendiente](docs/interfaces/pending-operation-web-api.md)
 - [Página de la operación pendiente](docs/interfaces/pending-operation-web-ui.md)
 - [Bitácora](docs/bitacora/bitacora.md)
+- [Campaña de validación de la Raspberry Pi](docs/testing/raspberry-validation/README.md)
 
 ## Licencia
 

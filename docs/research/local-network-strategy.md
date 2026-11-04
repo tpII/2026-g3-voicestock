@@ -11,7 +11,7 @@ use the resulting addresses. They do not choose the network.
 | Area | Status |
 | --- | --- |
 | Topology | Revised on 2026-10-11: isolated Wi-Fi access point on the Raspberry Pi 3, with two Wi-Fi interfaces on the PC. |
-| Access-point process | Revised on 2026-11-03: `hostapd` on the Pi. NetworkManager remains the Arch client and the Pi's manager for other interfaces. See [ADR-0012](../decisions/0012-run-the-voicestock-access-point-with-hostapd.md). |
+| Access-point process | Revised on 2026-11-03: `hostapd` on the Pi. NetworkManager remains the Arch client and the Pi's manager for other interfaces. See [ADR-0013](../decisions/0013-run-the-voicestock-access-point-with-hostapd.md). |
 | Addressing | Kept: static `192.168.50.0/24`. Raspberry Pi `192.168.50.1/24`. PC `192.168.50.2/24`. |
 | Physical validation | A manual `hostapd` session on 2026-11-03 authenticated two clients. The persistent installer has not had a new hardware run. LocalNetworkInfra-04 is not closed. |
 
@@ -188,7 +188,7 @@ does not ask it to join another network at the same time.
 Static addresses stay simpler than DHCP for two known hosts. The first
 implementation kept both ends in NetworkManager and did not install
 `hostapd` or `dnsmasq`. On 3 November 2026 that access-point path failed
-WPA2 negotiation on the Pi radio. [ADR-0012](../decisions/0012-run-the-voicestock-access-point-with-hostapd.md)
+WPA2 negotiation on the Pi radio. [ADR-0013](../decisions/0013-run-the-voicestock-access-point-with-hostapd.md)
 moves only the access point to `hostapd`. The address is still static.
 `dnsmasq` is still not used. The PC client stays on NetworkManager.
 
@@ -307,5 +307,7 @@ the Raspberry Pi an Internet path.
   `192.168.50.0/24` sits inside the private `192.168.0.0/16` block defined there.
 - [ADR-0010](../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md),
   the decision record for this revision.
-- [ADR-0012](../decisions/0012-run-the-voicestock-access-point-with-hostapd.md),
+- [ADR-0013](../decisions/0013-run-the-voicestock-access-point-with-hostapd.md),
   the access-point process. The topology in ADR-0010 stays in force.
+  [ADR-0012](../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md)
+  remains the **Proposed** evaluation and is not that decision.

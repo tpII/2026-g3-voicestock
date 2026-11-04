@@ -1,0 +1,17 @@
+{
+  "contract_version": "1",
+  "recognized_text": "agregar dos de arroz marolio de un kilo",
+  "operations": [
+    {
+      "operation": "add_stock",
+      "product": {
+        "name": "Arroz",
+        "brand": "Marolio",
+        "variant": null,
+        "presentation": "1 kg"
+      },
+      "quantity": 2,
+      "unit": "unit"
+    }
+  ]
+}

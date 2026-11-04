@@ -7,7 +7,7 @@ Why this topology was chosen is the
 [local network strategy](../research/local-network-strategy.md). The topology
 decision is [ADR-0010](../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md).
 The access-point process is
-[ADR-0012](../decisions/0012-run-the-voicestock-access-point-with-hostapd.md).
+[ADR-0013](../decisions/0013-run-the-voicestock-access-point-with-hostapd.md).
 This page is the procedure.
 
 Application traffic is a separate feature, `RaspberryPiPCCommunication`.

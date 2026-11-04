@@ -15,8 +15,9 @@ TC-WEB-001 are not closed. TC-E2E-002 has one execution at **FAILED**,
 with the v0.5.0 decision `ACCEPTED_WITH_KNOWN_LIMITATIONS`. That decision
 does not close the case. TC-CON-001 has one execution at
 **PASSED_PENDING_DOCUMENTATION**. Its technical result is **PASSED**.
-Review is NOT_REVIEWED, so it is not **CLOSED_PASSED**. TC-WEB-002,
-TC-FLOW-001, and TC-E2E-001 have no measurements. The second access-point execution includes a `hostapd`
+Review is NOT_REVIEWED, so it is not **CLOSED_PASSED**. TC-FLOW-001 has no
+measurements. TC-WEB-002 and TC-E2E-001 were withdrawn without an
+execution. The second access-point execution includes a `hostapd`
 diagnostic. That diagnostic is not TC-NET-002. The third access-point
 execution is **PASSED_PENDING_DOCUMENTATION**: the technical configuration
 assessment is **PASSED**, the evidence archive and the formal review are
@@ -36,11 +37,11 @@ project hardware and whether its components integrate across GPIO, audio,
 the isolated Wi-Fi cell, HTTP, contract validation, the pending-operation
 cycle, and the operator page.
 
-The simulated end-to-end pass replaces PC speech-to-text and interpretation
-with a deterministic contract. It is not a production end-to-end pass.
-TC-E2E-001 has no execution.
+The active campaign does not include a simulated end-to-end pass. TC-E2E-001
+and TC-WEB-002 were withdrawn before execution. That withdrawal is not a
+pass. The real path remains TC-E2E-002.
 
-The application on `develop` at `c151db2` can also run the real path:
+The application on `develop` at `c151db2` can run the real path:
 physical push-to-talk, WAV upload, Groq Whisper, `openai/gpt-oss-20b`, Pi
 contract validation, one pending operation, confirm or cancel, and idle.
 The PC server defaults to the stub. `VOICESTOCK_AUDIO_PIPELINE=groq`
@@ -164,14 +165,15 @@ Recorded executions:
 
 ## 3. Scope
 
-Eighteen cases, TC-ENV-001 through TC-E2E-002, listed in the
+Sixteen active cases, TC-ENV-001 through TC-E2E-002, excluding the
+withdrawn TC-WEB-002 and TC-E2E-001. The list is in the
 [README](README.md#what-this-campaign-covers).
 
 ## 4. Exclusions
 
 | Topic | Where it has to be validated later |
 | --- | --- |
-| Speech-to-text accuracy guarantee | A speech-to-text campaign. Not TC-E2E-001 and not [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md). |
+| Speech-to-text accuracy guarantee | A speech-to-text campaign. Not [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md). |
 | Interpretation accuracy guarantee | [InterpretationService-04](https://app.clickup.com/t/86e3ev2v6). The 2026-11-04 run does not close this task. |
 | More than one operation per voice command | Outside v0.5.0. The pipeline rejects a draft that does not contain exactly one operation. No campaign execution records that rejection. |
 | Closing PendingOperationWeb-08 | [PendingOperationWeb-08](https://app.clickup.com/t/86e3evek6). [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md) is **FAILED** on N1 and does not close the task. |
@@ -215,11 +217,9 @@ documentation branch.
 | TC-COM-001 | [EX-TC-COM-001-20261103-01](executions/EX-TC-COM-001-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | 10/10 CLI calls exit 0 with the stub text. Mean CLI duration 3092.4 ms. Not closed. Review NOT_REVIEWED. | Both machines reported `develop` `485559c`. Bind `192.168.50.2:8000`; the `ss` peer column is not a bind to every interface. Ten JSON responses were supplied interactively; no transcript file. Warm-up duration NOT RECORDED. Budget **TO BE DEFINED**. Not TC-COM-002. |
 | TC-COM-002 | [EX-TC-COM-002-20261103-01](executions/EX-TC-COM-002-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | 5/5 WAV uploads exit 0. Size 59436 and header fields matched. Local SHA-256 unchanged. Not closed. Review NOT_REVIEWED. | Reused the TC-COM-001 server. No new `ss` paste. Mean CLI duration 3136.7 ms. Budget **TO BE DEFINED**. Not a received-body digest. Not TC-COM-003. Source file remains owned by the **FAILED** PTT attempt 02. |
 | TC-COM-003 | [EX-TC-COM-003-20261103-01](executions/EX-TC-COM-003-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | 3/3 `connection_failed` and 3/3 `timeout`. Not closed. Review NOT_REVIEWED. | Procedure version 1. Python listener instead of the `ncat` example. Not relabeled as version 2. Scenario A has no TCP-attempt trace. Port cleanup NOT RECORDED. Durations stay out of TC-COM-001. |
-| TC-WEB-001 | [EX-TC-WEB-001-20261103-01](executions/EX-TC-WEB-001-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | 10/10 health HTTP 200. Standalone 503. Three idle reads and pending HTTP 204. Not closed. Review NOT_REVIEWED. | Mean `curl` duration 86.2 ms. Budget **TO BE DEFINED**. `voicestock-pi` script absent. Exit status NOT RELIABLY RECORDED. Not TC-WEB-002. |
-| TC-WEB-002 | none | DESIGNED | | |
+| TC-WEB-001 | [EX-TC-WEB-001-20261103-01](executions/EX-TC-WEB-001-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | 10/10 health HTTP 200. Standalone 503. Three idle reads and pending HTTP 204. Not closed. Review NOT_REVIEWED. | Mean `curl` duration 86.2 ms. Budget **TO BE DEFINED**. `voicestock-pi` script absent. Exit status NOT RELIABLY RECORDED. Not a pending-operation resolution case. |
 | TC-CON-001 | [EX-TC-CON-001-20261104-01](executions/EX-TC-CON-001-20261104-01.md) | PASSED_PENDING_DOCUMENTATION | 10/10 criteria on 3 identical transcripts. Not closed. Review NOT_REVIEWED. | Fixtures were absent on `develop` and were provisioned externally. Not a product defect. Does not close N1. |
-| TC-FLOW-001 | none | DESIGNED | | |
-| TC-E2E-001 | none | DESIGNED | | |
+| TC-FLOW-001 | none | DESIGNED | Procedure version 2 is the active text. It has no execution. Procedure version 1 was not executed. | |
 | TC-E2E-002 | [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md) | FAILED | P1–P5 reported passed. N1 failed criteria 8 and 9. Not closed. | Release decision for this test: `ACCEPTED_WITH_KNOWN_LIMITATIONS`. Incident [INC-EX-TC-E2E-002-20261104-01-01](executions/INC-EX-TC-E2E-002-20261104-01-01.md) is OPEN. Inventory persistence not tested. |
 
 Callback hold for
@@ -637,9 +637,9 @@ What this summary can say now:
   [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md)
   records that path and is **FAILED** on N1. Its v0.5.0 decision is
   `ACCEPTED_WITH_KNOWN_LIMITATIONS`. Persistence was not tested;
-- simulated end-to-end execution stays blocked on a fixture that is
-  specified and not implemented. TC-E2E-001 is unchanged and has no
-  execution;
+- the deterministic contract fixture is not an active v0.5.0
+  requirement. TC-E2E-001 and TC-WEB-002 were withdrawn without an
+  execution. That is a scope reduction, not a pass;
 - PendingOperationWeb-08 remains open. TC-E2E-002 does not close it.
 
 ## 10. Bitácora pointer

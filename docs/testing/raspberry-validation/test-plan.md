@@ -30,13 +30,12 @@ cell, that:
 | --- | --- | --- |
 | Hardware validation | Does this physical interface behave as the adapter assumes? | TC-ENV-001, TC-GPIO-001, TC-AUD-001, TC-NET-001, TC-NET-002, TC-NET-003 |
 | Software component on the Raspberry Pi | Does this module, running on the Pi, honor its contract when the neighboring hardware or service is held still? | TC-AUD-002, TC-CON-001, TC-WEB-001 |
-| Integration | Do two or more real components work together? | TC-PTT-001, TC-PTT-002, TC-COM-001, TC-COM-002, TC-COM-003, TC-WEB-002, TC-FLOW-001 |
-| Simulated end-to-end | Does the Pi runtime complete a cycle when only PC speech-to-text and interpretation are replaced by a deterministic contract? | TC-E2E-001 |
+| Integration | Do two or more real components work together? | TC-PTT-001, TC-PTT-002, TC-COM-001, TC-COM-002, TC-COM-003, TC-FLOW-001 |
 | Full real end-to-end | Does one spoken command become a validated pending operation, then idle after confirm or cancel, without an inventory write? | [TC-E2E-002](test-cases/TC-E2E-002.md). [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md) is **FAILED** on the written N1 criterion and is not **CLOSED_PASSED**. Inventory persistence was not tested. A stock change stays outside v0.5.0. |
 
 A unit test that mocks GPIO or PortAudio does not satisfy a hardware case.
 A hardware case that never starts `voicestock-pi` does not satisfy
-TC-E2E-001.
+TC-E2E-002 or TC-FLOW-001.
 
 ## Execution order
 
@@ -59,9 +58,7 @@ when their dependencies are already satisfied.
 | 12 | [TC-COM-003](test-cases/TC-COM-003.md) | Connection failure and timeout are reported by the client | Failure setup would contaminate the success samples of TC-COM-001. |
 | 13 | [TC-WEB-001](test-cases/TC-WEB-001.md) | `/health` and idle `system-status` on the Pi address | The page can be checked before a pending operation exists. |
 | 14 | [TC-CON-001](test-cases/TC-CON-001.md) | The Pi validator accepts and rejects the campaign payloads | The cycle trusts this module. It does not need the microphone. |
-| 15 | [TC-FLOW-001](test-cases/TC-FLOW-001.md) | Phase changes, including the stub's contract rejection | The success half waits on the fixture below. The rejection half does not. |
-| 16 | [TC-WEB-002](test-cases/TC-WEB-002.md) | The page and the resolution routes follow one pending operation | Requires the fixture. It is narrower than the full simulated cycle. |
-| 17 | [TC-E2E-001](test-cases/TC-E2E-001.md) | The simulated cycle across button, WAV, HTTP, contract, page, confirm, and cancel | Last, because it assumes the earlier interfaces already had their own records. |
+| 15 | [TC-FLOW-001](test-cases/TC-FLOW-001.md) | Integrated error handling: invalid contract, connection failure, and response timeout | Procedure version 2. It does not wait on a deterministic contract fixture. It has no execution. |
 
 TC-CON-001 may run any time after TC-ENV-001. It is placed late so the
 hardware work is not blocked on a software check. TC-GPIO-001 and
@@ -103,10 +100,9 @@ in [TC-COM-003](test-cases/TC-COM-003.md) was written after that execution
 and is not applied to it. The run is **PASSED_PENDING_DOCUMENTATION** and
 not **CLOSED_PASSED**.
 
-Which later cases can start, and which stay blocked on the missing PC
-contract entry point, is in [readiness.md](readiness.md). That note does
-not change the fixture rules in this plan and does not implement the entry
-point.
+Which later cases can start is in [readiness.md](readiness.md). That note
+does not implement a deterministic contract entry point. The active v0.5.0
+campaign no longer requires one.
 
 The project bitácora is not part of this order. Execution records, the
 summary, and this campaign's traceability are updated as each case
@@ -114,97 +110,62 @@ finishes. [The bitácora](README.md#bitácora) is appended once at the end of
 the testing day. The planned days, 23 and 24 October 2026, are not
 results. Unfinished cases stay pending or blocked if those days end first.
 
-## Simulated end-to-end
+## Withdrawn from the active v0.5.0 campaign
 
-TC-E2E-001 runs the real `voicestock-pi` process: physical button, USB
-microphone, `AudioCapture`, `RecordingSender`,
-`HttpInterpretationClient`, `PcResponseInterpreter`, `OperationValidator`,
-`PendingOperationFlow`, and the in-process web UI.
+<a id="simulated-end-to-end"></a>
+<a id="fixture-requirements"></a>
 
-Only PC speech-to-text and interpretation are replaced. The replacement
-must still be reached through `POST /api/v1/interpret-audio` on a PC
-process that the Pi can route to `192.168.50.2`. The real Groq pipeline is
-a different path. It is not this case.
+TC-E2E-001 and TC-WEB-002 were designed and never executed. This campaign
+no longer keeps them as active cases. Their standalone specifications were
+removed because they contained only that unexecuted text. This section is
+the record of that scope change. It is not an execution and it is not a
+pass.
 
-### Current PC audio path
+TC-E2E-001 would have run the real Pi runtime against a PC handler that
+returned one fixed operation contract for every accepted WAV. TC-WEB-002
+would have exercised the pending-operation card and the confirm and cancel
+routes against that same contract. Both overlap the real integration path
+already exercised in
+[TC-E2E-002](test-cases/TC-E2E-002.md). The team will not maintain a
+deterministic PC fixture only to finish v0.5.0.
+
+[TC-FLOW-001 procedure version 1](test-cases/TC-FLOW-001-procedure-v1.md)
+also required that fixture for its success trial. That procedure was not
+executed. Procedure version 2 keeps the identifier and drops the success
+trial. It tests invalid-contract, connection-failure, and response-timeout
+behavior. It is **DESIGNED** and has no execution.
+
+[fixtures/service-success-payload.json](fixtures/service-success-payload.json)
+remains in the tree as a historical payload. No active v0.5.0 case requires
+a PC entry point that returns it.
+
+## PC audio path used by the remaining cases
 
 `voicestock-pc-server` defaults to the stub. `VOICESTOCK_AUDIO_PIPELINE`
-unset or `stub` keeps `describe_received_audio`.
-`VOICESTOCK_AUDIO_PIPELINE=groq` transcribes the WAV with Groq Whisper,
-asks `openai/gpt-oss-20b` for one structured draft, and returns a version-1
-contract plus `recognized_text` when that draft matches one catalog
-product. The Pi validator assigns `product_id`. The pipeline does not
-accept more than one operation in the draft. Confirm and cancel do not
-persist inventory. Setup is
-[the PC audio pipeline guide](../../setup/pc-audio-pipeline.md).
-
-That mode is current product behavior on `develop` at `c151db2`. It is not
-an execution result of this campaign. It does not satisfy TC-E2E-001,
-because that case requires the same contract for every accepted WAV and
-forbids a transcription API and a language model. It also does not provide
-a production accuracy guarantee for speech-to-text or for interpretation.
-
-### Why the default server is not enough for the simulated case
-
-`voicestock-pc-server` calls `create_pc_app` with
-`describe_received_audio` unless `VOICESTOCK_AUDIO_PIPELINE=groq`
-(`src/pc/main.py`). For a readable WAV in the default mode, the Pi receives
-a success envelope whose service payload is `received_audio` (size,
-duration, sample rate, channels, sample width).
-`PcResponseInterpreter` removes `recognized_text` only when that field is a
-string, then passes the rest to `OperationValidator`. `received_audio` has
-no `contract_version`, so the validator rejects it. The flow returns to
-`idle` and sets:
+unset or `stub` keeps `describe_received_audio`. A readable WAV then
+returns a success envelope whose payload is `received_audio`. That object
+has no `contract_version`. The Pi rejects it, returns to `idle`, and sets:
 
 ```text
 El pedido no es una operación válida. Presioná el botón para intentar de nuevo.
 ```
 
-`StubProvider` is also insufficient. It answers the text endpoint with
-`{"recognized_text": "<input>"}` and is not the audio handler. The runtime
-uploads audio, not text (`RecordingSender` calls `interpret_audio`).
+That rejection is scenario A of
+[TC-FLOW-001](test-cases/TC-FLOW-001.md). It is not a pending operation.
 
-`create_pc_app(..., audio_handler=...)` can take another handler.
-`VOICESTOCK_AUDIO_PIPELINE` selects `stub` or `groq`. It does not select
-the deterministic campaign fixture. `groq` calls Groq. The fixture must
-not.
+`VOICESTOCK_AUDIO_PIPELINE=groq` transcribes the WAV with Groq Whisper,
+asks `openai/gpt-oss-20b` for one structured draft, and returns a version-1
+contract plus `recognized_text` when that draft matches one catalog
+product. The Pi validator assigns `product_id`. Confirm and cancel do not
+persist inventory. Setup is
+[the PC audio pipeline guide](../../setup/pc-audio-pipeline.md).
 
-### Fixture requirements
-
-Do not implement the fixture as part of this documentation change. A later
-change should add a PC entry point that:
-
-1. Runs on the PC and binds with `ServerSettings` (host and port from
-   `VOICESTOCK_PC_HOST` and `VOICESTOCK_PC_PORT`).
-2. Builds the app with `pc.main.create_pc_app` so the existing audio route
-   still enforces `audio/wav`, the 4 MiB limit (`MAX_AUDIO_BYTES`), and
-   `read_wav` before the handler runs.
-3. Supplies an audio handler that ignores the spoken content and returns
-   `ServiceResult.success` of the object in
-   [fixtures/service-success-payload.json](fixtures/service-success-payload.json).
-   That object is a version-1 contract plus a synthetic `recognized_text`.
-   The same bytes are returned for every WAV that `read_wav` accepts.
-4. Does not call `describe_received_audio`, `StubProvider`, a transcription
-   API, or a language model, and does not read API keys.
-5. Writes the received length and SHA-256 to stderr, or to a path outside
-   the repository. It does not copy the WAV into git.
-6. Is selected only by starting that entry point. Starting
-   `voicestock-pc-server` without `VOICESTOCK_AUDIO_PIPELINE=groq` must
-   keep the stub. Starting it with `groq` must keep the real pipeline.
-   Neither mode is this fixture.
-
-Until that entry point exists, TC-WEB-002, the success trials of
-TC-FLOW-001, and TC-E2E-001 stay **BLOCKED** at execution time because the
-fixture is absent. [EX-TC-PTT-001-20261104-01](executions/EX-TC-PTT-001-20261104-01.md)
-meets the written PTT status gate and does not remove that fixture block.
-Their specifications stay **DESIGNED**. Do not point those cases at the stub and
-then treat the rejection as a successful pending operation. Do not point
-them at `VOICESTOCK_AUDIO_PIPELINE=groq` and treat a real transcription as
-the simulated pass. TC-E2E-001 remains a simulated case. It has no
-execution.
-
-The rejection trial in TC-FLOW-001 is different: it uses the stub on
-purpose and expects the message quoted above.
+That mode is current product behavior on `develop` at `c151db2`. It is the
+peer required by TC-E2E-002. It is not a production accuracy guarantee.
+[EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md) is
+**FAILED** on the written N1 criterion. Its v0.5.0 decision remains
+`ACCEPTED_WITH_KNOWN_LIMITATIONS`. That decision does not close the case
+and does not close the campaign.
 
 ## Campaign catalog
 
@@ -290,10 +251,13 @@ Test ids in this campaign:
 - TC-COM-002
 - TC-COM-003
 - TC-WEB-001
-- TC-WEB-002
 - TC-CON-001
 - TC-FLOW-001
-- TC-E2E-001
+- TC-E2E-002
+
+Sixteen cases are active. TC-WEB-002 and TC-E2E-001 were specified, never
+executed, and withdrawn from this campaign. Removing them is not a pass.
+See [Withdrawn from the active v0.5.0 campaign](#withdrawn-from-the-active-v050-campaign).
 
 Execution ids: `EX-<test-id>-<YYYYMMDD>-<nn>` with `<nn>` starting at `01`
 for that test id and date. Incident ids: `INC-<execution-id>-<nn>`.
@@ -313,7 +277,7 @@ gates.
 | ICMP loss and RTT | Loss count and RTT samples from `ping` | Zero successful replies in the measured set, or the route uses the wrong interface |
 | HTTP duration | Monotonic time around one client call on the Pi | Wrong envelope status or wrong error code for that trial |
 | UI lag | Time from the API showing `wait_confirmation` until the page shows it | The page never shows the API confirmation text |
-| Button-to-pending latency | User-observed interval, kept separate from HTTP time | No pending operation when the fixture response is valid |
+| Button-to-pending latency | User-observed interval, kept separate from HTTP time | No pending operation when TC-E2E-002's assigned positive command was spoken to the Groq peer |
 | Repeated-cycle success rate | Passes over the planned repeats | A criterion inside the cycle fails |
 
 The repeat counts are in the

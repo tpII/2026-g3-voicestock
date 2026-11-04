@@ -22,14 +22,15 @@ documents it cites. Session notes in the project log stay in Spanish; see
 | Integrated push-to-talk | [TC-PTT-001](test-cases/TC-PTT-001.md), [TC-PTT-002](test-cases/TC-PTT-002.md) |
 | Isolated Wi-Fi access point and PC link | [TC-NET-001](test-cases/TC-NET-001.md), [TC-NET-002](test-cases/TC-NET-002.md), [TC-NET-003](test-cases/TC-NET-003.md) |
 | HTTP client and WAV transport | [TC-COM-001](test-cases/TC-COM-001.md), [TC-COM-002](test-cases/TC-COM-002.md), [TC-COM-003](test-cases/TC-COM-003.md) |
-| Web server and operator UI | [TC-WEB-001](test-cases/TC-WEB-001.md), [TC-WEB-002](test-cases/TC-WEB-002.md) |
+| Web server and operator UI | [TC-WEB-001](test-cases/TC-WEB-001.md) |
 | Operation contract on the Pi | [TC-CON-001](test-cases/TC-CON-001.md) |
-| Pending-operation cycle | [TC-FLOW-001](test-cases/TC-FLOW-001.md) |
-| Simulated end-to-end | [TC-E2E-001](test-cases/TC-E2E-001.md) |
+| Integrated error handling | [TC-FLOW-001](test-cases/TC-FLOW-001.md) |
 | Real hardware end-to-end | [TC-E2E-002](test-cases/TC-E2E-002.md) |
 
-The order, the reason each stage exists, and the simulated end-to-end
-strategy are in the [test plan](test-plan.md). How to measure is in the
+The order and the reason each stage exists are in the
+[test plan](test-plan.md). TC-E2E-001 and TC-WEB-002 were withdrawn before
+execution. That withdrawal is recorded in the test plan and is not a pass.
+How to measure is in the
 [measurement methodology](measurement-methodology.md). ClickUp mapping is
 the [traceability matrix](traceability-matrix.md). The report skeleton is
 the [campaign summary](summary.md).
@@ -66,10 +67,10 @@ exactly one operation. This campaign has no execution of that report.
 
 [PendingOperationWeb-08](https://app.clickup.com/t/86e3evek6) expects a real
 end-to-end flow that includes real speech-to-text and interpretation.
-[TC-E2E-001](test-cases/TC-E2E-001.md) replaces that PC-side processing with
-a deterministic contract. A pass of TC-E2E-001 does not close
-PendingOperationWeb-08. TC-E2E-001 has no ClickUp task yet. Its traceability
-is **PENDING CLICKUP TASK CREATION**. Do not invent an identifier.
+TC-E2E-001 would have replaced that PC-side processing with a deterministic
+contract. It was never executed and is withdrawn from this campaign. It
+does not close PendingOperationWeb-08. It had no ClickUp task. Do not
+invent an identifier.
 
 [InterpretationService-04](https://app.clickup.com/t/86e3ev2v6) is listed in
 the matrix so the exclusion stays visible. No case in this campaign closes
@@ -149,9 +150,9 @@ decision does not close the case and does not close any other case.
 at **PASSED_PENDING_DOCUMENTATION**. The technical result is **PASSED**.
 Review is NOT_REVIEWED, so it is not **CLOSED_PASSED**. It does not close
 the N1 incident.
-What is still blocked is in [readiness.md](readiness.md). None of these cases is
-**CLOSED_PASSED**. TC-WEB-002, TC-FLOW-001, and TC-E2E-001
-have no execution. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
+What is still open is in [readiness.md](readiness.md). None of these cases is
+**CLOSED_PASSED**. TC-FLOW-001 has no execution. TC-WEB-002 and TC-E2E-001
+were withdrawn without an execution. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
 without evidence, are in the [test plan](test-plan.md#status-model).
 
 ## Layout
@@ -279,13 +280,11 @@ These notes come from the current source. They are not physical results.
    contract. That mode is not a deterministic fixture.
    [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md)
    records one run and is **FAILED** on N1. It is not **CLOSED_PASSED**.
-   [TC-WEB-002](test-cases/TC-WEB-002.md),
-   the success trials of TC-FLOW-001, and [TC-E2E-001](test-cases/TC-E2E-001.md)
-   still need the fixture described in the
-   [test plan](test-plan.md#simulated-end-to-end). That fixture is not
-   implemented. Do not point those cases at `groq` and treat the result as
-   the simulated pass. Confirm still uses `ProvisionalOperationExecutor`
-   and does not persist inventory.
+   Its v0.5.0 decision is `ACCEPTED_WITH_KNOWN_LIMITATIONS`.
+   The deterministic fixture is not an active v0.5.0 requirement. TC-WEB-002
+   and TC-E2E-001 were withdrawn without an execution. TC-FLOW-001 procedure
+   version 2 tests error handling and does not need that fixture. Confirm
+   still uses `ProvisionalOperationExecutor` and does not persist inventory.
 2. `WebServerSettings` in `src/pi/web/settings.py` says the default host is
    the Ethernet segment. The address `192.168.50.1` matches the Wi-Fi plan
    in [local network setup](../../setup/local-network.md) and

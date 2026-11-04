@@ -50,8 +50,8 @@ That run is **FAILED** on an ambiguous product command and is not
 The sentence above, that an ambiguous catalog description is a service error
 and not a guessed product, is the intended contract. The N1 observation did
 not meet it. The root cause is not identified here.
-[TC-E2E-001](../testing/raspberry-validation/test-cases/TC-E2E-001.md) remains
-a simulated fixture case and is not this path.
+The simulated case TC-E2E-001 was withdrawn from the active campaign
+before any execution. It is not this path.
 
 ## Earlier plan: STT on the Raspberry Pi
 

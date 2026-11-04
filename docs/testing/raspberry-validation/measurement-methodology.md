@@ -230,15 +230,11 @@ string, and whether a confirm or cancel response matches the
 synchronization is "the page shows the same `operation_id` and
 `confirmation_message` as the API", not a millisecond gate.
 
-### Simulated end-to-end
+### Integrated error handling
 
-Record user-observed button-to-pending latency separately from per-stage
-samples the operator can actually instrument. Stages without a timestamp in
-the product are **NOT MEASURED** rather than estimated. Record the success
-count over the five measured cycles, whether a second press during
-`wait_confirmation` leaves the same `operation_id` in place, and whether
-idle is reached after confirm and after cancel.
-
-Error recovery in the simulated cycle uses the trials in
-[TC-FLOW-001](test-cases/TC-FLOW-001.md): stub rejection and PC unreachable.
-Those are flow trials, not speech-recognition trials.
+Record, for each of the three scenarios in
+[TC-FLOW-001](test-cases/TC-FLOW-001.md), the peer condition, the operator
+sentence, the release-to-idle observation, and the pending-operation HTTP
+status. Scenarios B and C share the transport sentence. Distinguish them
+by the closed port versus a logged accepted connection, not by a second
+sentence. Do not invent a latency budget.

@@ -166,5 +166,7 @@ case. Do not commit the output directory.
 
 `/health` does not mean the microphone, the button, or the PC is healthy.
 The runtime documents that. This case does not confirm or cancel anything.
-That is TC-WEB-002. It does not close
+Pending-card resolution is outside this case. TC-WEB-002, which would have
+covered that card against a deterministic fixture, was withdrawn without
+an execution. It does not close
 [PendingOperationWeb-08](https://app.clickup.com/t/86e3evek6).

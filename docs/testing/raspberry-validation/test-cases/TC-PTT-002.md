@@ -124,5 +124,6 @@ shell alias that forces 2 seconds.
 The controller's queue drops a press that arrives while not `IDLE`. This
 procedure observes that from the files, not from an internal trace. There
 is no product log line for an ignored press. Absence of a second file is
-the observation. This case does not involve `PendingOperationFlow`; a press
-ignored because a pending operation exists is TC-FLOW-001.
+the observation. This case does not involve `PendingOperationFlow`. A press
+ignored because a pending operation exists is outside TC-FLOW-001
+procedure version 2.

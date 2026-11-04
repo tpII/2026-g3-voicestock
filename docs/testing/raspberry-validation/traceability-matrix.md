@@ -8,7 +8,10 @@ one execution and is not closed. TC-NET-001 has three executions and is not clos
 one execution and is not closed. TC-NET-003 has one execution and is not
 closed. TC-COM-001 has one execution and is not closed. TC-COM-002 has
 one execution and is not closed. TC-COM-003 has one execution and is not
-closed. TC-WEB-001 has one execution and is not closed. Every other case is unexecuted. The result column stays `not executed` until an execution
+closed. TC-WEB-001 has one execution and is not closed. TC-E2E-002 has one
+execution at **FAILED** and is not closed. TC-CON-001 has one execution at
+**PASSED_PENDING_DOCUMENTATION** and is not closed. TC-WEB-002, TC-FLOW-001,
+and TC-E2E-001 have no execution. The result column stays `not executed` until an execution
 record is linked. Do not infer a pass from the existence of a unit test.
 Do not treat **PASSED_PENDING_DOCUMENTATION** or a callback count as
 **CLOSED_PASSED**.
@@ -32,7 +35,7 @@ those tasks.
 | [TC-COM-003](test-cases/TC-COM-003.md) | [RaspberryPiPCCommunication-05](https://app.clickup.com/t/86e3ev0ux) | Client reports `connection_failed` and `timeout`. | [EX-TC-COM-003-20261103-01](executions/EX-TC-COM-003-20261103-01.md): **PASSED_PENDING_DOCUMENTATION**. Technical error handling **PASSED** on procedure version 1. 3/3 `connection_failed`, 3/3 `timeout`. Python listener is a tooling deviation, not a run of procedure version 2. Scenario A TCP attempts NOT RECORDED. Port cleanup NOT RECORDED. Review NOT_REVIEWED. Not **CLOSED_PASSED**. |
 | [TC-WEB-001](test-cases/TC-WEB-001.md) | [PendingOperationWeb-07](https://app.clickup.com/t/86e3eve7j) | Pi HTTP server, idle status, and the page shell. | [EX-TC-WEB-001-20261103-01](executions/EX-TC-WEB-001-20261103-01.md): **PASSED_PENDING_DOCUMENTATION**. Technical page and idle status **PASSED**. 10/10 health HTTP 200. Standalone 503. Three idle reads and pending HTTP 204. Trial B used `pi.runtime.main`. Exit status NOT RELIABLY RECORDED. Review NOT_REVIEWED. Not **CLOSED_PASSED**. Not a pending operation. |
 | [TC-WEB-002](test-cases/TC-WEB-002.md) | [PendingOperationWeb-07](https://app.clickup.com/t/86e3eve7j) | Pending card, confirm, cancel, and the documented conflict responses. | not executed |
-| [TC-CON-001](test-cases/TC-CON-001.md) | [OperationContractValidation-06](https://app.clickup.com/t/86e3ev73g) | Structural and catalog validation on the Pi interpreter. | not executed |
+| [TC-CON-001](test-cases/TC-CON-001.md) | [OperationContractValidation-06](https://app.clickup.com/t/86e3ev73g) | Structural and catalog validation on the Pi interpreter. | [EX-TC-CON-001-20261104-01](executions/EX-TC-CON-001-20261104-01.md): **PASSED_PENDING_DOCUMENTATION**. Technical result **PASSED**. 3/3 identical transcripts. Review NOT_REVIEWED. Not **CLOSED_PASSED**. Does not close [INC-EX-TC-E2E-002-20261104-01-01](executions/INC-EX-TC-E2E-002-20261104-01-01.md). |
 | [TC-FLOW-001](test-cases/TC-FLOW-001.md) | [PendingOperationFlow-05](https://app.clickup.com/t/86e3evaer) | Phases, single pending operation, stub rejection, and transport failure. | not executed |
 | [TC-E2E-001](test-cases/TC-E2E-001.md) | **PENDING CLICKUP TASK CREATION** | Simulated Pi cycle with a contract fixture. | not executed |
 | [TC-E2E-002](test-cases/TC-E2E-002.md) | [PendingOperationWeb-08](https://app.clickup.com/t/86e3evek6) is related and is not closed by this row | Real Groq voice-to-web cycle on the Pi and the PC. | [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md): **FAILED**. P1–P5, N2, N3, and the valid N4 retry were reported as passed. N1 created a pending operation and fails criteria 8 and 9. Review NOT_REVIEWED. Not **CLOSED_PASSED**. v0.5.0 decision for this test: `ACCEPTED_WITH_KNOWN_LIMITATIONS`. Inventory persistence not tested. |

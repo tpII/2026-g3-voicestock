@@ -71,18 +71,20 @@ need either that script or an explicit command deviation.
 
 | Case | Code on `develop` | Fixture | Hardware seen in this campaign | Environment | Preconditions | Executed | Readiness |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [TC-CON-001](test-cases/TC-CON-001.md) | `OperationValidator` and `PcResponseInterpreter` are in the tree. | The three JSON files are on this branch: catalog, `contract-add-stock.json`, `service-success-payload.json`. They are not in `develop` at `485559c`. | Pi only. No button and no PC process. | Importing `pi` worked during TC-WEB-001. The three files still have to be placed on the Pi. TC-ENV-001 is **PASSED_PENDING_DOCUMENTATION**, not closed. | No PC fixture. | No | **Partially ready.** Runnable after the three files are provisioned on the Pi and their digests are recorded there. |
+| [TC-CON-001](test-cases/TC-CON-001.md) | `OperationValidator` and `PcResponseInterpreter` are in the tree. | The three JSON files are on this branch. On the Pi `develop` checkout they were absent and were extracted to an external directory. Contents were reported unmodified. | Pi only. No button and no PC request from the script. | [EX-TC-CON-001-20261104-01](executions/EX-TC-CON-001-20261104-01.md) ran on Python 3.13.5 at `c151db2`. | No PC fixture. | Yes | **PASSED_PENDING_DOCUMENTATION.** Technical result **PASSED**. Review NOT_REVIEWED. External hashes were not recomputed in this workspace. Not **CLOSED_PASSED**. |
 | [TC-FLOW-001](test-cases/TC-FLOW-001.md) trials A and C | Runtime and the default stub exist. Trial A must start the server as stub, not `groq`. Trial C uses no server. | Not required. Trial A uses `describe_received_audio`. | Button, G435, and the cell were used in other cases. Those cases are not passes. | `voicestock-pi` script missing unless the operator repeats the direct `main` call and records it. | Written gate: TC-PTT-001 is not **FAILED**. Both PTT executions are **FAILED**. TC-COM-002 and TC-WEB-001 are not **FAILED**. | No | **Blocked by the written PTT-001 gate.** The stub and the stopped-server setup themselves do not need the contract fixture. |
 | TC-FLOW-001 trial B | `create_pc_app` can take a handler. `groq` exists on `c151db2` and is not this fixture. No separate deterministic entry point ships the fixture. | Missing. The specification payload is only a JSON file. | Same capture path, not a passed PTT result. | Same script gap. | Same PTT gate, plus the fixture. | No | **Blocked.** Do not substitute the stub or `groq`. |
 | [TC-WEB-002](test-cases/TC-WEB-002.md) | Page and confirm/cancel routes exist. The Groq pipeline can create a contract and is not the required fixture. | Missing PC contract entry point. | Needs a press that produces a pending card. TC-PTT-001 is **FAILED**. | Same script gap. Browser on the cell worked for TC-WEB-001. | TC-WEB-001 is not **FAILED**. TC-PTT-001 is **FAILED**. Fixture absent. | No | **Blocked.** |
-| [TC-E2E-001](test-cases/TC-E2E-001.md) | The same runtime. `groq` is a real pipeline, not the deterministic stand-in this case requires. | Missing, and the procedure also wants a server-side hash of each received WAV. | Needs the capture path and the page. | Same script gap. | TC-FLOW-001 trial B and TC-WEB-002 have no executions. | No | **Blocked.** The case stays simulated. A pass would still not be real speech-to-text or inventory persistence. No execution accepts the real Groq path. |
+| [TC-E2E-001](test-cases/TC-E2E-001.md) | The same runtime. `groq` is a real pipeline, not the deterministic stand-in this case requires. | Missing, and the procedure also wants a server-side hash of each received WAV. | Needs the capture path and the page. | Same script gap. | TC-FLOW-001 trial B and TC-WEB-002 have no executions. | No | **Blocked.** The case stays simulated. A pass would still not be real speech-to-text or inventory persistence. [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md) is a separate real-path run and is **FAILED** on N1. |
 
 ## Suggested sequence
 
 1. Keep the open reviews open. Do not mark GPIO, PTT, COM, NET, or WEB-001
    **CLOSED_PASSED** from this note.
-2. Copy the three campaign JSON files to the Pi, record `sha256sum` there,
-   and run TC-CON-001. That case does not wait for the PC fixture.
+2. TC-CON-001 has
+   [EX-TC-CON-001-20261104-01](executions/EX-TC-CON-001-20261104-01.md).
+   The technical result is **PASSED**. Review is still open, so the case
+   is not **CLOSED_PASSED**. It does not close the N1 incident.
 3. Before FLOW, WEB-002, or E2E, either produce a TC-PTT-001 execution that
    is not **FAILED**, or leave those cases unstarted. Attempt 02 is not
    that execution.

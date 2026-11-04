@@ -2,6 +2,7 @@
 
 Filed executions:
 
+- [EX-TC-CON-001-20261104-01.md](EX-TC-CON-001-20261104-01.md) — **PASSED_PENDING_DOCUMENTATION**. Technical result **PASSED**. Three identical transcripts. Review NOT_REVIEWED. Not **CLOSED_PASSED**. Does not close N1.
 - [EX-TC-E2E-002-20261104-01.md](EX-TC-E2E-002-20261104-01.md) — **FAILED**. Real Groq path. N1 created a pending operation. Not **CLOSED_PASSED**. v0.5.0 decision for this test: `ACCEPTED_WITH_KNOWN_LIMITATIONS`.
 - [INC-EX-TC-E2E-002-20261104-01-01.md](INC-EX-TC-E2E-002-20261104-01-01.md) — **OPEN**. Ambiguous product command. Non-blocking for v0.5.0. Does not close the parent.
 - [EX-TC-ENV-001-20261027-01.md](EX-TC-ENV-001-20261027-01.md) — **PASSED_PENDING_DOCUMENTATION**. Not a closed pass.

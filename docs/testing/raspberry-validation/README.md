@@ -134,8 +134,13 @@ at **PASSED_PENDING_DOCUMENTATION**. It is not **CLOSED_PASSED**.
 at **FAILED**. N1 did not meet the written rejection criterion. The
 v0.5.0 decision for that test is `ACCEPTED_WITH_KNOWN_LIMITATIONS`. That
 decision does not close the case and does not close any other case.
+[TC-CON-001](test-cases/TC-CON-001.md) has
+[EX-TC-CON-001-20261104-01](executions/EX-TC-CON-001-20261104-01.md)
+at **PASSED_PENDING_DOCUMENTATION**. The technical result is **PASSED**.
+Review is NOT_REVIEWED, so it is not **CLOSED_PASSED**. It does not close
+the N1 incident.
 What is still blocked is in [readiness.md](readiness.md). None of these cases is
-**CLOSED_PASSED**. TC-WEB-002, TC-CON-001, TC-FLOW-001, and TC-E2E-001
+**CLOSED_PASSED**. TC-WEB-002, TC-FLOW-001, and TC-E2E-001
 have no execution. Allowed statuses, and the rule that forbids `CLOSED_PASSED`
 without evidence, are in the [test plan](test-plan.md#status-model).
 
@@ -261,8 +266,10 @@ These notes come from the current source. They are not physical results.
    `VOICESTOCK_AUDIO_PIPELINE=groq` selects the real pipeline: Groq Whisper
    for speech-to-text, `openai/gpt-oss-20b` for the structured draft, then
    `map_draft` and the catalog check. The Pi validates the resulting
-   contract. That mode is not a deterministic fixture, and no execution in
-   this campaign accepts it. [TC-WEB-002](test-cases/TC-WEB-002.md),
+   contract. That mode is not a deterministic fixture.
+   [EX-TC-E2E-002-20261104-01](executions/EX-TC-E2E-002-20261104-01.md)
+   records one run and is **FAILED** on N1. It is not **CLOSED_PASSED**.
+   [TC-WEB-002](test-cases/TC-WEB-002.md),
    the success trials of TC-FLOW-001, and [TC-E2E-001](test-cases/TC-E2E-001.md)
    still need the fixture described in the
    [test plan](test-plan.md#simulated-end-to-end). That fixture is not

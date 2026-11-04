@@ -1,7 +1,7 @@
 # TC-CON-001 — Operation contract validation on the Raspberry Pi
 
 - Status: DESIGNED
-- Executions: none
+- Executions: [EX-TC-CON-001-20261104-01](../executions/EX-TC-CON-001-20261104-01.md) (`PASSED_PENDING_DOCUMENTATION`; technical result PASSED; review NOT_REVIEWED; not `CLOSED_PASSED`)
 - Procedure version: 1
 
 ## Objective
@@ -186,3 +186,5 @@ create a pending operation inside `voicestock-pi`. The flow's use of the
 same interpreter is TC-FLOW-001. Product matching rules are not redesigned
 here; they are the ones in
 [ADR-0006](../../../decisions/0006-identify-products-by-unique-attribute-match.md).
+The `AMBIGUOUS` result does not close
+[INC-EX-TC-E2E-002-20261104-01-01](../executions/INC-EX-TC-E2E-002-20261104-01-01.md).

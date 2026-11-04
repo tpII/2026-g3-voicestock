@@ -42,6 +42,24 @@ This campaign does not validate:
 - SQLite inventory persistence;
 - a production end-to-end path from a real spoken command to a stock change.
 
+The application on `develop` at `c151db2` can run a real audio path. The
+default PC server remains the stub. `VOICESTOCK_AUDIO_PIPELINE=groq`
+transcribes with Groq Whisper, interprets with `openai/gpt-oss-20b`, and
+returns one version-1 contract. The Pi validates that contract and assigns
+`product_id`. Confirm and cancel return the cycle to idle.
+`ProvisionalOperationExecutor` does not persist inventory. That capability
+is not a campaign result. No execution record accepts it. A conversation
+or a demonstration is not **CLOSED_PASSED**.
+
+For the v0.5.0 claim, the intended path is physical push-to-talk capture,
+WAV upload, real speech-to-text, real language-model interpretation,
+contract validation, one pending operation, confirm or cancel, and idle.
+That release claim excludes inventory persistence, a production accuracy
+guarantee for speech-to-text, a production accuracy guarantee for
+interpretation, and more than one operation in a single command. The
+pipeline reports `unsupported_command` when the draft does not contain
+exactly one operation. This campaign has no execution of that report.
+
 [PendingOperationWeb-08](https://app.clickup.com/t/86e3evek6) expects a real
 end-to-end flow that includes real speech-to-text and interpretation.
 [TC-E2E-001](test-cases/TC-E2E-001.md) replaces that PC-side processing with
@@ -220,19 +238,27 @@ replace them.
 
 These notes come from the current source. They are not physical results.
 
-1. `voicestock-pc-server` always uses `describe_received_audio` in
-   `pc.main`. That handler returns a `ServiceResult` whose payload describes
-   the WAV. It does not return a `ContractPayload`. The Pi then rejects the
-   body and returns to idle with the contract-rejection message. The same
-   limit is already stated in the
+1. `voicestock-pc-server` defaults to `describe_received_audio` in
+   `pc.main` when `VOICESTOCK_AUDIO_PIPELINE` is unset or `stub`. That
+   handler returns a `ServiceResult` whose payload describes the WAV. It
+   does not return a `ContractPayload`. The Pi then rejects the body and
+   returns to idle with the contract-rejection message. The same limit is
+   already stated in the
    [operation workflow](../../architecture/pending-operation-flow.md#information-flow).
    The default server is therefore usable for transport checks and for the
    rejection trial of [TC-FLOW-001](test-cases/TC-FLOW-001.md). It cannot
-   create a pending operation. [TC-WEB-002](test-cases/TC-WEB-002.md),
+   create a pending operation.
+   `VOICESTOCK_AUDIO_PIPELINE=groq` selects the real pipeline: Groq Whisper
+   for speech-to-text, `openai/gpt-oss-20b` for the structured draft, then
+   `map_draft` and the catalog check. The Pi validates the resulting
+   contract. That mode is not a deterministic fixture, and no execution in
+   this campaign accepts it. [TC-WEB-002](test-cases/TC-WEB-002.md),
    the success trials of TC-FLOW-001, and [TC-E2E-001](test-cases/TC-E2E-001.md)
-   need the fixture described in the
+   still need the fixture described in the
    [test plan](test-plan.md#simulated-end-to-end). That fixture is not
-   implemented.
+   implemented. Do not point those cases at `groq` and treat the result as
+   the simulated pass. Confirm still uses `ProvisionalOperationExecutor`
+   and does not persist inventory.
 2. `WebServerSettings` in `src/pi/web/settings.py` says the default host is
    the Ethernet segment. The address `192.168.50.1` matches the Wi-Fi plan
    in [local network setup](../../setup/local-network.md) and
@@ -261,8 +287,11 @@ These notes come from the current source. They are not physical results.
 - [Push-to-talk setup](../../setup/push-to-talk.md)
 - [Local network](../../setup/local-network.md)
 - [hostapd evaluation note](hostapd-evaluation.md) (diagnostic only; not a passed case)
+- [PC audio pipeline](../../setup/pc-audio-pipeline.md)
+- [Audio and interpretation integration](../../architecture/audio-interpretation-integration.md)
 - [ADR-0010](../../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md)
-- [ADR-0012](../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md) (**Proposed**)
+- [ADR-0012](../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md) (**Proposed** evaluation; not renumbered)
+- [ADR-0013](../../decisions/0013-run-the-voicestock-access-point-with-hostapd.md) (**Accepted** `hostapd` process; not a closed campaign result)
 - [Web setup](../../setup/pi-web.md)
 - [Pending-operation workflow](../../architecture/pending-operation-flow.md)
 - [Audio transport](../../interfaces/pc-audio-communication.md)

@@ -9,10 +9,11 @@ version 1, and it is not
 Procedure version 2 is now the in-force text of
 [TC-NET-001](test-cases/TC-NET-001.md). The installer attempt 03 ran is on
 `develop` at `485559c` (pull request #36). This note is not rewritten to
-describe that installer. ADR numbering on this branch is unchanged. The
-campaign file
+describe that installer. The evaluation record
 [ADR-0012](../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md)
-stays **Proposed**.
+stays **Proposed** and is not renumbered. The accepted process decision is
+[ADR-0013](../../decisions/0013-run-the-voicestock-access-point-with-hostapd.md).
+This note is not that decision and does not close a campaign execution.
 
 The isolated cell is still the decision in
 [ADR-0010](../../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md):
@@ -20,8 +21,10 @@ SSID `VoiceStock`, Pi `192.168.50.1/24`, PC `192.168.50.2/24`, no DHCP,
 DNS, gateway, NAT, forwarding, or bridge, and the PC default route kept
 on the Internet interface. This note does not replace that decision.
 
-The proposed record, still **Proposed** on this branch, is
+The proposed record, still **Proposed**, is
 [ADR-0012](../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md).
+The accepted `hostapd` decision is
+[ADR-0013](../../decisions/0013-run-the-voicestock-access-point-with-hostapd.md).
 The observations in this note are
 [EX-TC-NET-001-20261103-02](executions/EX-TC-NET-001-20261103-02.md).
 

@@ -114,8 +114,11 @@ execution of those scripts.
 ## Later campaign facts
 
 This section does not change the status, the title, or the identifier.
-This file stays **Proposed**. It is not renumbered, and it is not
-reconciled with any other ADR-0012.
+This file stays **Proposed** and remains ADR-0012. It is not renumbered.
+The accepted access-point process is
+[ADR-0013](0013-run-the-voicestock-access-point-with-hostapd.md). That
+record does not accept this proposal and does not change the failed
+procedure-version-1 executions cited below.
 
 `develop` at `485559c` (pull request #36) contains the `hostapd` installer.
 [TC-NET-001](../testing/raspberry-validation/test-cases/TC-NET-001.md)

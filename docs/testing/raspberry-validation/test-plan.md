@@ -31,8 +31,8 @@ cell, that:
 | Hardware validation | Does this physical interface behave as the adapter assumes? | TC-ENV-001, TC-GPIO-001, TC-AUD-001, TC-NET-001, TC-NET-002, TC-NET-003 |
 | Software component on the Raspberry Pi | Does this module, running on the Pi, honor its contract when the neighboring hardware or service is held still? | TC-AUD-002, TC-CON-001, TC-WEB-001 |
 | Integration | Do two or more real components work together? | TC-PTT-001, TC-PTT-002, TC-COM-001, TC-COM-002, TC-COM-003, TC-WEB-002, TC-FLOW-001 |
-| Simulated end-to-end | Does the Pi runtime complete a cycle when only the unavailable PC interpretation is replaced? | TC-E2E-001 |
-| Full real end-to-end | Does a spoken command become a validated operation and a stock change? | Not in this campaign |
+| Simulated end-to-end | Does the Pi runtime complete a cycle when only PC speech-to-text and interpretation are replaced by a deterministic contract? | TC-E2E-001 |
+| Full real end-to-end | Does one spoken command become a validated pending operation, then idle after confirm or cancel, without an inventory write? | Not in this campaign. The product path exists when `VOICESTOCK_AUDIO_PIPELINE=groq`. No execution record accepts it. A stock change is outside v0.5.0 because inventory persistence is not implemented. |
 
 A unit test that mocks GPIO or PortAudio does not satisfy a hardware case.
 A hardware case that never starts `voicestock-pi` does not satisfy
@@ -121,16 +121,36 @@ microphone, `AudioCapture`, `RecordingSender`,
 `HttpInterpretationClient`, `PcResponseInterpreter`, `OperationValidator`,
 `PendingOperationFlow`, and the in-process web UI.
 
-Only the missing PC interpretation is replaced. The replacement must still
-be reached through `POST /api/v1/interpret-audio` on a PC process that the
-Pi can route to `192.168.50.2`.
+Only PC speech-to-text and interpretation are replaced. The replacement
+must still be reached through `POST /api/v1/interpret-audio` on a PC
+process that the Pi can route to `192.168.50.2`. The real Groq pipeline is
+a different path. It is not this case.
 
-### Why the shipped server is not enough
+### Current PC audio path
 
-`voicestock-pc-server` calls `create_pc_app` with the default
-`describe_received_audio` handler (`src/pc/main.py`). For a readable WAV
-the Pi receives a success envelope whose service payload is
-`received_audio` (size, duration, sample rate, channels, sample width).
+`voicestock-pc-server` defaults to the stub. `VOICESTOCK_AUDIO_PIPELINE`
+unset or `stub` keeps `describe_received_audio`.
+`VOICESTOCK_AUDIO_PIPELINE=groq` transcribes the WAV with Groq Whisper,
+asks `openai/gpt-oss-20b` for one structured draft, and returns a version-1
+contract plus `recognized_text` when that draft matches one catalog
+product. The Pi validator assigns `product_id`. The pipeline does not
+accept more than one operation in the draft. Confirm and cancel do not
+persist inventory. Setup is
+[the PC audio pipeline guide](../../setup/pc-audio-pipeline.md).
+
+That mode is current product behavior on `develop` at `c151db2`. It is not
+an execution result of this campaign. It does not satisfy TC-E2E-001,
+because that case requires the same contract for every accepted WAV and
+forbids a transcription API and a language model. It also does not provide
+a production accuracy guarantee for speech-to-text or for interpretation.
+
+### Why the default server is not enough for the simulated case
+
+`voicestock-pc-server` calls `create_pc_app` with
+`describe_received_audio` unless `VOICESTOCK_AUDIO_PIPELINE=groq`
+(`src/pc/main.py`). For a readable WAV in the default mode, the Pi receives
+a success envelope whose service payload is `received_audio` (size,
+duration, sample rate, channels, sample width).
 `PcResponseInterpreter` removes `recognized_text` only when that field is a
 string, then passes the rest to `OperationValidator`. `received_audio` has
 no `contract_version`, so the validator rejects it. The flow returns to
@@ -144,9 +164,10 @@ El pedido no es una operación válida. Presioná el botón para intentar de nue
 `{"recognized_text": "<input>"}` and is not the audio handler. The runtime
 uploads audio, not text (`RecordingSender` calls `interpret_audio`).
 
-`create_pc_app(..., audio_handler=...)` can take another handler, but no
-environment variable, CLI flag, or config file selects one.
-`voicestock-pc-server` does not expose the parameter.
+`create_pc_app(..., audio_handler=...)` can take another handler.
+`VOICESTOCK_AUDIO_PIPELINE` selects `stub` or `groq`. It does not select
+the deterministic campaign fixture. `groq` calls Groq. The fixture must
+not.
 
 ### Fixture requirements
 
@@ -168,12 +189,17 @@ change should add a PC entry point that:
 5. Writes the received length and SHA-256 to stderr, or to a path outside
    the repository. It does not copy the WAV into git.
 6. Is selected only by starting that entry point. Starting
-   `voicestock-pc-server` must keep today's stub.
+   `voicestock-pc-server` without `VOICESTOCK_AUDIO_PIPELINE=groq` must
+   keep the stub. Starting it with `groq` must keep the real pipeline.
+   Neither mode is this fixture.
 
 Until that entry point exists, TC-WEB-002, the success trials of
 TC-FLOW-001, and TC-E2E-001 stay **BLOCKED** at execution time. Their
 specifications stay **DESIGNED**. Do not point those cases at the stub and
-then treat the rejection as a successful pending operation.
+then treat the rejection as a successful pending operation. Do not point
+them at `VOICESTOCK_AUDIO_PIPELINE=groq` and treat a real transcription as
+the simulated pass. TC-E2E-001 remains a simulated case. It has no
+execution.
 
 The rejection trial in TC-FLOW-001 is different: it uses the stub on
 purpose and expects the message quoted above.
@@ -195,10 +221,11 @@ it is not loaded unless the operator passes `--catalog`.
 
 In scope: the areas in the [campaign README](README.md#what-this-campaign-covers).
 
-Out of scope for every case:
+Out of scope for every case, and excluded from the v0.5.0 claim:
 
-- real speech-to-text quality;
-- real language-model interpretation;
+- a production-grade speech-to-text accuracy guarantee;
+- a production-grade language-model interpretation accuracy guarantee;
+- more than one operation in a single voice command;
 - SQLite or any inventory mutation;
 - closing [PendingOperationWeb-08](https://app.clickup.com/t/86e3evek6);
 - closing [InterpretationService-04](https://app.clickup.com/t/86e3ev2v6);

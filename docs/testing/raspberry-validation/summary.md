@@ -32,6 +32,18 @@ cycle, and the operator page.
 
 The simulated end-to-end pass replaces PC speech-to-text and interpretation
 with a deterministic contract. It is not a production end-to-end pass.
+TC-E2E-001 has no execution.
+
+The application on `develop` at `c151db2` can also run the real path:
+physical push-to-talk, WAV upload, Groq Whisper, `openai/gpt-oss-20b`, Pi
+contract validation, one pending operation, confirm or cancel, and idle.
+The PC server defaults to the stub. `VOICESTOCK_AUDIO_PIPELINE=groq`
+selects that real path. Inventory is not persisted. That description is
+current product behavior. It is not a result of any execution in this
+file. v0.5.0 does not include a production accuracy guarantee for
+speech-to-text or interpretation, and it does not include more than one
+operation per command. No formal acceptance of the real path exists until
+a dedicated execution record does.
 
 ## 2. Method
 
@@ -123,10 +135,11 @@ Seventeen cases, TC-ENV-001 through TC-E2E-001, listed in the
 
 | Topic | Where it has to be validated later |
 | --- | --- |
-| Speech-to-text quality | A speech-to-text campaign. Not TC-E2E-001. |
-| Interpretation quality | [InterpretationService-04](https://app.clickup.com/t/86e3ev2v6). |
-| Real spoken command through STT and the model, then the web flow | [PendingOperationWeb-08](https://app.clickup.com/t/86e3evek6). |
-| SQLite inventory | A persistence campaign, after an executor replaces `ProvisionalOperationExecutor`. |
+| Speech-to-text accuracy guarantee | A speech-to-text campaign. Not TC-E2E-001. The Groq Whisper path can run and has no accepted execution here. |
+| Interpretation accuracy guarantee | [InterpretationService-04](https://app.clickup.com/t/86e3ev2v6). `openai/gpt-oss-20b` can run and has no accepted execution here. |
+| More than one operation per voice command | Outside v0.5.0. The pipeline rejects a draft that does not contain exactly one operation. No campaign execution records that rejection. |
+| Real spoken command through STT and the model, then the web flow | [PendingOperationWeb-08](https://app.clickup.com/t/86e3evek6). The product path exists. This summary does not accept it. |
+| SQLite inventory | A persistence campaign, after an executor replaces `ProvisionalOperationExecutor`. Excluded from v0.5.0. |
 
 ## 5. Environment
 
@@ -556,11 +569,18 @@ What this summary can say now:
   `voicestock-pi` executable was not started. Review is NOT_REVIEWED.
   [readiness.md](readiness.md) records which later cases are still blocked.
   [ADR-0012](../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md)
-  stays **Proposed** on this branch and is not renumbered. It does not
-  replace [ADR-0010](../../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md);
+  stays **Proposed** and is not renumbered. The accepted `hostapd` process
+  is [ADR-0013](../../decisions/0013-run-the-voicestock-access-point-with-hostapd.md).
+  Neither record replaces
+  [ADR-0010](../../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md)
+  or closes a network execution;
 - the default PC audio stub cannot create a pending operation;
-- simulated end-to-end execution is blocked on a fixture that is specified
-  and not implemented;
+- `VOICESTOCK_AUDIO_PIPELINE=groq` can create one validated contract and
+  does not persist inventory. No execution in this summary accepts that
+  path;
+- simulated end-to-end execution stays blocked on a fixture that is
+  specified and not implemented. TC-E2E-001 is unchanged and has no
+  execution;
 - PendingOperationWeb-08 remains open regardless of TC-E2E-001.
 
 ## 10. Bitácora pointer

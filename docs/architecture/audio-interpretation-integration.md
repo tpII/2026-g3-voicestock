@@ -22,20 +22,35 @@ flowchart LR
 The transport is implemented
 ([ADR-0007](../decisions/0007-send-push-to-talk-audio-as-raw-wav-over-http.md),
 [audio interface](../interfaces/pc-audio-communication.md)).
-`VOICESTOCK_AUDIO_PIPELINE=stub` keeps `describe_received_audio`.
-`groq` runs Groq Whisper, then `openai/gpt-oss-20b`, then `map_draft`.
+The PC server defaults to the stub. `VOICESTOCK_AUDIO_PIPELINE` unset or
+`stub` keeps `describe_received_audio` and does not return a contract.
+`VOICESTOCK_AUDIO_PIPELINE=groq` runs Groq Whisper for speech-to-text, then
+`openai/gpt-oss-20b` for one structured draft, then `map_draft`.
 The Groq HTTP client opens with the server lifespan and closes once when the
 process stops. Stub mode does not create it. Blocking transcription and
 interpretation run outside the ASGI event loop.
 The setup is [the PC audio pipeline guide](../setup/pc-audio-pipeline.md).
-A successful response carries the version-1 contract and `recognized_text`.
-The Raspberry Pi validator still assigns `product_id`. An ambiguous catalog
-description is a service error, not a guessed product. Confirming the
-operation still uses `ProvisionalOperationExecutor` and does not persist
-inventory. Automated tests mock Groq; they are not a live API call and not
-the physical end-to-end run.
+A successful `groq` response carries one version-1 contract and
+`recognized_text`. A draft with zero operations or more than one is
+`unsupported_command`. The Raspberry Pi validator assigns `product_id`.
+An ambiguous catalog description is a service error, not a guessed product.
+Confirming the operation still uses `ProvisionalOperationExecutor` and does
+not persist inventory.
+
+This is the v0.5.0 product path: physical push-to-talk capture, WAV upload,
+real speech-to-text, real interpretation, contract validation, one pending
+operation, confirm or cancel, and idle. It excludes inventory persistence,
+a production accuracy guarantee for speech-to-text, a production accuracy
+guarantee for interpretation, and more than one operation per command.
+Automated tests mock Groq. They are not a live API call. The Raspberry Pi
+validation campaign has no execution that accepts this path.
+[TC-E2E-001](../testing/raspberry-validation/test-cases/TC-E2E-001.md) remains
+a simulated fixture case and is not this path.
 
 ## Earlier plan: STT on the Raspberry Pi
+
+This section is historical. It is not the v0.5.0 audio path. Speech-to-text
+for that path runs on the PC through Groq Whisper, as drawn above.
 
 The PC benchmark already executes WAV → Whisper → interpreter → experimental
 JSON. It uses recorded fixtures and calls models directly. It does not exercise
@@ -51,9 +66,11 @@ flowchart LR
     F --> G[InterpretationDraft: pending]
 ```
 
-The graph is the planned application flow. Currently the PC registry only
-registers `StubProvider`. Benchmark JSON must not be treated as the official
-production operation contract.
+The graph is the old plan, not the current audio route. The text route's
+`default_registry()` still registers only `StubProvider`. The audio route
+uses `GroqDraftProvider` only when `VOICESTOCK_AUDIO_PIPELINE=groq`.
+Benchmark JSON must not be treated as the official production operation
+contract.
 
 ## Existing integration points
 
@@ -85,11 +102,15 @@ layers. PC address and timeout use `VOICESTOCK_PC_URL` and
 
 ## Proposed module boundaries
 
-The STT module belongs under `src/pi/speech_to_text/` and consumes already
-captured WAV PCM16 mono 16 kHz. Its public interface must hide whisper.cpp types
-and return text or a typed error. It does not capture, call an API or interpret
-inventory commands. Use a queued orchestration step rather than running costly
-inference inside GPIO callbacks; model loading should be reusable.
+The following Pi-local speech-to-text boundary is the earlier offline plan.
+It is not the v0.5.0 audio path. That path sends the WAV to the PC.
+
+The STT module described for the offline plan belongs under
+`src/pi/speech_to_text/` and consumes already captured WAV PCM16 mono 16 kHz.
+Its public interface must hide whisper.cpp types and return text or a typed
+error. It does not capture, call an API or interpret inventory commands. Use
+a queued orchestration step rather than running costly inference inside GPIO
+callbacks; model loading should be reusable.
 
 The draft provider implements the existing port under `src/pc/interpretation/`
 and does not import an HTTP client. The Groq request lives in
@@ -103,7 +124,8 @@ benchmark schema does not implement them.
 adapter; [StructuredCommandInterpretation-04](https://app.clickup.com/t/86e3ev4cx)
 owns the real interpreter. The PC audio path now has that provider behind
 `VOICESTOCK_AUDIO_PIPELINE=groq`. A live Groq acceptance run and the physical
-button-to-UI run remain pending.
+button-to-UI run remain pending as formal test records. The code path is not
+that record.
 
 ## Tooling and operation
 
@@ -132,5 +154,8 @@ exist under `src/pi/speech_to_text/`. The new SSH coordinator transfers recorded
 WAVs and exercises that adapter remotely, then calls Groq from the PC. See
 [the preparation and execution guide](../testing/raspberry-stt-ssh.md). Hardware
 execution is pending. The earlier diagram is the original plan. The PC HTTP
-server can now run the Groq audio pipeline. Connecting that server to a
-physical capture and accepting it on hardware remains pending.
+server can now run the Groq audio pipeline: Groq Whisper, then
+`openai/gpt-oss-20b`, then Pi contract validation, without inventory
+persistence. No raspberry-validation execution accepts that physical cycle.
+Connecting a recorded capture to this server and accepting it under test
+criteria remains pending.

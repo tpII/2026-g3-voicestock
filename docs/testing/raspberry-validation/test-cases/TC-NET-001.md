@@ -18,9 +18,11 @@ revision does not regrade attempts 01 and 02.
 [ADR-0010](../../../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md)
 remains the topology. The campaign file
 [ADR-0012](../../../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md)
-stays **Proposed** and is not renumbered here. The installer under test
+stays **Proposed** and is not renumbered. The accepted process decision is
+[ADR-0013](../../../decisions/0013-run-the-voicestock-access-point-with-hostapd.md).
+Neither ADR closes this case. The installer under test
 is the one merged to `develop` by pull request #36, commit `485559c`.
-That product history is not copied into this ADR file.
+That product history is not copied into either ADR file.
 
 ## Objective
 

@@ -1249,3 +1249,315 @@ acceso Wi-Fi aislado de la
 `192.168.50.1` y `192.168.50.2` no cambian. Tailscale y el túnel SSH inverso
 del 22/10 quedan como camino de prueba, no como reemplazo de esa red. La
 validación física del punto de acceso sigue sin hacerse.
+
+### Campaña de validación en hardware
+
+El mismo día se escribió la campaña de la Raspberry Pi, en
+`docs/testing/raspberry-validation/`. Cada caso tiene un procedimiento, un
+criterio de aceptación y un identificador de ejecución. Un test automático
+o un mock no cuenta como prueba de GPIO, micrófono o red. Una ejecución
+que no cumple el criterio queda **FAILED** o **BLOCKED**; una posterior
+que sí lo cumple no reescribe la anterior.
+
+En ese momento la validación física del punto de acceso, del recorrido
+completo y del handler real de audio seguía pendiente. El handler de la PC
+seguía siendo el stub.
+
+---
+
+## 27/10/2026
+
+### Línea de base de la Raspberry Pi
+
+[EX-TC-ENV-001-20261027-01](../testing/raspberry-validation/executions/EX-TC-ENV-001-20261027-01.md)
+inventarió la placa tal como estaba: Raspberry Pi 3 Model B, Raspberry Pi
+OS 13, Python del entorno del proyecto. La PC no estaba en esa sesión. El
+registro no es un resultado de red ni de micrófono. Quedó
+**PASSED_PENDING_DOCUMENTATION**: el comportamiento pedido se vio, y la
+revisión formal sigue abierta. No es un cierre **CLOSED_PASSED**.
+
+### Pulsador: dos intentos, ninguno cerrado como éxito
+
+[EX-TC-GPIO-001-20261027-01](../testing/raspberry-validation/executions/EX-TC-GPIO-001-20261027-01.md)
+quedó **BLOCKED** antes de `READY`: el constructor no llegó a escuchar el
+botón. No es un defecto del pulsador físico.
+
+[EX-TC-GPIO-001-20261027-02](../testing/raspberry-validation/executions/EX-TC-GPIO-001-20261027-02.md)
+llegó a contar 9 pulsaciones y 9 liberaciones, pero se omitió la práctica
+prevista y no se midieron las pausas ni los intervalos en reposo. El caso
+quedó **FAILED**. Esas nueve parejas no se promocionan a aprobado.
+
+### Micrófono USB
+
+[EX-TC-AUD-001-20261027-01](../testing/raspberry-validation/executions/EX-TC-AUD-001-20261027-01.md)
+vio el Logitech G435 en las tres enumeraciones con el receptor conectado y
+dejó de verlo al desconectarlo. La consulta de PortAudio quedó registrada.
+No es una grabación a 16 kHz ni una prueba de escucha. El resultado técnico
+es satisfactorio y la revisión sigue abierta.
+
+---
+
+## 30/10/2026
+
+### Captura por callback
+
+La grabación bloqueante complicaba el cierre del stream. Se pasó a una
+captura dirigida por callback, con una cola PCM acotada y un cierre que
+separa la parada del worker del cierre del stream. Quedó en
+[ADR-0011](../decisions/0011-use-callback-driven-audio-capture-with-a-bounded-pcm-queue.md)
+y en el pull request 34 (`fix/audio-capture-stream-shutdown`), integrado el
+03/11. Ese día no hubo una ejecución de campaña: la prueba de los cinco WAV
+es la del 03/11.
+
+También se dejó un perfil ALSA reproducible para el micrófono de la placa.
+
+---
+
+## 03/11/2026
+
+Día de hardware. Los resultados de abajo son de las ejecuciones de esa
+fecha. Los documentos se escribieron el mismo día o al sincronizar la rama
+de campaña; la fecha del commit de documentación no cambia la fecha de la
+prueba.
+
+### Captura de audio
+
+[EX-TC-AUD-002-20261103-01](../testing/raspberry-validation/executions/EX-TC-AUD-002-20261103-01.md)
+publicó cinco WAV de cinco, a 16 kHz, mono y 16 bit, sobre el commit
+`88a95d5` de la rama del arreglo de audio. El error de duración quedó cerca
+de −56,2 ms y la tolerancia sigue **por definir**. No es una prueba de
+calidad de voz. El resultado técnico es satisfactorio; la revisión no está
+cerrada.
+
+### GPIO y push-to-talk: todavía no
+
+[EX-TC-GPIO-001-20261103-01](../testing/raspberry-validation/executions/EX-TC-GPIO-001-20261103-01.md)
+repitió 9 y 9 con la práctica excluida, pero no verificó el cierre después
+de Ctrl+C. Quedó **FAILED**. No se afirmó un defecto de `close()`.
+
+[EX-TC-PTT-001-20261103-01](../testing/raspberry-validation/executions/EX-TC-PTT-001-20261103-01.md)
+grabó con el botón, pero el micrófono estaba muteado y no se pudo escuchar.
+**FAILED**. No es un fallo de software.
+
+[EX-TC-PTT-001-20261103-02](../testing/raspberry-validation/executions/EX-TC-PTT-001-20261103-02.md)
+produjo tres WAV válidos que el operador escuchó. La tabla de frases no
+quedó confirmada por separado y el GPIO del que dependía seguía **FAILED**.
+El caso quedó **FAILED**.
+
+[EX-TC-PTT-002-20261103-01](../testing/raspberry-validation/executions/EX-TC-PTT-002-20261103-01.md)
+vio el corte por duración máxima y pulsaciones posteriores en `RELEASED`,
+pero el prerrequisito de PTT-001 no estaba cumplido. Quedó **BLOCKED**. La
+segunda pulsación mecánica no aplicaba. No es un fallo del límite de
+duración.
+
+### Red aislada: NetworkManager no armó el AP
+
+[EX-TC-NET-001-20261103-01](../testing/raspberry-validation/executions/EX-TC-NET-001-20261103-01.md)
+falló al preparar el punto de acceso. El script trataba `100 (connected)`
+como no administrado porque comparaba el estado con el patrón `10*`.
+Incidencia abierta:
+[INC-EX-TC-NET-001-20261103-01-01](../testing/raspberry-validation/executions/INC-EX-TC-NET-001-20261103-01-01.md).
+
+El pull request 35 corrigió esa detección. El segundo intento,
+[EX-TC-NET-001-20261103-02](../testing/raspberry-validation/executions/EX-TC-NET-001-20261103-02.md),
+pasó la detección y falló al activar WPA2 con NetworkManager en el chip
+Broadcom de la Pi 3: timeout del supplicant y, después de desactivar PMF a
+mano, diferencia de RSN. En la PC el perfil guardó una MAC transitoria.
+Una sesión manual de `hostapd` autenticó dos estaciones; ese diagnóstico no
+es un caso aprobado ni es TC-NET-002. Tres incidencias de ese intento
+siguen **OPEN**.
+
+### Migración a hostapd
+
+NetworkManager no produjo la celda WPA2 del proyecto. Se migró el punto de
+acceso a `hostapd` y a una dirección estática, sin DHCP, NAT ni puente. La
+topología de
+[ADR-0010](../decisions/0010-use-isolated-raspberry-pi-wifi-access-point.md)
+no cambia: SSID `VoiceStock`, Pi `192.168.50.1/24`, PC `192.168.50.2/24`.
+La decisión de usar `hostapd` es
+[ADR-0013](../decisions/0013-run-the-voicestock-access-point-with-hostapd.md).
+El pull request 36 entró a `develop` el mismo día. La evaluación previa
+sigue como
+[ADR-0012](../decisions/0012-evaluate-hostapd-for-the-voicestock-access-point.md),
+en estado propuesto, y no se renumeró.
+
+[EX-TC-NET-001-20261103-03](../testing/raspberry-validation/executions/EX-TC-NET-001-20261103-03.md)
+es el primer intento del procedimiento nuevo. La configuración técnica
+pasó. No mide ICMP, aislamiento ni reinicio, y no cierra los dos intentos
+anteriores.
+
+[EX-TC-NET-002-20261103-01](../testing/raspberry-validation/executions/EX-TC-NET-002-20261103-01.md):
+10 de 10 ecos en cada sentido. Tras sacar Ethernet, la Pi no tenía ruta por
+defecto e `1.1.1.1` respondía `Network is unreachable`. La PC siguió saliendo
+a Internet por su otra interfaz. Los RTT que imprimió `ping`, de la PC hacia
+la Pi, fueron 0,808 / 4,407 / 5,545 / 1,272 ms (mínimo, media, máximo y
+mdev). De la Pi hacia la PC: 4,101 / 4,561 / 5,827 / 0,512 ms. El mdev no
+es el desvío muestral calculado aparte. No hay presupuesto de latencia ni
+de pérdida.
+
+[EX-TC-NET-003-20261103-01](../testing/raspberry-validation/executions/EX-TC-NET-003-20261103-01.md):
+después de reiniciar, `voicestock-hostapd.service`,
+`voicestock-ap-address.service` y el cliente volvieron sin correr de nuevo
+el script de instalación. El aislamiento IPv4 se mantuvo. No se midió el
+tiempo de arranque.
+
+### HTTP, WAV y errores del cliente
+
+Sobre esa celda:
+
+- [EX-TC-COM-001-20261103-01](../testing/raspberry-validation/executions/EX-TC-COM-001-20261103-01.md):
+  10 de 10 llamadas de texto al stub, con salida 0. Duración media de la
+  CLI: 3092,4 ms. Presupuesto **por definir**. No es reconocimiento de voz.
+- [EX-TC-COM-002-20261103-01](../testing/raspberry-validation/executions/EX-TC-COM-002-20261103-01.md):
+  5 de 5 WAV. El stub informó 59436 bytes y el mismo formato que el archivo
+  local. El SHA-256 local no cambió. No hay un digest del cuerpo recibido.
+- [EX-TC-COM-003-20261103-01](../testing/raspberry-validation/executions/EX-TC-COM-003-20261103-01.md):
+  3 de 3 `connection_failed` con el puerto cerrado y 3 de 3 `timeout` contra
+  un par que aceptaba y no respondía. El par silencioso fue un listener de
+  Python, no el ejemplo `ncat` del procedimiento. La limpieza del puerto no
+  quedó registrada.
+
+### Página en reposo
+
+[EX-TC-WEB-001-20261103-01](../testing/raspberry-validation/executions/EX-TC-WEB-001-20261103-01.md)
+sirvió `/health` 10 de 10 veces con HTTP 200. La media de `curl` fue 86,2 ms.
+El estado en reposo y la operación pendiente vacía (HTTP 204) coincidieron
+con la página. El ejecutable `voicestock-pi` no estaba instalado: el ensayo
+integrado llamó `pi.runtime.main`. No se confirmó ni se canceló nada. Esa
+parte de la interfaz queda para el recorrido del 04/11. El caso
+TC-WEB-002, que la hubiera probado contra un contrato fijo, se retiró el
+04/11 sin ejecutarse.
+
+### Pipeline Groq en la PC
+
+El pull request 37 integró el handler real de audio. Con
+`VOICESTOCK_AUDIO_PIPELINE=groq`, la PC transcribe con Groq Whisper
+(`whisper-large-v3-turbo`) y pide un solo borrador a `openai/gpt-oss-20b`.
+El stub sigue siendo el default. Confirmar sigue en
+`ProvisionalOperationExecutor` y no escribe inventario. El código quedó en
+`develop` como `c151db2`. La prueba de voz sobre hardware es la del día
+siguiente, no este merge.
+
+---
+
+## 04/11/2026
+
+### Recorrido real de voz
+
+[EX-TC-E2E-002-20261104-01](../testing/raspberry-validation/executions/EX-TC-E2E-002-20261104-01.md)
+usó el botón, el micrófono, la celda y el pipeline Groq. Los cinco comandos
+positivos llegaron a una tarjeta y volvieron a reposo al confirmar o
+cancelar. Los negativos previstos, salvo N1, se comportaron como estaba
+escrito. Cinco tiempos observados desde la liberación del botón hasta la
+tarjeta promedian 2,66 s (mediana 2,40 s, entre 1,71 s y 4,11 s). No es un
+presupuesto de latencia ni el tiempo solo de Groq. El primer positivo no
+tiene esa muestra.
+
+N1, «Agregá dos paquetes de arroz Marolio», no nombró el peso. El sistema
+propuso sumar 2 unidades de Arroz Marolio 1 kg
+(`0c9df2fe-da88-48e8-8d69-be4b3e8f5742`). El operador lo canceló. Cancelar
+evita guardar el error y no impide confirmar una propuesta incorrecta. Los
+criterios 8 y 9 fallan. El resultado experimental queda **FAILED**. La
+incidencia
+[INC-EX-TC-E2E-002-20261104-01-01](../testing/raspberry-validation/executions/INC-EX-TC-E2E-002-20261104-01-01.md)
+sigue **OPEN**. No se persiste inventario.
+
+La decisión de release de esa prueba es aparte:
+`ACCEPTED_WITH_KNOWN_LIMITATIONS`. No convierte el **FAILED** en aprobado.
+
+### Contrato en la placa
+
+[EX-TC-CON-001-20261104-01](../testing/raspberry-validation/executions/EX-TC-CON-001-20261104-01.md)
+corrió el validador tres veces, con la misma transcripción. Acepta el
+contrato válido y rechaza producto desconocido, cantidad, versión, unidad
+y campos de más. Con nombre Arroz, marca Marolio y presentación nula
+responde `ambiguous_product`. Eso muestra la regla del validador. No
+muestra el contrato que produjo N1 y no cierra la incidencia. Los fixtures
+no estaban en el checkout `develop` de la Pi; se extrajeron a un directorio
+externo sin modificar el contenido. Es una adaptación del entorno, no un
+defecto del producto.
+
+### GPIO y push-to-talk que sí cumplen el escrito
+
+[EX-TC-GPIO-001-20261104-01](../testing/raspberry-validation/executions/EX-TC-GPIO-001-20261104-01.md):
+9 y 9 medidos, práctica aparte, cierre con `GPIO_CLOSED` y el GPIO17 libre
+después. Las pausas no se instrumentaron. La latencia de flanco no se midió.
+Resultado técnico satisfactorio. Los tres intentos anteriores siguen
+**BLOCKED**, **FAILED** y **FAILED**.
+
+[EX-TC-PTT-001-20261104-01](../testing/raspberry-validation/executions/EX-TC-PTT-001-20261104-01.md):
+tres grabaciones medidas, formato del contrato y tabla de escucha. Los dos
+intentos del 03/11 siguen **FAILED**.
+
+[EX-TC-PTT-002-20261104-01](../testing/raspberry-validation/executions/EX-TC-PTT-002-20261104-01.md):
+con máximo de 2 s, tres cortes `MAX_DURATION` (cabecera 1,984 s, −16 ms) y
+tres `RELEASED`. La segunda pulsación mecánica no se generó: **no aplica**.
+Esos 2 s son un parámetro de la prueba, no el default del producto. El
+intento del 03/11 sigue **BLOCKED**. El margen de −16 ms queda **por
+definir**.
+
+### Errores integrados, sin Groq
+
+TC-E2E-001 y TC-WEB-002 se retiraron de la campaña activa. Pedían un
+fixture determinista que nunca se implementó y se solapaban con el
+recorrido real. Retirarlos no es un aprobado. El procedimiento 1 de
+TC-FLOW-001, que también dependía de ese fixture, no se ejecutó.
+
+[EX-TC-FLOW-001-20261104-01](../testing/raspberry-validation/executions/EX-TC-FLOW-001-20261104-01.md)
+es el procedimiento 2, el mismo proceso `voicestock-pi` para los diez
+ciclos, timeout de cliente de 5 s:
+
+- tres ciclos contra el stub: HTTP 200 y la frase de contrato inválido;
+- tres con el puerto 8000 cerrado: la frase de que no se pudo comunicar;
+- tres contra un servidor que aceptaba el POST y esperaba 30 s: la misma
+  frase de transporte, con una línea `ACCEPTED` en cada ciclo. El tiempo
+  desde soltar el botón hasta `idle` no se midió;
+- un ciclo de recuperación, otra vez contra el stub, sin reiniciar la Pi.
+
+No hubo operación pendiente. No es un éxito de inventario ni una prueba de
+Groq. El resultado técnico es satisfactorio y la revisión sigue abierta.
+El comando de arranque, con `--bounce-time 0.05` y el catálogo externo ya
+usado ese día, se anotó después desde la conversación de cierre, no desde
+un log de proceso.
+
+### Cierre de la campaña y de v0.5.0
+
+El equipo cerró las pruebas de esta versión. No se piden más mediciones.
+De los 16 casos activos, 15 tienen un último resultado técnico
+satisfactorio. TC-E2E-002 queda **FAILED** en el experimento y aceptado
+para el release con la limitación N1. Los productos ambiguos no se corrigen
+en v0.5.0; pasan a una feature futura. Las incidencias de red del 03/11
+siguen abiertas y no bloquean la publicación. No están marcadas como
+resueltas.
+
+La persistencia del inventario no entra en esta versión. Ningún caso está
+**CLOSED_PASSED**: falta la revisión formal y parte de la evidencia sigue
+fuera del repositorio. El informe de cierre es
+[el reporte de la campaña](../testing/raspberry-validation/v0.5.0-campaign-report.md).
+Las notas, todavía sin tag y sin GitHub Release, están en
+[v0.5.0](../releases/v0.5.0.md). `pyproject.toml` sigue en `0.1.0`.
+
+### Limpieza y respaldo del hardware
+
+Se exportó desde la Raspberry Pi hacia la PC Arch lo que no eran WAV:
+logs, manifiestos, fixtures y evidencias de texto. El archivo
+`pi-test-evidence.tar.gz` pesa unos 20 KB. Su SHA-256 es
+`6dcd2cca825464e2546ecac0ce4748fa14d65bc875f631b2bc453ec1d45391cd`.
+La verificación de integridad fue satisfactoria. Los WAV no forman parte
+de ese respaldo.
+
+Después se borraron las grabaciones, las evidencias locales ya copiadas y
+las cachés de prueba. El árbol de Git quedó limpio. El entorno virtual se
+conservó y seguía usable. `voicestock-hostapd.service` y
+`voicestock-ap-address.service` quedaron activos.
+
+### Qué queda para después
+
+- Rechazar o pedir aclaración cuando el pedido no distingue una
+  presentación del catálogo, en lugar de elegir una.
+- Reemplazar `ProvisionalOperationExecutor` por una escritura real de
+  inventario.
+- Cerrar formalmente los casos que hoy están pendientes de revisión, si una
+  versión posterior lo exige. Esta versión no lo exige para publicarse.
+- Publicar el tag y el GitHub Release cuando el número de versión y el
+  merge a `develop` estén hechos. Esta entrada no los hace.

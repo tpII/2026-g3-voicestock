@@ -2,8 +2,8 @@
 
 This file is the outline of a later technical report. It is not the report
 of a finished experiment. One baseline execution, four GPIO executions,
-one microphone-enumeration execution, one WAV-capture execution, two
-push-to-talk executions, one maximum-duration execution, and three
+one microphone-enumeration execution, one WAV-capture execution, three
+push-to-talk executions, two maximum-duration executions, and three
 access-point executions are recorded, plus one connectivity execution and
 one reboot-persistence execution, one text-HTTP execution, one
 WAV-transfer execution, one client-error execution, one Pi web
@@ -91,6 +91,16 @@ Recorded executions:
 - [EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md),
   **BLOCKED**. Max-duration observations met. TC-PTT-001 prerequisite
   unmet. Not a product failure of the duration limit. Not closed.
+- [EX-TC-PTT-001-20261104-01](executions/EX-TC-PTT-001-20261104-01.md),
+  **PASSED_PENDING_DOCUMENTATION**. Latest. Three measured `RELEASED`
+  files, practice excluded. Listening table filled on the G435. Review
+  NOT_REVIEWED. Not **CLOSED_PASSED**. Does not rewrite the two November 3
+  failures.
+- [EX-TC-PTT-002-20261104-01](executions/EX-TC-PTT-002-20261104-01.md),
+  **PASSED_PENDING_DOCUMENTATION**. Latest. Three `MAX_DURATION` and three
+  `RELEASED`. Second press **NOT APPLICABLE**. Duration gate **TO BE
+  DEFINED**. Review NOT_REVIEWED. Not **CLOSED_PASSED**. Does not rewrite
+  the blocked November 3 run.
 - [EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md),
   **FAILED**. The access-point script rejected a connected `wlan0`.
   Not closed. Not a traffic result.
@@ -197,8 +207,8 @@ documentation branch.
 | TC-GPIO-001 | [EX-TC-GPIO-001-20261027-01](executions/EX-TC-GPIO-001-20261027-01.md); [EX-TC-GPIO-001-20261027-02](executions/EX-TC-GPIO-001-20261027-02.md); [EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md); [EX-TC-GPIO-001-20261104-01](executions/EX-TC-GPIO-001-20261104-01.md) | BLOCKED, then FAILED, then FAILED, then PASSED_PENDING_DOCUMENTATION | Latest: 9 measured presses and 9 releases, practice excluded. Cleanup evidenced by `GPIO_CLOSED` and a later free GPIO17. Not closed. Review NOT_REVIEWED. | Attempts 01–03 stay BLOCKED, FAILED, and FAILED. Attempt 04 does not instrument pause and idle durations. Edge latency NOT MEASURED. |
 | TC-AUD-001 | [EX-TC-AUD-001-20261027-01](executions/EX-TC-AUD-001-20261027-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–4 met. Not closed. | G435 in 3 of 3 plugged lists, absent while unplugged. Query: `G435 Wireless Gaming Headset: USB Audio (hw:2,0)`. Default rate 48000 Hz. Detection latency NOT MEASURED. Logs remain on the Pi. |
 | TC-AUD-002 | [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | Criteria 1–4 and 6 met on 5/5 measured runs. Criterion 5 stores operator-reported hashes. Criterion 7 not triggered. Not closed. | Commit `88a95d5` on `fix/audio-capture-stream-shutdown` at the time of the run. Later `origin/develop` is `1b81442`, which merges that fix. The measured revision is unchanged. Device `voicestock_mic`. Duration error about −56.2 ms, tolerance **TO BE DEFINED**. `throttled=0x50005` at the later inventory. Review NOT_REVIEWED. WAV files remain on the Pi. |
-| TC-PTT-001 | [EX-TC-PTT-001-20261103-01](executions/EX-TC-PTT-001-20261103-01.md); [EX-TC-PTT-001-20261103-02](executions/EX-TC-PTT-001-20261103-02.md) | FAILED, then FAILED | Attempt 02: 3 measured WAV files, 1 channel, width 2, 16000 Hz, `RELEASED`, files retained. Operator heard all three. Not closed. | Attempt 01: microphone muted; listening not verified; not a demonstrated software defect. Attempt 02 phrase match and defect columns not separately confirmed. Both ran while [EX-TC-GPIO-001-20261103-01](executions/EX-TC-GPIO-001-20261103-01.md) was **FAILED**. PC not contacted. `develop` at `1b81442`. |
-| TC-PTT-002 | [EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md) | BLOCKED | 3 `MAX_DURATION` and 3 later `RELEASED`. No extra file while held. Format 6/6. Not closed. | Second mechanical press **NOT APPLICABLE**. Header duration 1.984 s versus 2 s. Error −16 ms. Gate **TO BE DEFINED**. Prerequisite TC-PTT-001 remains **FAILED**. Not a product failure of the limit. |
+| TC-PTT-001 | [EX-TC-PTT-001-20261103-01](executions/EX-TC-PTT-001-20261103-01.md); [EX-TC-PTT-001-20261103-02](executions/EX-TC-PTT-001-20261103-02.md); [EX-TC-PTT-001-20261104-01](executions/EX-TC-PTT-001-20261104-01.md) | FAILED, then FAILED, then PASSED_PENDING_DOCUMENTATION | Latest: 3 measured `RELEASED` files, format contract met, listening table filled. Not closed. Review NOT_REVIEWED. | Attempt 01: microphone muted; listening not verified. Attempt 02: phrase match and defect columns not separately confirmed; GPIO prerequisite then unmet. Both stay **FAILED**. Latest practice phrase differed from `práctica` and is excluded. No PC. Playback was `aplay` to the G435 after the default device was silent. |
+| TC-PTT-002 | [EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md); [EX-TC-PTT-002-20261104-01](executions/EX-TC-PTT-002-20261104-01.md) | BLOCKED, then PASSED_PENDING_DOCUMENTATION | Latest: 3 `MAX_DURATION` and 3 `RELEASED`. Format 6/6. Not closed. Review NOT_REVIEWED. | Attempt 01 stays **BLOCKED**. Second mechanical press **NOT APPLICABLE**. Header duration 1.984 s versus 2 s. Error −16 ms. Gate **TO BE DEFINED**. Two seconds is a test parameter, not the product default. |
 | TC-NET-001 | [EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md); [EX-TC-NET-001-20261103-02](executions/EX-TC-NET-001-20261103-02.md); [EX-TC-NET-001-20261103-03](executions/EX-TC-NET-001-20261103-03.md) | FAILED, then FAILED, then PASSED_PENDING_DOCUMENTATION | Attempt 03: technical configuration PASSED. Evidence pending. Review NOT_REVIEWED. Not CLOSED_PASSED. | Attempt 01: `10*` matched `100 (connected)`. Attempt 02 failed WPA2 activation and a transient MAC match; its `hostapd` diagnostic is not a pass. Both stay **FAILED** on procedure version 1. Attempt 03 does not regrade them and does not measure ICMP, isolation, reboot, unit recovery, or long-term reliability. Pi commit confirmed `485559c`. Arch SHA **NOT RECORDED**. Ethernet left up. |
 | TC-NET-002 | [EX-TC-NET-002-20261103-01](executions/EX-TC-NET-002-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | Connectivity: 10/10 each way. IPv4 isolation after Ethernet removal: no default route, no reply from `1.1.1.1`. Not closed. Review NOT_REVIEWED. | Tool RTT PC to Pi `0.808/4.407/5.545/1.272` ms. Pi to PC `4.101/4.561/5.827/0.512` ms. Printed-line median and sample stdev stay in the execution and do not replace those lines. Loss allowance and latency budget **TO BE DEFINED**. Pi Internet probe was `Network is unreachable`, not a three-packet loss rate. `tailscale0` observed only. Arch SHA **NOT RECORDED**. Not TC-NET-003. |
 | TC-NET-003 | [EX-TC-NET-003-20261103-01](executions/EX-TC-NET-003-20261103-01.md) | PASSED_PENDING_DOCUMENTATION | Both reboots confirmed by boot id. 10/10 functional replies in each post-reboot direction that was measured. No Pi default route. Not closed. Review NOT_REVIEWED. | Procedure version 2. No setup script. Arch Internet stayed on `wlo1` at metric 601. Pi Internet probe was `Network is unreachable`, not a three-packet loss rate. Startup time **NOT RECORDED**. Loss allowance **TO BE DEFINED**. Not a latency baseline. PC SHA **NOT RECORDED**. |
@@ -552,17 +562,20 @@ What this summary can say now:
   the operator heard clearly. Phrase match and the defect columns were not
   separately confirmed. Both attempts ran while TC-GPIO-001 attempt 03 was
   **FAILED**. Those two results stay **FAILED**.
-  [EX-TC-GPIO-001-20261104-01](executions/EX-TC-GPIO-001-20261104-01.md)
-  is later and is not **FAILED** or **BLOCKED**, so the written GPIO
-  prerequisite is met for a future PTT run. A new PTT execution is still
-  required before TC-PTT-001 can be accepted. PC communication was not
-  tested;
+  [EX-TC-PTT-001-20261104-01](executions/EX-TC-PTT-001-20261104-01.md)
+  is the latest execution. Technical result **PASSED**, campaign status
+  **PASSED_PENDING_DOCUMENTATION**, review NOT_REVIEWED. It is not
+  **CLOSED_PASSED**. PC communication was not tested;
 - TC-PTT-002 has one execution on 3 November 2026. The three long holds
   stopped with one `MAX_DURATION` file each, and the three following holds
-  printed `RELEASED`. The execution is **BLOCKED**, not closed, because
-  TC-PTT-001 is still **FAILED**. A second mechanical press was not
-  possible while the switch stayed down. The duration error of −16 ms has
-  no acceptance gate yet;
+  printed `RELEASED`. That execution stays **BLOCKED**. A second mechanical
+  press was not possible. The duration error of −16 ms has no acceptance
+  gate.
+  [EX-TC-PTT-002-20261104-01](executions/EX-TC-PTT-002-20261104-01.md)
+  is the latest execution, with the same file pattern and the same
+  **NOT APPLICABLE** second press. Technical result **PASSED**. It is
+  **PASSED_PENDING_DOCUMENTATION**, not **CLOSED_PASSED**. Two seconds
+  remains a test parameter;
 - TC-NET-001 has three executions on 3 November 2026. Attempts 01 and
   02 stay **FAILED** on procedure version 1 and are not closed. Attempt
   01 exited because `10*` matched `100 (connected)`. Attempt 02 did not

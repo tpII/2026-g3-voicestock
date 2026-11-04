@@ -1,7 +1,7 @@
 # TC-PTT-001 — Integrated physical push-to-talk
 
 - Status: DESIGNED
-- Executions: [EX-TC-PTT-001-20261103-01](../executions/EX-TC-PTT-001-20261103-01.md) (`FAILED`, microphone muted, listening not verified, not closed); [EX-TC-PTT-001-20261103-02](../executions/EX-TC-PTT-001-20261103-02.md) (`FAILED`, WAV contract met and files heard, listening table incomplete, GPIO prerequisite unmet, not closed)
+- Executions: [EX-TC-PTT-001-20261103-01](../executions/EX-TC-PTT-001-20261103-01.md) (`FAILED`, microphone muted, listening not verified, not closed); [EX-TC-PTT-001-20261103-02](../executions/EX-TC-PTT-001-20261103-02.md) (`FAILED`, WAV contract met and files heard, listening table incomplete, GPIO prerequisite unmet, not closed); [EX-TC-PTT-001-20261104-01](../executions/EX-TC-PTT-001-20261104-01.md) (latest; `PASSED_PENDING_DOCUMENTATION`; technical result PASSED; review NOT_REVIEWED; not `CLOSED_PASSED`)
 - Procedure version: 2
 
 ## Objective

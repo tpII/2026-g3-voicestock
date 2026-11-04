@@ -194,8 +194,10 @@ change should add a PC entry point that:
    Neither mode is this fixture.
 
 Until that entry point exists, TC-WEB-002, the success trials of
-TC-FLOW-001, and TC-E2E-001 stay **BLOCKED** at execution time. Their
-specifications stay **DESIGNED**. Do not point those cases at the stub and
+TC-FLOW-001, and TC-E2E-001 stay **BLOCKED** at execution time because the
+fixture is absent. [EX-TC-PTT-001-20261104-01](executions/EX-TC-PTT-001-20261104-01.md)
+meets the written PTT status gate and does not remove that fixture block.
+Their specifications stay **DESIGNED**. Do not point those cases at the stub and
 then treat the rejection as a successful pending operation. Do not point
 them at `VOICESTOCK_AUDIO_PIPELINE=groq` and treat a real transcription as
 the simulated pass. TC-E2E-001 remains a simulated case. It has no

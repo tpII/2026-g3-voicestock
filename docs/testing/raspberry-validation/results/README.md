@@ -14,6 +14,9 @@ No results sheet has been filed.
 **FAILED** and not **CLOSED_FAILED**.
 [EX-TC-PTT-002-20261103-01](../executions/EX-TC-PTT-002-20261103-01.md) is
 **BLOCKED** and not **CLOSED_PASSED**.
+[EX-TC-PTT-001-20261104-01](../executions/EX-TC-PTT-001-20261104-01.md) and
+[EX-TC-PTT-002-20261104-01](../executions/EX-TC-PTT-002-20261104-01.md) are
+**PASSED_PENDING_DOCUMENTATION** and do not add closed sheets.
 [EX-TC-NET-001-20261103-01](../executions/EX-TC-NET-001-20261103-01.md) and
 [EX-TC-NET-001-20261103-02](../executions/EX-TC-NET-001-20261103-02.md) are
 **FAILED** and not **CLOSED_FAILED**. The `hostapd` diagnostic in attempt

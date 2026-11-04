@@ -99,9 +99,15 @@ has [EX-TC-AUD-002-20261103-01](executions/EX-TC-AUD-002-20261103-01.md)
 at **PASSED_PENDING_DOCUMENTATION**. [TC-PTT-001](test-cases/TC-PTT-001.md)
 has [EX-TC-PTT-001-20261103-01](executions/EX-TC-PTT-001-20261103-01.md)
 and [EX-TC-PTT-001-20261103-02](executions/EX-TC-PTT-001-20261103-02.md),
-both **FAILED** and not closed. [TC-PTT-002](test-cases/TC-PTT-002.md)
+both **FAILED** and not closed.
+[EX-TC-PTT-001-20261104-01](executions/EX-TC-PTT-001-20261104-01.md)
+is the latest execution, at **PASSED_PENDING_DOCUMENTATION**. It is not
+**CLOSED_PASSED**. [TC-PTT-002](test-cases/TC-PTT-002.md)
 has [EX-TC-PTT-002-20261103-01](executions/EX-TC-PTT-002-20261103-01.md)
-at **BLOCKED**. [TC-NET-001](test-cases/TC-NET-001.md) has
+at **BLOCKED**, and
+[EX-TC-PTT-002-20261104-01](executions/EX-TC-PTT-002-20261104-01.md)
+at **PASSED_PENDING_DOCUMENTATION**. The earlier result stays **BLOCKED**.
+The two-second limit is a test parameter. [TC-NET-001](test-cases/TC-NET-001.md) has
 [EX-TC-NET-001-20261103-01](executions/EX-TC-NET-001-20261103-01.md)
 and [EX-TC-NET-001-20261103-02](executions/EX-TC-NET-001-20261103-02.md),
 both **FAILED** on procedure version 1, and

@@ -1,5 +1,12 @@
 """Current stock of the catalog products, persisted in the Pi database."""
 
+from pi.inventory.service import (
+    InventoryService,
+    StockLevel,
+    StockLookup,
+    StockReader,
+    StockStatus,
+)
 from pi.inventory.stock import (
     InvalidQuantityError,
     RetiredProductError,
@@ -13,7 +20,12 @@ from pi.inventory.stock import (
 
 __all__ = [
     "InvalidQuantityError",
+    "InventoryService",
     "RetiredProductError",
+    "StockLevel",
+    "StockLookup",
+    "StockReader",
+    "StockStatus",
     "StockRecordError",
     "StockRecordExistsError",
     "UnknownProductError",

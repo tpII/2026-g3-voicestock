@@ -97,3 +97,32 @@ def test_pending_operation_does_not_import_web_libraries() -> None:
     }
 
     assert offending == set()
+
+
+def test_inventory_and_storage_stay_below_the_application() -> None:
+    """Stock and its database know nothing of HTTP, the cycle or the model.
+
+    They are called by the confirmation executor and the web page, never the
+    other way around, and the language model has no path to them.
+    """
+    forbidden = (
+        "fastapi",
+        "starlette",
+        "uvicorn",
+        "httpx",
+        "pi.web",
+        "pi.communication",
+        "pi.pending_operation",
+        "pi.push_to_talk",
+        "pi.audio",
+        "shared.communication",
+    )
+    offending = {
+        f"{name}: {module}"
+        for name, modules in _imports_by_file().items()
+        if name.startswith(("pi/inventory/", "pi/storage/"))
+        for module in modules
+        if any(module == item or module.startswith(f"{item}.") for item in forbidden)
+    }
+
+    assert offending == set()

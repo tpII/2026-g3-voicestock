@@ -31,7 +31,7 @@ def create_app(
     if not INDEX_FILE.is_file():
         raise FileNotFoundError(f"web index was not found at {INDEX_FILE}")
 
-    app = FastAPI(title="VoiceStock Web", version="0.1.0")
+    app = FastAPI(title="VoiceStock Web", version="0.5.0")
     app.state.query_port = query_port
     app.state.resolution_port = resolution_port
     app.state.status_port = status_port

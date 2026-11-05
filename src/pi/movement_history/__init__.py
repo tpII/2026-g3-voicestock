@@ -8,6 +8,15 @@ from pi.movement_history.model import (
     format_utc,
     parse_utc,
 )
+from pi.movement_history.queries import (
+    DEFAULT_PAGE_SIZE,
+    MAX_PAGE_SIZE,
+    InvalidMovementQueryError,
+    MovementHistoryReader,
+    MovementPage,
+    MovementQuery,
+    SQLiteMovementHistory,
+)
 from pi.movement_history.recorder import (
     MOVEMENT_COLUMNS,
     CausationConflictError,
@@ -19,6 +28,13 @@ from pi.movement_history.recorder import (
 )
 
 __all__ = [
+    "DEFAULT_PAGE_SIZE",
+    "MAX_PAGE_SIZE",
+    "InvalidMovementQueryError",
+    "MovementHistoryReader",
+    "MovementPage",
+    "MovementQuery",
+    "SQLiteMovementHistory",
     "MOVEMENT_COLUMNS",
     "REQUIRED_CAUSE_KEYS",
     "CausationConflictError",

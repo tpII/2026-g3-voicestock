@@ -15,7 +15,7 @@ import sqlite3
 
 
 class StockRecordError(Exception):
-    """A stock record could not be created."""
+    """A stock record could not be created or changed."""
 
 
 class UnknownProductError(StockRecordError):
@@ -32,6 +32,30 @@ class StockRecordExistsError(StockRecordError):
 
 class InvalidQuantityError(StockRecordError, ValueError):
     """The quantity is not an exact, non-negative integer."""
+
+
+class StockNotInitializedError(StockRecordError):
+    """The product is in the catalog but has no stock record yet."""
+
+
+class IncompatibleUnitError(StockRecordError):
+    """The unit is not the stock unit of the product. Nothing is converted."""
+
+
+class InsufficientStockError(StockRecordError):
+    """Applying the delta would leave a negative quantity."""
+
+    def __init__(self, product_id: str, available: int, delta: int) -> None:
+        super().__init__(
+            f"product {product_id!r} has {available}, cannot apply {delta}"
+        )
+        self.product_id = product_id
+        self.available = available
+        self.delta = delta
+
+
+class InvalidDeltaError(StockRecordError, ValueError):
+    """The delta is not an exact, non-zero integer."""
 
 
 def create_stock_record(
@@ -90,3 +114,11 @@ def check_quantity(quantity: object) -> None:
         )
     if quantity < 0:
         raise InvalidQuantityError(f"quantity must not be negative, got {quantity}")
+
+
+def check_delta(delta: object) -> None:
+    """Reject anything but an exact, non-zero integer, positive or negative."""
+    if type(delta) is not int:
+        raise InvalidDeltaError(f"delta must be an integer, got {type(delta).__name__}")
+    if delta == 0:
+        raise InvalidDeltaError("delta must not be zero")

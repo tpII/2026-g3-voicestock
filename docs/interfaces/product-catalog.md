@@ -251,7 +251,9 @@ catalog source beside it.
 
 ## Inventory initialization
 
-Another change creates the initial stock. This catalog does not insert into
+`pi.inventory.load_initial_stock` creates the initial stock, following the
+sequence below ([inventory stock](inventory-stock.md#initial-stock)). This
+catalog does not insert into
 `inventory_stock` and does not reset quantities. After migrations and the
 seed, the stock loader can do the following. It must use the same connection
 and must not run while another process owns the file.

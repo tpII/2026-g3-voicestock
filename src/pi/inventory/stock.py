@@ -84,6 +84,12 @@ def create_stock_record(
             (quantity, product_id),
         )
     except sqlite3.IntegrityError as error:
+        exists = connection.execute(
+            "SELECT 1 FROM inventory_stock WHERE product_id = ?", (product_id,)
+        ).fetchone()
+        if exists is None:
+            # Another constraint failed; report it as it is.
+            raise
         raise StockRecordExistsError(
             f"product {product_id!r} already has a stock record"
         ) from error

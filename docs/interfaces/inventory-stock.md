@@ -23,7 +23,7 @@ tests, seed ────────────────────┘     
 |---|---|
 | OperationConfirmationExecution | `get_stock` to evaluate, `apply_delta` to execute a confirmed operation |
 | InventoryWebApp | `get_stock` and `list_stock` to show inventory |
-| InventoryPersistence-04 seed | `create_stock_record` and `find_active_products_without_stock` |
+| Initial stock load (`load_initial_stock`) | `create_stock_record`, `get_stock` and the movement recorder |
 
 ## Model
 
@@ -130,12 +130,49 @@ the path, connects and applies the migrations. The default location is
 overrides it. Temporary and in-memory paths are rejected
 ([ADR-0014](../decisions/0014-keep-catalog-stock-and-history-in-one-pi-sqlite-database.md)).
 
-The closed catalog is loaded with `pi.catalog.load_initial_catalog` after
-migrations. That load does not insert stock. Initial quantities are created
-with `create_stock_record` for the ids from
-`CatalogService.list_active_product_ids`, and only where `get_stock` reports
-`not_initialized`. The sequence and the provisional-row exception are in the
-[product catalog](product-catalog.md).
+### Preparing the database
+
+`voicestock-pi-database init` prepares the database on the Raspberry Pi. It
+opens the file on its persistent path, applies the migrations, loads the closed
+catalog (`pi.catalog.load_initial_catalog`) and then the initial stock
+(`pi.inventory.load_initial_stock`). `voicestock-pi-database status` reports
+the schema version, active products, stock records and units, movements and
+active products without stock, without changing anything. Both accept
+`--database PATH`. Stop `voicestock-pi` before `init`.
+
+```bash
+voicestock-pi-database init
+voicestock-pi-database status
+```
+
+### Initial stock
+
+`pi.inventory.INITIAL_STOCK` gives one exact quantity to each of the 91
+products of the closed catalog. A test checks that its keys are exactly the
+catalog seed. Fast movers get more units and bulky or expensive products
+fewer; `yogur-serenisima-natural-120` starts at zero and a few products start
+at two to five units, so a removal can be rejected for lack of stock during a
+demonstration.
+
+`load_initial_stock(connection)`:
+
+- refuses to write anything when the table and the active catalog name
+  different products (`InitialStockMismatchError`, with `missing` and
+  `unknown`) or a quantity is not an exact non-negative integer;
+- creates a record only for active products whose stock is `not_initialized`,
+  so running it again never resets a quantity that operations already
+  changed; retired products are left out;
+- records one `initialization` movement for each record created with a
+  positive quantity, with causation key `initial-stock:<product_id>`, so the
+  history shows where the first units came from;
+- runs everything in one unit of work: it joins the caller's transaction or
+  opens its own, and a failure leaves neither stock nor movements behind;
+- returns `InitialStockResult(created, skipped)`.
+
+There is no reset. Records are never deleted and the history is append-only,
+so starting over means deleting the database file on a development machine,
+explicitly and with `voicestock-pi` stopped. Never do it on the Raspberry Pi
+that holds real stock.
 
 ## Rules for maintainers
 

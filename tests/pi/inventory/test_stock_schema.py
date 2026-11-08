@@ -255,3 +255,13 @@ def test_the_schema_holds_no_movements_or_pending_operations(connection) -> None
         "quantity",
         "unit",
     }
+
+
+def test_other_integrity_failures_are_not_reported_as_duplicates(connection):
+    connection.execute(
+        "CREATE TEMP TRIGGER fail_stock_write BEFORE INSERT ON inventory_stock "
+        "BEGIN SELECT RAISE(FAIL, 'disk I/O error'); END"
+    )
+
+    with pytest.raises(sqlite3.IntegrityError, match="disk I/O error"):
+        create_stock_record(connection, "coca-cola-zero-2l", 1)

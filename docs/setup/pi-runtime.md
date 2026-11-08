@@ -63,6 +63,12 @@ persistent catalog is `pi.catalog` in the Pi database
 open the database yet, so `GET /api/v1/catalog` answers `503` with
 `catalog_not_ready`.
 
+The database itself is prepared once with `voicestock-pi-database init`,
+which applies the migrations and loads the catalog and the initial stock on
+the persistent path (`~/.local/share/voicestock/voicestock.sqlite3`). It is
+idempotent; `voicestock-pi-database status` shows what the file holds
+([inventory stock](../interfaces/inventory-stock.md#preparing-the-database)).
+
 ## Run
 
 `--pin`, `--bounce-time`, `--input-device`, `--output-directory`, and

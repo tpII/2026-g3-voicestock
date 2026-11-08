@@ -1,6 +1,7 @@
 """Tests for loading the initial stock of the test supermarket."""
 
 import sqlite3
+import tempfile
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -221,8 +222,9 @@ def test_the_database_command_initializes_and_reports(
     assert "active products without stock: 0" in status
 
 
-def test_the_database_command_refuses_a_temporary_path(tmp_path, capsys) -> None:
-    path = tmp_path / "x.sqlite3"
+def test_the_database_command_refuses_a_temporary_path(capsys) -> None:
+    # The system temporary directory, wherever pytest keeps its own files.
+    path = Path(tempfile.gettempdir()) / "voicestock-refused.sqlite3"
 
     assert database_cli.main(["status", "--database", str(path)]) == 2
     assert "does not persist" in capsys.readouterr().err

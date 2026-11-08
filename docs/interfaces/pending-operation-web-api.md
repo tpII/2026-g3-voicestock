@@ -30,14 +30,18 @@ no collection and no alternate route.
 | `GET` | `/api/v1/pending-operation` | `get_current()` |
 | `POST` | `/api/v1/pending-operation/{operation_id}/confirm` | `confirm(operation_id)` |
 | `POST` | `/api/v1/pending-operation/{operation_id}/cancel` | `cancel(operation_id)` |
+| `GET` | `/api/v1/catalog` | `read_snapshot()` |
 
 Confirm and cancel have no request body. The id is the path segment.
-`Content-Type` is not required.
+`Content-Type` is not required. The catalog route is read-only and is
+specified in the [product catalog](product-catalog.md).
 
 The standalone `voicestock-pi-web` command does not receive ports. `/health`,
-`/`, and `/static/*` still answer. The four routes above then return
-`503` with `application_not_ready`. `/health` does not check the ports.
-`voicestock-pi` passes all three ports. See the
+`/`, and `/static/*` still answer. The pending-operation routes above then
+return `503` with `application_not_ready`. `GET /api/v1/catalog` returns
+`503` with `catalog_not_ready` until a catalog port is provided. `/health`
+does not check the ports. `voicestock-pi` passes the three
+pending-operation ports and does not open the catalog database yet. See the
 [integrated runtime](../setup/pi-runtime.md).
 
 ## Read the cycle

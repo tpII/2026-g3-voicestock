@@ -31,6 +31,8 @@ def test_migrations_create_the_catalog_and_stock_tables(tmp_path: Path) -> None:
         assert _tables(connection) == {
             "schema_migrations",
             "catalog_products",
+            "catalog_categories",
+            "catalog_aliases",
             "inventory_stock",
             "inventory_movements",
             "sqlite_sequence",
@@ -62,7 +64,7 @@ def test_only_pending_migrations_are_applied(tmp_path: Path) -> None:
     try:
         apply_migrations(connection, MIGRATIONS[:1])
 
-        assert apply_migrations(connection) == (2, 3)
+        assert apply_migrations(connection) == (2, 3, 4, 5)
         assert "inventory_stock" in _tables(connection)
     finally:
         connection.close()

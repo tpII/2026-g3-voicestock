@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse, Response
 from pi.pending_operation.resolution import ResolutionResult, ResolutionStatus
 from pi.web.dependencies import (
     APIError,
+    CatalogPortDep,
     QueryPortDep,
     ResolutionPortDep,
     StatusPortDep,
@@ -17,6 +18,7 @@ from pi.web.dependencies import (
     validated_operation_id,
 )
 from pi.web.schemas import (
+    CatalogSnapshotResponse,
     PendingOperationResponse,
     ResolutionResponse,
     SystemStatusResponse,
@@ -57,6 +59,17 @@ def resolution_http_response(result: ResolutionResult) -> JSONResponse:
         status_code=_HTTP_STATUS[result.status],
         content=body.model_dump(mode="json"),
     )
+
+
+@router.get("/catalog")
+async def read_catalog(catalog_port: CatalogPortDep) -> JSONResponse:
+    """Return the active catalog snapshot. The route does not change it.
+
+    It is async so the read stays on the server thread. That is the thread
+    that owns the SQLite connection; a worker thread would be rejected.
+    """
+    body = CatalogSnapshotResponse.from_snapshot(catalog_port.read_snapshot())
+    return JSONResponse(content=body.model_dump(mode="json"), headers=NO_STORE)
 
 
 @router.get("/system-status")

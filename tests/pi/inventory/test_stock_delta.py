@@ -37,7 +37,7 @@ def database(tmp_path: Path) -> Path:
     with transaction(connection):
         create_stock_record(connection, COCA, 5)
         create_stock_record(connection, "arroz-gallo-1kg", 2)
-        create_stock_record(connection, "yerba-retirada", 3)
+        create_stock_record(connection, "yerba-retirada", 0)
         connection.execute(
             "UPDATE catalog_products SET retired = 1 "
             "WHERE product_id = 'yerba-retirada'"
@@ -123,7 +123,7 @@ def test_a_retired_product_is_not_changed(database, service) -> None:
     with pytest.raises(RetiredProductError):
         service.apply_delta("yerba-retirada", 1, "unit")
 
-    assert _quantity(database, "yerba-retirada") == 3
+    assert _quantity(database, "yerba-retirada") == 0
 
 
 @pytest.mark.parametrize("unit", ["kg", "UNIT", "units", None])

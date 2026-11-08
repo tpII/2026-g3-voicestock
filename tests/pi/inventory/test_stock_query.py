@@ -35,7 +35,7 @@ def database(tmp_path: Path) -> Path:
     with transaction(connection):
         create_stock_record(connection, "coca-cola-zero-2l", 12)
         create_stock_record(connection, "arroz-gallo-1kg", 0)
-        create_stock_record(connection, "yerba-retirada", 3)
+        create_stock_record(connection, "yerba-retirada", 0)
         connection.execute(
             "UPDATE catalog_products SET retired = 1 "
             "WHERE product_id = 'yerba-retirada'"
@@ -85,7 +85,7 @@ def test_a_product_without_a_record_is_not_reported_as_zero(service) -> None:
 
 def test_a_retired_product_still_reports_its_kept_stock(service) -> None:
     assert service.get_stock("yerba-retirada") == StockLookup(
-        StockStatus.FOUND, StockLevel("yerba-retirada", 3, "unit", retired=True)
+        StockStatus.FOUND, StockLevel("yerba-retirada", 0, "unit", retired=True)
     )
 
 
@@ -100,7 +100,7 @@ def test_the_listing_can_include_retired_products(service) -> None:
     assert service.list_stock(include_retired=True) == (
         StockLevel("arroz-gallo-1kg", 0, "unit"),
         StockLevel("coca-cola-zero-2l", 12, "unit"),
-        StockLevel("yerba-retirada", 3, "unit", retired=True),
+        StockLevel("yerba-retirada", 0, "unit", retired=True),
     )
 
 

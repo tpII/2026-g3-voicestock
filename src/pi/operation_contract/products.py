@@ -132,15 +132,16 @@ def match_products(
 
 
 class InMemoryProductResolver:
-    """Resolver over a fixed list of products, used until ProductCatalog exists.
+    """Resolver over a fixed list of products.
 
     Construction fails when the catalog breaks the invariant of ADR-0006: every
     product must be identifiable by querying with all of its own attributes.
+    The persistent catalog uses the same check and the same matching rule.
     """
 
     def __init__(self, products: Sequence[CatalogProduct]) -> None:
         self._products = tuple(products)
-        _check_catalog(self._products)
+        ensure_catalog_identifiable(self._products)
 
     def resolve(self, query: ProductQuery) -> ProductResolution:
         return match_products(query, self._products)
@@ -170,7 +171,13 @@ def _normalized_attributes(source: ProductQuery | CatalogProduct) -> dict[str, s
     return {attribute: value for attribute, value in values.items() if value}
 
 
-def _check_catalog(products: tuple[CatalogProduct, ...]) -> None:
+def ensure_catalog_identifiable(products: Sequence[CatalogProduct]) -> None:
+    """Reject duplicate ids and products that their own attributes cannot find.
+
+    This is the catalog invariant of ADR-0006. Absent attributes do not
+    constrain a query, so a product whose attributes are a subset of another
+    product's attributes is unreachable and the catalog is invalid.
+    """
     ids = [product.product_id for product in products]
     if duplicated := sorted({item for item in ids if ids.count(item) > 1}):
         raise ValueError(f"duplicated product ids: {duplicated}")

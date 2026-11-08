@@ -57,6 +57,11 @@ routed through that profile. The page does not need Node.js. The catalog
 file is a JSON list of products, the format `pi.operation_contract.load_catalog`
 reads. Product identity follows
 [ADR-0006](../decisions/0006-identify-products-by-unique-attribute-match.md).
+`voicestock-pi` still builds `OperationValidator` from that file. The
+persistent catalog is `pi.catalog` in the Pi database
+([product catalog](../interfaces/product-catalog.md)); this process does not
+open the database yet, so `GET /api/v1/catalog` answers `503` with
+`catalog_not_ready`.
 
 ## Run
 

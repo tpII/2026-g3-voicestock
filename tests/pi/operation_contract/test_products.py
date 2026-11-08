@@ -1,10 +1,12 @@
 """Tests for product identification (ADR-0006)."""
 
+import tempfile
 from collections.abc import Callable, Sequence
 from pathlib import Path
 
 import pytest
 
+from pi.catalog import CatalogService, Category, Product, SqliteProductResolver
 from pi.operation_contract import (
     CatalogProduct,
     InMemoryProductResolver,
@@ -14,6 +16,7 @@ from pi.operation_contract import (
     load_catalog,
     normalize_attribute,
 )
+from pi.storage import apply_migrations, connect
 
 CATALOG_PATH = (
     Path(__file__).parents[2]
@@ -34,9 +37,35 @@ ATTRIBUTE_CATALOG = (
 
 ResolverFactory = Callable[[Sequence[CatalogProduct]], ProductResolver]
 
+
+def _sqlite_resolver(products: Sequence[CatalogProduct]) -> ProductResolver:
+    directory = tempfile.TemporaryDirectory()
+    connection = connect(Path(directory.name) / "catalog.sqlite3")
+    apply_migrations(connection)
+    catalog = CatalogService(connection)
+    catalog.add_category(Category("general", "General"))
+    for product in products:
+        catalog.add_product(
+            Product(
+                product_id=product.product_id,
+                name=product.name,
+                brand=product.brand,
+                variant=product.variant,
+                presentation=product.presentation,
+                category_id="general",
+                stock_unit=product.units[0],
+                retired=False,
+            )
+        )
+    resolver = SqliteProductResolver(connection)
+    resolver._keepalive = (directory, connection)  # type: ignore[attr-defined]
+    return resolver
+
+
 # Every ProductResolver implementation must pass the contract tests below.
 RESOLVER_FACTORIES: dict[str, ResolverFactory] = {
     "in_memory": InMemoryProductResolver,
+    "sqlite": _sqlite_resolver,
 }
 
 

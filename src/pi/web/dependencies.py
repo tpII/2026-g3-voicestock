@@ -5,6 +5,7 @@ from typing import Annotated
 
 from fastapi import Depends, Request
 
+from pi.catalog import CatalogSnapshotReader
 from pi.pending_operation import (
     OperationCycleQueryPort,
     PendingOperationQueryPort,
@@ -15,6 +16,8 @@ from pi.web.schemas import ErrorResponse
 
 NOT_READY_CODE = "application_not_ready"
 NOT_READY_DETAIL = "pending-operation application ports are not configured"
+CATALOG_NOT_READY_CODE = "catalog_not_ready"
+CATALOG_NOT_READY_DETAIL = "product catalog is not configured"
 INVALID_OPERATION_ID_CODE = "invalid_operation_id"
 INVALID_OPERATION_ID_DETAIL = "operation_id must be a non-blank string"
 _BLANK_OPERATION_ID = "operation_id must be a non-blank string"
@@ -54,6 +57,14 @@ def get_status_port(request: Request) -> OperationCycleQueryPort:
     return port
 
 
+def get_catalog_port(request: Request) -> CatalogSnapshotReader:
+    """Return the catalog snapshot port, or fail when it was not provided."""
+    port = request.app.state.catalog_port
+    if port is None:
+        raise APIError(503, CATALOG_NOT_READY_CODE, CATALOG_NOT_READY_DETAIL)
+    return port
+
+
 def validated_operation_id(operation_id: str) -> str:
     """Reject a blank path id before the application port is called."""
     if not operation_id.strip():
@@ -81,3 +92,4 @@ ResolutionPortDep = Annotated[
     PendingOperationResolutionPort, Depends(get_resolution_port)
 ]
 StatusPortDep = Annotated[OperationCycleQueryPort, Depends(get_status_port)]
+CatalogPortDep = Annotated[CatalogSnapshotReader, Depends(get_catalog_port)]

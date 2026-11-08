@@ -130,9 +130,12 @@ the path, connects and applies the migrations. The default location is
 overrides it. Temporary and in-memory paths are rejected
 ([ADR-0014](../decisions/0014-keep-catalog-stock-and-history-in-one-pi-sqlite-database.md)).
 
-Loading the initial stock of the test supermarket is InventoryPersistence-04.
-It depends on loading the catalog (ProductCatalog-03) and is not available
-yet. Until then, tests create catalog rows and use `create_stock_record`.
+The closed catalog is loaded with `pi.catalog.load_initial_catalog` after
+migrations. That load does not insert stock. Initial quantities are created
+with `create_stock_record` for the ids from
+`CatalogService.list_active_product_ids`, and only where `get_stock` reports
+`not_initialized`. The sequence and the provisional-row exception are in the
+[product catalog](product-catalog.md).
 
 ## Rules for maintainers
 

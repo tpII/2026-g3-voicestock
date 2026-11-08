@@ -33,6 +33,7 @@ def test_create_app_returns_a_fastapi_app() -> None:
     assert app.state.query_port is None
     assert app.state.resolution_port is None
     assert app.state.status_port is None
+    assert app.state.catalog_port is None
 
 
 def test_create_app_keeps_ports_for_a_later_api() -> None:

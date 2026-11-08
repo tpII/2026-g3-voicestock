@@ -3,8 +3,9 @@
 ## Status
 
 Accepted — 4 November 2026. Implemented by InventoryPersistence-01..03
-(#38, #40, #41) and InventoryMovementHistory-01 (#43). ProductCatalog-02
-extends the same database; it has not started yet.
+(#38, #40, #41) and InventoryMovementHistory-01 (#43). Product catalog
+identity and lifecycle extend this database in
+[ADR-0015](0015-persist-the-product-catalog-in-the-pi-database.md).
 
 ## Context
 

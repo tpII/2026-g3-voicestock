@@ -178,10 +178,160 @@ _INVENTORY_MOVEMENTS = Migration(
     ),
 )
 
+# Identity columns, categories and aliases. Existing rows keep product_id,
+# stock_unit and retired; name stays NULL until an explicit reconciliation.
+# Those provisional rows are not overwritten and are not given invented
+# attributes. Complete products are counted in 'unit'.
+_CATALOG_IDENTITY = Migration(
+    version=4,
+    name="extend_catalog_products",
+    statements=(
+        """
+        CREATE TABLE catalog_categories (
+            category_id TEXT NOT NULL PRIMARY KEY
+                CHECK (typeof(category_id) = 'text'
+                       AND length(trim(category_id)) > 0),
+            name TEXT NOT NULL
+                CHECK (typeof(name) = 'text' AND length(trim(name)) > 0),
+            name_key TEXT NOT NULL UNIQUE
+                CHECK (typeof(name_key) = 'text' AND length(name_key) > 0)
+        )
+        """,
+        """
+        ALTER TABLE catalog_products ADD COLUMN name TEXT
+            CHECK (name IS NULL OR (typeof(name) = 'text'
+                                    AND length(trim(name)) > 0))
+        """,
+        """
+        ALTER TABLE catalog_products ADD COLUMN brand TEXT
+            CHECK (brand IS NULL OR (typeof(brand) = 'text'
+                                     AND length(trim(brand)) > 0))
+        """,
+        """
+        ALTER TABLE catalog_products ADD COLUMN variant TEXT
+            CHECK (variant IS NULL OR (typeof(variant) = 'text'
+                                       AND length(trim(variant)) > 0))
+        """,
+        """
+        ALTER TABLE catalog_products ADD COLUMN presentation TEXT
+            CHECK (presentation IS NULL OR (typeof(presentation) = 'text'
+                                            AND length(trim(presentation)) > 0))
+        """,
+        """
+        ALTER TABLE catalog_products ADD COLUMN category_id TEXT
+            REFERENCES catalog_categories (category_id)
+            ON UPDATE RESTRICT ON DELETE RESTRICT
+        """,
+        """
+        ALTER TABLE catalog_products ADD COLUMN name_key TEXT
+            CHECK (name_key IS NULL OR (typeof(name_key) = 'text'
+                                        AND length(name_key) > 0))
+        """,
+        """
+        ALTER TABLE catalog_products ADD COLUMN brand_key TEXT
+            CHECK (brand_key IS NULL OR (typeof(brand_key) = 'text'
+                                         AND length(brand_key) > 0))
+        """,
+        """
+        ALTER TABLE catalog_products ADD COLUMN variant_key TEXT
+            CHECK (variant_key IS NULL OR (typeof(variant_key) = 'text'
+                                           AND length(variant_key) > 0))
+        """,
+        """
+        ALTER TABLE catalog_products ADD COLUMN presentation_key TEXT
+            CHECK (presentation_key IS NULL OR (
+                typeof(presentation_key) = 'text' AND length(presentation_key) > 0
+            ))
+        """,
+        """
+        CREATE UNIQUE INDEX catalog_products_canonical_identity
+        ON catalog_products (
+            name_key,
+            ifnull(brand_key, ''),
+            ifnull(variant_key, ''),
+            ifnull(presentation_key, '')
+        )
+        WHERE name_key IS NOT NULL
+        """,
+        """
+        CREATE INDEX catalog_products_by_category
+        ON catalog_products (category_id)
+        WHERE category_id IS NOT NULL
+        """,
+        """
+        CREATE TABLE catalog_aliases (
+            product_id TEXT NOT NULL,
+            alias TEXT NOT NULL
+                CHECK (typeof(alias) = 'text' AND length(trim(alias)) > 0),
+            alias_key TEXT NOT NULL
+                CHECK (typeof(alias_key) = 'text' AND length(alias_key) > 0),
+            PRIMARY KEY (product_id, alias_key),
+            FOREIGN KEY (product_id) REFERENCES catalog_products (product_id)
+                ON UPDATE RESTRICT ON DELETE RESTRICT
+        )
+        """,
+        """
+        CREATE INDEX catalog_aliases_by_key ON catalog_aliases (alias_key)
+        """,
+        """
+        CREATE TRIGGER catalog_products_require_identity_on_insert
+        BEFORE INSERT ON catalog_products
+        WHEN NEW.name IS NOT NULL AND (
+            NEW.category_id IS NULL
+            OR NEW.name_key IS NULL
+            OR NEW.stock_unit <> 'unit'
+            OR (NEW.brand IS NULL) <> (NEW.brand_key IS NULL)
+            OR (NEW.variant IS NULL) <> (NEW.variant_key IS NULL)
+            OR (NEW.presentation IS NULL) <> (NEW.presentation_key IS NULL)
+        )
+        BEGIN
+            SELECT RAISE(ABORT, 'catalog product identity is incomplete');
+        END
+        """,
+        """
+        CREATE TRIGGER catalog_products_require_identity_on_update
+        BEFORE UPDATE OF name, brand, variant, presentation, category_id,
+            name_key, brand_key, variant_key, presentation_key, stock_unit
+        ON catalog_products
+        WHEN NEW.name IS NOT NULL AND (
+            NEW.category_id IS NULL
+            OR NEW.name_key IS NULL
+            OR NEW.stock_unit <> 'unit'
+            OR (NEW.brand IS NULL) <> (NEW.brand_key IS NULL)
+            OR (NEW.variant IS NULL) <> (NEW.variant_key IS NULL)
+            OR (NEW.presentation IS NULL) <> (NEW.presentation_key IS NULL)
+        )
+        BEGIN
+            SELECT RAISE(ABORT, 'catalog product identity is incomplete');
+        END
+        """,
+        """
+        CREATE TRIGGER catalog_aliases_reject_shared_active_alias
+        BEFORE INSERT ON catalog_aliases
+        WHEN EXISTS (
+            SELECT 1
+            FROM catalog_aliases AS other
+            JOIN catalog_products AS owner
+                ON owner.product_id = other.product_id
+            JOIN catalog_products AS incoming
+                ON incoming.product_id = NEW.product_id
+            WHERE other.alias_key = NEW.alias_key
+              AND other.product_id <> NEW.product_id
+              AND owner.retired = 0
+              AND incoming.retired = 0
+        )
+        BEGIN
+            SELECT RAISE(ABORT, 'alias belongs to another active product');
+        END
+        """,
+    ),
+)
+
 MIGRATIONS: tuple[Migration, ...] = (
     _CATALOG_PRODUCTS,
     _INVENTORY_STOCK,
     _INVENTORY_MOVEMENTS,
+    _CATALOG_IDENTITY,
 )
 
 

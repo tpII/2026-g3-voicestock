@@ -221,7 +221,9 @@ no persiste stock.
 - [API de la operación pendiente](docs/interfaces/pending-operation-web-api.md)
 - [Página de la operación pendiente](docs/interfaces/pending-operation-web-ui.md)
 - [Stock del inventario en SQLite](docs/interfaces/inventory-stock.md)
+- [Catálogo de productos](docs/interfaces/product-catalog.md)
 - [ADR-0014: catálogo, stock e historial en una sola SQLite de la Pi](docs/decisions/0014-keep-catalog-stock-and-history-in-one-pi-sqlite-database.md)
+- [ADR-0015: identidad y ciclo de vida del catálogo en la SQLite de la Pi](docs/decisions/0015-persist-the-product-catalog-in-the-pi-database.md)
 - [Bitácora](docs/bitacora/bitacora.md)
 - [Campaña de validación de la Raspberry Pi](docs/testing/raspberry-validation/README.md)
 

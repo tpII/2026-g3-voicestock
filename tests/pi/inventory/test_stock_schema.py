@@ -239,4 +239,19 @@ def test_the_schema_holds_no_movements_or_pending_operations(connection) -> None
         for (_, column, *_rest) in connection.execute(f"PRAGMA table_info({table})")
     }
 
-    assert columns == {"product_id", "stock_unit", "retired", "quantity", "unit"}
+    assert columns == {
+        "product_id",
+        "stock_unit",
+        "retired",
+        "name",
+        "brand",
+        "variant",
+        "presentation",
+        "category_id",
+        "name_key",
+        "brand_key",
+        "variant_key",
+        "presentation_key",
+        "quantity",
+        "unit",
+    }

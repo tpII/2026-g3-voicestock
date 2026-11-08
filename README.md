@@ -197,6 +197,7 @@ no persiste stock.
 - [ADR-0005: Whisper Small Q5 pendiente de validación en Pi](docs/decisions/0005-use-whisper-small-q5-for-offline-stt.md)
 - [Integración de captura, STT e interpretación](docs/architecture/audio-interpretation-integration.md)
 - [Ciclo de operación en la Raspberry Pi](docs/architecture/pending-operation-flow.md)
+- [Historial de movimientos de inventario](docs/interfaces/inventory-movement-history.md)
 - [ADR-0008: un solo orquestador del ciclo](docs/decisions/0008-use-a-single-raspberry-pi-operation-workflow.md)
 - [Runtime integrado de la Raspberry Pi](docs/setup/pi-runtime.md)
 

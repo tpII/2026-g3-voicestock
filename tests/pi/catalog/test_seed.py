@@ -23,8 +23,8 @@ def test_the_seed_is_a_small_closed_supermarket() -> None:
         product.product_id for product in SEED_PRODUCTS if not product.aliases
     ]
 
-    assert 20 <= len(SEED_PRODUCTS) <= 30
-    assert len(SEED_CATEGORIES) == 5
+    assert 70 <= len(SEED_PRODUCTS) <= 100
+    assert len(SEED_CATEGORIES) == 8
     assert alias_count >= 8
     assert products_without_aliases
     assert all(product.stock_unit == "unit" for product in SEED_PRODUCTS)

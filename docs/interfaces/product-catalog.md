@@ -61,8 +61,11 @@ foreign key. Listing by category is `list_products(category_id=...)`.
 Aliases live in `catalog_aliases`, one row per normalized phrase. A blank
 alias is rejected. The same normalized alias on the same product is stored
 once and the original text is not rewritten. The same normalized alias cannot
-belong to two active products. A retired product may keep its aliases; they
-are readable on the product and are omitted from the active snapshot.
+belong to two active products. That holds for an insert, for a change of the
+alias text or its normalized key, for a change of the owning product, and for
+a return from retired to active. A retired product may keep its aliases; they
+are readable on the product and are omitted from the active snapshot. There
+is no public API to edit an alias.
 
 `SqliteProductResolver` does not read aliases. A spoken alias becomes a
 canonical attribute only if the interpreter on the PC does that translation.
@@ -73,7 +76,11 @@ The Raspberry Pi still matches the canonical attributes.
 Products are not deleted. `retire_product(product_id)` sets `retired` when
 the product has no `inventory_stock` row or that row has quantity zero. A
 positive quantity raises `ProductHasStockError` and changes nothing. The
-check and the update run in one `pi.storage.transaction`.
+check and the update run in one `pi.storage.transaction`. The schema rejects
+the same transition when a writer sets `retired = 1` directly: a trigger
+aborts the update while `inventory_stock.quantity > 0`. Zero stock and a
+missing stock row stay legal. The stock row is not deleted and its quantity
+is not changed.
 
 Retirement keeps the id, the identity, the stock row and the movement
 history. A retired product remains available from `get_product` and from
@@ -91,6 +98,28 @@ is only `retire_product`.
 
 Migration 4, `extend_catalog_products`, adds the identity columns, the
 category foreign key and `catalog_aliases`. Migrations 1 to 3 are unchanged.
+Their SQL is not edited, and the SQL of migration 4 is not edited either:
+that version may already be recorded in a development database.
+
+Migration 5, `protect_catalog_retirement_and_aliases`, adds three triggers
+and does not rewrite rows:
+
+- `catalog_products_reject_retirement_with_stock` blocks `retired` going
+  from 0 to 1 while stock quantity is positive.
+- `catalog_aliases_reject_shared_active_alias_on_update` blocks an update of
+  `alias`, `alias_key` or `product_id` that would leave two active products
+  with the same normalized alias.
+- `catalog_products_reject_activation_with_shared_alias` blocks `retired`
+  going from 1 to 0 when that product would then share an alias with another
+  active product. The public API does not reactivate products; the trigger
+  covers a direct SQL update.
+
+A fresh database applies versions 1 through 5. A database at version 3
+applies 4 and then 5. A database that already applied version 4 applies only
+5, so it does not miss the new triggers. Existing stock, movement history
+and product rows are left in place. A row that was already retired with
+positive stock, which the old schema allowed only through direct SQL, is not
+rewritten; later retirement and activation updates are rejected.
 
 Rows created before this migration may contain only `product_id`,
 `stock_unit` and `retired`. The migration leaves them in place and does not
@@ -118,11 +147,28 @@ The caller owns the connection and uses it from one thread.
 ## Seed
 
 `load_initial_catalog(connection)` loads the closed supermarket catalog:
-26 products, 5 categories (`almacen`, `bebidas`, `higiene`, `lacteos`,
-`limpieza`) and 9 aliases. Product ids are fixed strings in
-`pi.catalog.seed.SEED_PRODUCTS`. Running the seed again does not create new
-ids, does not reset `retired`, and does not write `inventory_stock` or
-`inventory_movements`.
+91 products, 8 categories (`almacen`, `bebidas`, `congelados`, `conservas`,
+`higiene`, `lacteos`, `limpieza`, `snacks`) and 21 aliases. Product ids are
+fixed strings in `pi.catalog.seed.SEED_PRODUCTS`. The original 26 ids and
+their canonical attributes are unchanged. New ids were added beside them.
+One existing product, `leche-serenisima-descremada-1000`, gained the alias
+`Leche Serenísima descremada`; that is an added phrase, not a new identity.
+
+Running the seed again does not create new ids, does not reset `retired`,
+and does not write `inventory_stock` or `inventory_movements`. On a database
+that already has the original 26 products, a later run inserts only the
+missing categories, products and aliases. Stock quantities and movement
+history already stored for those ids stay as they are.
+
+The same product type is split by brand, variant and presentation. An
+incomplete query is ambiguous on purpose. `Arroz` at `1 kg` matches Gallo,
+Marolio and Dos Hermanos. `Arroz` Gallo matches `500 g` and `1 kg`.
+`Gaseosa` Coca-Cola at `1.5 L` matches Original and Zero. `Gaseosa`
+Coca-Cola Zero matches `1.5 L` and `2.25 L`. `ProductQuery(name="Gaseosa",
+brand="Coca-Cola")` is ambiguous. A query that carries every canonical
+attribute of a product identifies that product and no other. Aliases such as
+`Coca Zero de litro y medio` and `Arroz Gallo de medio kilo` are stored for
+the interpreter and are not used by `SqliteProductResolver`.
 
 If an existing category, product or alias disagrees with the seed, the call
 raises `CatalogConflictError` and rolls back everything that call inserted.
@@ -218,7 +264,9 @@ from pi.storage import open_database, transaction
 connection = open_database("/path/to/voicestock.sqlite3")
 try:
     load_initial_catalog(connection)
-    quantities = {"gaseosa-coca-cola-zero-2250": 12}  # one entry per product id
+    # One entry for every active id that does not have stock yet.
+    # Ids that already have a record are skipped; do not reset them.
+    quantities = {"gaseosa-coca-cola-zero-2250": 12}
     catalog = CatalogService(connection)
     with transaction(connection):
         for product_id in catalog.list_active_product_ids():
@@ -231,7 +279,13 @@ finally:
 ```
 
 `list_active_product_ids()` is the list of complete, non-retired products,
-ordered by id. `find_active_products_without_stock(connection)` is the
+ordered by id. After this seed it contains the expanded set, not the
+original 26. A quantity map written for the old seed must gain an entry for
+each new active id. An id that already has stock is left untouched: the loop
+skips it because `get_stock` is not `not_initialized`. Do not reload the
+catalog by writing those quantities again.
+
+`find_active_products_without_stock(connection)` is the
 inventory helper and has a wider meaning: it also returns provisional legacy
 rows that are not retired and have no stock record. On a database that only
 contains this seed, the two lists match. On a database upgraded from
@@ -280,4 +334,9 @@ All catalog failures derive from `CatalogError`.
 - Provisional rows from migration 3 stay unresolved until a person decides
   their commercial identity.
 - Aliases are not matching keys. An underspecified command can still be
-  `ambiguous`; that is a query, not a broken catalog.
+  `ambiguous`; that is a query, not a broken catalog. The seed keeps several
+  of those groups on purpose.
+- There is no public alias editor and no reactivation. Direct SQL that would
+  create either invalid state is rejected by migration 5.
+- A product retired with positive stock before migration 5 is left as stored.
+  The migration does not zero that quantity and does not clear `retired`.

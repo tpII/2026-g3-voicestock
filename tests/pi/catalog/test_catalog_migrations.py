@@ -49,6 +49,8 @@ def test_the_first_three_migrations_keep_their_identity() -> None:
     ]
     assert MIGRATIONS[3].version == 4
     assert MIGRATIONS[3].name == "extend_catalog_products"
+    assert MIGRATIONS[4].version == 5
+    assert MIGRATIONS[4].name == "protect_catalog_retirement_and_aliases"
 
 
 def test_a_fresh_database_accepts_a_legacy_shaped_insert(tmp_path: Path) -> None:
@@ -77,7 +79,7 @@ def test_version_3_data_survives_the_catalog_migration(tmp_path: Path) -> None:
 
     connection = connect(path)
     try:
-        assert apply_migrations(connection) == (4,)
+        assert apply_migrations(connection) == (4, 5)
         assert apply_migrations(connection) == ()
 
         product = connection.execute(
@@ -134,9 +136,73 @@ def test_a_failed_upgrade_rolls_back_and_keeps_version_3(tmp_path: Path) -> None
     }
     assert "catalog_categories" not in tables
 
-    assert apply_migrations(connection) == (4,)
+    assert apply_migrations(connection) == (4, 5)
     assert connection.execute("SELECT quantity FROM inventory_stock").fetchone() == (3,)
     connection.close()
+
+
+def test_version_4_receives_only_the_integrity_migration(tmp_path: Path) -> None:
+    path = tmp_path / "voicestock.sqlite3"
+    prepared = connect(path)
+    apply_migrations(prepared, MIGRATIONS[:4])
+    prepared.execute(
+        "INSERT INTO catalog_categories (category_id, name, name_key) "
+        "VALUES ('almacen', 'Almacén', 'almacen')"
+    )
+    prepared.execute(
+        "INSERT INTO catalog_products ("
+        "product_id, stock_unit, retired, name, name_key, brand, brand_key, "
+        "category_id) VALUES ("
+        "'arroz-previo', 'unit', 0, 'Arroz', 'arroz', 'Gallo', 'gallo', 'almacen'"
+        ")"
+    )
+    prepared.execute(
+        "INSERT INTO catalog_aliases (product_id, alias, alias_key) "
+        "VALUES ('arroz-previo', 'Arroz de un kilo', 'arroz de un kilo')"
+    )
+    prepared.execute(
+        "INSERT INTO inventory_stock (product_id, quantity, unit) "
+        "VALUES ('arroz-previo', 4, 'unit')"
+    )
+    prepared.execute(
+        """
+        INSERT INTO inventory_movements (
+            movement_id, product_id, delta, unit, quantity_before, quantity_after,
+            origin, operation_id, causation_key, recorded_at, cause
+        ) VALUES (
+            'mov-previo', 'arroz-previo', 4, 'unit', 0, 4,
+            'initialization', NULL, 'init-arroz',
+            '2026-11-04T18:30:05.123456Z', ?
+        )
+        """,
+        (json.dumps({"reason": "carga previa"}),),
+    )
+    prepared.close()
+
+    connection = connect(path)
+    try:
+        assert apply_migrations(connection) == (5,)
+        assert connection.execute(
+            "SELECT product_id, quantity FROM inventory_stock"
+        ).fetchone() == ("arroz-previo", 4)
+        assert connection.execute(
+            "SELECT movement_id, delta FROM inventory_movements"
+        ).fetchone() == ("mov-previo", 4)
+
+        with pytest.raises(sqlite3.IntegrityError, match="positive stock"):
+            connection.execute(
+                "UPDATE catalog_products SET retired = 1 "
+                "WHERE product_id = 'arroz-previo'"
+            )
+
+        assert connection.execute(
+            "SELECT retired FROM catalog_products WHERE product_id = 'arroz-previo'"
+        ).fetchone() == (0,)
+        assert connection.execute(
+            "SELECT quantity FROM inventory_stock"
+        ).fetchone() == (4,)
+    finally:
+        connection.close()
 
 
 def test_a_complete_product_without_a_category_is_rejected(connection) -> None:

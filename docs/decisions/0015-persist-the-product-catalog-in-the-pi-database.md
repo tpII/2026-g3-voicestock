@@ -68,14 +68,29 @@ stock unit. `CatalogProduct.units` stays a tuple of that stock unit.
 Retirement is logical. It is allowed only when stock is absent or zero, and
 the check shares the write transaction with the flag update. Stock rows and
 movement rows are kept. Inventory continues to reject changes to a retired
-product.
+product. Migration 5 repeats that rule in the schema, so a direct
+`UPDATE retired = 1` fails while `inventory_stock.quantity > 0`. The same
+migration rejects an alias update, an alias ownership change, and a return
+to active that would give two active products the same normalized alias.
+There is still no public editor for aliases and no reactivation.
 
 ### Seed and snapshot
 
-`load_initial_catalog` inserts a fixed set of 26 products, 5 categories and
-9 aliases. Ids are constants. A second run does not mint ids, does not clear
-`retired`, and does not write stock or history. A conflicting existing row
-aborts the seed.
+`load_initial_catalog` inserts a fixed set of 91 products, 8 categories and
+21 aliases. Ids are constants. The original 26 ids and their canonical
+attributes stay as first published on this branch; the later products were
+added beside them. A second run does not mint ids, does not clear `retired`,
+and does not write stock or history. A database that already holds the
+original seed receives only the missing categories, products and aliases. A
+conflicting existing row aborts the seed.
+
+The set is large enough to exercise brand, variant, presentation and
+legitimate ambiguity. `Gaseosa` plus `Coca-Cola`, without variant or
+presentation, matches more than one product. A query with every canonical
+attribute of a product identifies that product. Aliases stay out of matching.
+
+Migration 4 is left as published. Databases that already applied it receive
+migration 5 and do not need a reset. Migrations 1 to 3 stay untouched.
 
 The snapshot revision is the SHA-256 of the canonical JSON of active
 products, aliases included and category excluded. It is not the migration
@@ -113,7 +128,10 @@ sources. The PC is not changed and does not read the snapshot yet.
   returns those rows; that behavior is unchanged on purpose.
 - A catalog write cannot commit an active catalog that hides a product.
 - Retirement cannot pass a positive stock quantity by checking and updating
-  in two transactions.
+  in two transactions, or by writing `retired` outside `CatalogService`.
+- Inventory initialization must enumerate `list_active_product_ids()` after
+  the expanded seed and must supply a quantity only for ids that are still
+  `not_initialized`. Previously stored quantities stay.
 - The HTTP catalog route answers `503` until the runtime passes a port.
 - The PC prompt can drift from the database until a later change delivers
   the snapshot to the interpreter.

@@ -327,11 +327,75 @@ _CATALOG_IDENTITY = Migration(
     ),
 )
 
+# Retirement and alias invariants for writers that bypass CatalogService.
+# Migration 4 already rejects a shared alias on insert. This step also rejects
+# the same alias after an update or a return to active, and rejects retiring
+# a product whose stock quantity is positive. Existing rows are not rewritten.
+_CATALOG_INTEGRITY = Migration(
+    version=5,
+    name="protect_catalog_retirement_and_aliases",
+    statements=(
+        """
+        CREATE TRIGGER catalog_products_reject_retirement_with_stock
+        BEFORE UPDATE OF retired ON catalog_products
+        WHEN NEW.retired = 1 AND OLD.retired = 0 AND EXISTS (
+            SELECT 1 FROM inventory_stock
+            WHERE product_id = NEW.product_id AND quantity > 0
+        )
+        BEGIN
+            SELECT RAISE(ABORT, 'product has positive stock');
+        END
+        """,
+        """
+        CREATE TRIGGER catalog_aliases_reject_shared_active_alias_on_update
+        BEFORE UPDATE OF alias, alias_key, product_id ON catalog_aliases
+        WHEN EXISTS (
+            SELECT 1
+            FROM catalog_aliases AS other
+            JOIN catalog_products AS owner
+                ON owner.product_id = other.product_id
+            JOIN catalog_products AS incoming
+                ON incoming.product_id = NEW.product_id
+            WHERE other.alias_key = NEW.alias_key
+              AND NOT (
+                  other.product_id = OLD.product_id
+                  AND other.alias_key = OLD.alias_key
+              )
+              AND other.product_id <> NEW.product_id
+              AND owner.retired = 0
+              AND incoming.retired = 0
+        )
+        BEGIN
+            SELECT RAISE(ABORT, 'alias belongs to another active product');
+        END
+        """,
+        """
+        CREATE TRIGGER catalog_products_reject_activation_with_shared_alias
+        BEFORE UPDATE OF retired ON catalog_products
+        WHEN NEW.retired = 0 AND OLD.retired = 1 AND EXISTS (
+            SELECT 1
+            FROM catalog_aliases AS own
+            JOIN catalog_aliases AS other
+                ON other.alias_key = own.alias_key
+               AND other.product_id <> own.product_id
+            JOIN catalog_products AS owner
+                ON owner.product_id = other.product_id
+            WHERE own.product_id = NEW.product_id
+              AND owner.retired = 0
+        )
+        BEGIN
+            SELECT RAISE(ABORT, 'alias belongs to another active product');
+        END
+        """,
+    ),
+)
+
 MIGRATIONS: tuple[Migration, ...] = (
     _CATALOG_PRODUCTS,
     _INVENTORY_STOCK,
     _INVENTORY_MOVEMENTS,
     _CATALOG_IDENTITY,
+    _CATALOG_INTEGRITY,
 )
 
 

@@ -176,13 +176,13 @@ def test_the_schema_rejects_a_record_for_a_retired_product(connection) -> None:
 
 
 def test_a_record_is_kept_when_its_product_is_retired(connection) -> None:
-    create_stock_record(connection, "coca-cola-zero-2l", 4)
+    create_stock_record(connection, "coca-cola-zero-2l", 0)
 
     connection.execute(
         "UPDATE catalog_products SET retired = 1 WHERE product_id = 'coca-cola-zero-2l'"
     )
 
-    assert _stock(connection) == [("coca-cola-zero-2l", 4, "unit")]
+    assert _stock(connection) == [("coca-cola-zero-2l", 0, "unit")]
     assert find_active_products_without_stock(connection) == ("arroz-gallo-1kg",)
 
 

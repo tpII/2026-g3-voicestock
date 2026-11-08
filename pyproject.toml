@@ -26,6 +26,7 @@ voicestock-pi-client = "pi.main:main"
 voicestock-pi-ptt = "pi.push_to_talk.manual:main"
 voicestock-pi-web = "pi.web.server:main"
 voicestock-pi = "pi.runtime:main"
+voicestock-pi-database = "pi.database_cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pc", "src/pi", "src/shared"]

@@ -1,5 +1,11 @@
 """Current stock of the catalog products, persisted in the Pi database."""
 
+from pi.inventory.initial_stock import (
+    INITIAL_STOCK,
+    InitialStockMismatchError,
+    InitialStockResult,
+    load_initial_stock,
+)
 from pi.inventory.service import (
     InventoryService,
     StockLevel,
@@ -25,6 +31,10 @@ from pi.inventory.stock import (
 )
 
 __all__ = [
+    "INITIAL_STOCK",
+    "InitialStockMismatchError",
+    "InitialStockResult",
+    "load_initial_stock",
     "IncompatibleUnitError",
     "InsufficientStockError",
     "InvalidDeltaError",

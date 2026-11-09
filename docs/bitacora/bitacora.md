@@ -1561,3 +1561,76 @@ conservó y seguía usable. `voicestock-hostapd.service` y
   versión posterior lo exige. Esta versión no lo exige para publicarse.
 - Publicar el tag y el GitHub Release cuando el número de versión y el
   merge a `develop` estén hechos. Esta entrada no los hace.
+
+## 08/11/2026
+
+### Persistencia del inventario y del historial (`InventoryPersistence`, `InventoryMovementHistory`)
+
+Entre el 04/11 y hoy se completaron las dos features de persistencia sobre
+la base SQLite de la Raspberry Pi, cada tarea en su PR:
+
+- IP-01 (#38): infraestructura común (`pi.storage`): ruta persistente por
+  defecto en `~/.local/share/voicestock/`, rechazo de rutas temporales y en
+  memoria, conexiones con claves foráneas y WAL, transacciones que abre el
+  llamador y un único orden de migraciones. Esquema de existencias: un
+  registro por producto, cantidad entera no negativa y unidad atada a la del
+  catálogo.
+- IP-02 (#40) y IP-03 (#41): consulta de existencias y modificación por
+  delta con un único `UPDATE` condicional. Dos cambios concurrentes no
+  pierden una actualización ni dejan stock negativo; se probó con
+  conexiones independientes en hilos.
+- IMH-01 (#43), IMH-02 (#45) e IMH-03 (#49): historial de solo agregado,
+  con origen, saldo anterior y posterior, motivo e idempotencia por causa,
+  y consultas paginadas por cursor.
+- IP-05 (#47) e IMH-04 (#50): documentación de las dos interfaces y
+  ADR-0014 (una sola base para catálogo, existencias e historial).
+- IP-04 (#52): carga inicial de 91 productos, 1198 unidades, sobre el
+  catálogo de `ProductCatalog` (#51). Comando
+  `voicestock-pi-database init | status`.
+
+Mientras ProductCatalog no existía se armó una tabla de productos mínima
+para que el stock tuviera a qué apuntar. #51 la extendió con las
+migraciones 4 y 5 sin tocar las anteriores, que era lo acordado.
+
+### Problemas encontrados
+
+- En SQLite una restricción `CHECK` que da `NULL` se considera cumplida.
+  La regla «la clave de causa de un movimiento de voz es su
+  `operation_id`» se escribió primero con `=` y dejaba pasar una clave
+  nula. Se corrigió con `IS` antes del merge.
+- `create_stock_record` informaba cualquier violación de integridad como
+  «el producto ya tiene stock». Una falla de escritura simulada lo mostró;
+  ahora solo informa eso si el registro existe y, si no, deja ver el error
+  real.
+- #46 y #48 eran PR apilados y se mergearon sobre sus ramas base, que para
+  ese momento ya estaban viejas: GitHub los mostró como mergeados, pero el
+  código no llegó a `develop`. Se detectó al revisar `develop` y se
+  volvieron a abrir como #49 y #50 sobre `develop`. Desde entonces los PR
+  van siempre contra `develop`.
+- El reloj de la Raspberry Pi estaba más de un día atrasado y el servicio
+  NTP está inactivo. Es la razón por la que el historial se ordena por una
+  secuencia de la base y no por la hora. Activar NTP requiere `sudo` y queda
+  para quien administra la placa; en modo operación la Pi no tiene Internet
+  de todos modos.
+
+### Validación en la Raspberry Pi
+
+Todo se probó en la placa, en un clon aparte del repositorio y sin tocar el
+del equipo hasta que estuvo mergeado. La suite completa pasó en la Pi
+(882 pruebas), también sobre el disco USB en lugar de `/tmp`, que en la Pi
+es `tmpfs`. La base real quedó creada en
+`~/.local/share/voicestock/voicestock.sqlite3` con el esquema 5, el
+catálogo y las existencias iniciales.
+
+La prueba de persistencia tras reinicio
+([TC-PER-001](../testing/raspberry-validation/test-cases/TC-PER-001.md),
+para IP-06 e IMH-05) escribió cambios conocidos en una base de validación
+aparte, en la misma carpeta persistente: el historial no se puede borrar y
+no correspondía dejar movimientos de voz inventados en la base real, que
+solo se leyó. Después de reiniciar el proceso y después de que Juan
+reinició la placa, las existencias, los 93 movimientos campo por campo, las
+consultas por producto, operación, origen e intervalo y las páginas del
+cursor coincidieron con lo guardado, y repetir las causas de voz no creó
+duplicados. Las dos bases tenían el mismo SHA-256 antes y después del
+reinicio. El punto de acceso y Tailscale volvieron solos. Resultado en
+[EX-TC-PER-001-20261108-01](../testing/raspberry-validation/executions/EX-TC-PER-001-20261108-01.md).

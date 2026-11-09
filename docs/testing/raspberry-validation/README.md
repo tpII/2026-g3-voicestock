@@ -26,6 +26,7 @@ documents it cites. Session notes in the project log stay in Spanish; see
 | Operation contract on the Pi | [TC-CON-001](test-cases/TC-CON-001.md) |
 | Integrated error handling | [TC-FLOW-001](test-cases/TC-FLOW-001.md) |
 | Real hardware end-to-end | [TC-E2E-002](test-cases/TC-E2E-002.md) |
+| Stock and history persistence across restarts (after v0.5.0) | [TC-PER-001](test-cases/TC-PER-001.md) |
 
 The order and the reason each stage exists are in the
 [test plan](test-plan.md). TC-E2E-001 and TC-WEB-002 were withdrawn before

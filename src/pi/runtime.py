@@ -5,6 +5,7 @@ This module is the composition that shares a single pending-operation flow.
 """
 
 import argparse
+import sqlite3
 import sys
 from collections.abc import Callable
 from pathlib import Path
@@ -13,22 +14,26 @@ from typing import Protocol
 from pi.audio.capture import AudioCapture
 from pi.audio.config import AudioCaptureConfig
 from pi.audio.sounddevice_backend import SoundDeviceBackend
+from pi.catalog.access import (
+    CatalogNotInitializedError,
+    OpeningProductResolver,
+    OpeningSnapshotReader,
+    require_initialized_catalog,
+)
+from pi.catalog.snapshot import CatalogSnapshotReader
 from pi.communication import (
     AudioInterpretationClient,
     ClientSettings,
     HttpInterpretationClient,
 )
-from pi.operation_contract import (
-    InMemoryProductResolver,
-    OperationValidator,
-    load_catalog,
-)
+from pi.operation_contract import OperationValidator
 from pi.pending_operation import PendingOperationFlow
 from pi.pending_operation.executor import OperationExecutor
 from pi.push_to_talk import (
     DEFAULT_MAX_DURATION_SECONDS,
     PushToTalkController,
 )
+from pi.storage import VolatileDatabasePathError, default_database_path
 from pi.web.app import create_app
 from pi.web.server import ServerRunner, run_server
 from pi.web.settings import WebServerSettings
@@ -54,12 +59,14 @@ class PiRuntime:
         button: _Closeable,
         client: AudioInterpretationClient,
         web_settings: WebServerSettings,
+        catalog_port: CatalogSnapshotReader | None = None,
     ) -> None:
         self.flow = flow
         self.controller = controller
         self._button = button
         self._client = client
         self.web_settings = web_settings
+        self._catalog = catalog_port
         self._closed = False
 
     def serve(self, runner: ServerRunner | None = None) -> None:
@@ -69,6 +76,7 @@ class PiRuntime:
             query_port=self.flow.query_port,
             resolution_port=self.flow.resolution_port,
             status_port=self.flow,
+            catalog_port=self._catalog,
         )
         try:
             run_server(self.web_settings, app=app, runner=runner)
@@ -98,6 +106,7 @@ def build_runtime(
     max_duration: float = DEFAULT_MAX_DURATION_SECONDS,
     delete_after_send: bool = True,
     executor: OperationExecutor | None = None,
+    catalog_port: CatalogSnapshotReader | None = None,
 ) -> PiRuntime:
     """Wire one flow into push-to-talk and the button factory.
 
@@ -125,12 +134,22 @@ def build_runtime(
         web_settings
         if web_settings is not None
         else WebServerSettings.from_environment(),
+        catalog_port,
     )
 
 
 def main(argv: list[str] | None = None) -> int:
     """Run the integrated Raspberry Pi process until the web server stops."""
     args = _parse_args(argv)
+    try:
+        database = require_initialized_catalog(default_database_path())
+    except (
+        CatalogNotInitializedError,
+        VolatileDatabasePathError,
+        sqlite3.Error,
+    ) as error:
+        print(f"voicestock-pi: {error}", file=sys.stderr)
+        return 1
     config = AudioCaptureConfig(
         input_device=args.input_device,
         output_directory=args.output_directory,
@@ -140,9 +159,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         runtime = build_runtime(
             client=client,
-            validator=OperationValidator(
-                InMemoryProductResolver(load_catalog(args.catalog))
-            ),
+            validator=OperationValidator(OpeningProductResolver(database)),
+            catalog_port=OpeningSnapshotReader(database),
             capture=AudioCapture(config, SoundDeviceBackend(config.input_device)),
             button_factory=lambda controller: _physical_button(
                 args.pin,
@@ -199,12 +217,6 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
         type=Path,
         required=True,
         help="directory for published WAV files",
-    )
-    parser.add_argument(
-        "--catalog",
-        type=Path,
-        required=True,
-        help="JSON product catalog used to validate operations",
     )
     parser.add_argument(
         "--max-duration",

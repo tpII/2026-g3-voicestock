@@ -73,6 +73,7 @@ async def test_catalog_returns_the_snapshot_without_stock() -> None:
 
     assert response.status_code == 200
     assert response.headers["cache-control"] == "no-store"
+    assert response.headers["etag"] == '"abc"'
     body = response.json()
     assert body["version"] == 1
     assert body["revision"] == revision
@@ -113,3 +114,26 @@ async def test_the_route_can_read_a_sqlite_catalog(tmp_path) -> None:
 
     assert response.status_code == 200
     assert response.json()["products"][0]["product_id"] == "gaseosa-zero"
+
+
+async def test_if_none_match_returns_304_without_a_body() -> None:
+    snapshot = CatalogSnapshot(version=1, revision="abc", products=())
+    async with client_for(_SnapshotPort(snapshot)) as client:
+        matching = await client.get(
+            "/api/v1/catalog", headers={"If-None-Match": '"abc"'}
+        )
+        weak = await client.get("/api/v1/catalog", headers={"If-None-Match": 'W/"abc"'})
+        listed = await client.get(
+            "/api/v1/catalog", headers={"If-None-Match": '"old", "abc"'}
+        )
+        wildcard = await client.get("/api/v1/catalog", headers={"If-None-Match": "*"})
+        stale = await client.get("/api/v1/catalog", headers={"If-None-Match": '"old"'})
+
+    for response in (matching, weak, listed, wildcard):
+        assert response.status_code == 304
+        assert response.content == b""
+        assert response.headers["etag"] == '"abc"'
+        assert response.headers["cache-control"] == "no-store"
+    assert stale.status_code == 200
+    assert stale.json()["revision"] == "abc"
+    assert stale.headers["etag"] == '"abc"'

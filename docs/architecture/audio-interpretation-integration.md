@@ -19,6 +19,9 @@ flowchart LR
     I --> J[ContractPayload plus recognized_text]
 ```
 
+The diagram above is the v0.5.0 audio path. It predates the persistent
+catalog. The path that is current after ProductCatalog is the next section.
+
 The transport is implemented
 ([ADR-0007](../decisions/0007-send-push-to-talk-audio-as-raw-wav-over-http.md),
 [audio interface](../interfaces/pc-audio-communication.md)).
@@ -94,6 +97,8 @@ contract.
 | PC speech-to-text | `src/pc/speech_to_text/` | `GroqWhisperTranscriber`; WAV bytes in, text or `TranscriptionError` out |
 | Groq chat call | `src/pc/audio/groq_chat.py` | HTTP for the draft provider. Failures become `ProviderError` |
 | Draft provider | `src/pc/interpretation/groq.py` | `GroqDraftProvider`; structured draft, no HTTP import |
+| Pi catalog publication | `src/pi/web/api.py` | `GET /api/v1/catalog`. See the [product catalog](../interfaces/product-catalog.md). |
+| PC catalog client | `src/pc/audio/pi_catalog.py` | Conditional GET before each Groq interpretation. |
 | Audio pipeline | `src/pc/audio/pipeline.py` | STT, one operation, `map_draft`, catalog match, `recognized_text` |
 | Pi operation cycle | `src/pi/pending_operation/flow.py` | Owns the phase and the pending operation after a capture is sent. See [the operation workflow](pending-operation-flow.md). |
 | Pi process | `src/pi/runtime.py` | `voicestock-pi`: capture, client, cycle, and web UI. See [the runtime guide](../setup/pi-runtime.md). |
@@ -163,10 +168,75 @@ WAVs and exercises that adapter remotely, then calls Groq from the PC. See
 [the preparation and execution guide](../testing/raspberry-stt-ssh.md). Hardware
 execution is pending. The earlier diagram is the original plan. The PC HTTP
 server can now run the Groq audio pipeline: Groq Whisper, then
-`openai/gpt-oss-20b`, then Pi contract validation, without inventory
-persistence.
+`openai/gpt-oss-20b`, then Pi contract validation. Confirmation does not
+write stock.
 [EX-TC-E2E-002-20261104-01](../testing/raspberry-validation/executions/EX-TC-E2E-002-20261104-01.md)
 records one physical cycle. It is **FAILED** on N1 and does not accept the
 cycle as **CLOSED_PASSED**.
 Connecting a recorded capture to this server and accepting it under test
 criteria remains pending.
+
+## Authoritative catalog (November 2026)
+
+The Raspberry Pi SQLite file is the only product catalog. The PC does not
+open that file and does not keep a JSON catalog of its own. Identity,
+interpretation and stock stay separate. Confirmation still uses
+`ProvisionalOperationExecutor` and does not write stock or history.
+
+```mermaid
+flowchart TD
+    A[Pi capture] --> B[POST /api/v1/interpret-audio]
+    B --> C[PC catalog GET]
+    C --> D{200 or 304}
+    D --> E[Validated snapshot]
+    E --> F[LLM context]
+    E --> G[Local matcher]
+    F --> H[STT then draft]
+    G --> H
+    H --> I[ContractPayload]
+    I --> J[Pi SqliteProductResolver]
+    J --> K[PendingOperationFlow]
+```
+
+1. The Pi captures the WAV.
+2. The Pi submits it with `POST /api/v1/interpret-audio`. The request does
+   not carry a catalog revision.
+3. In `groq` mode the PC calls `GET /api/v1/catalog` before transcription.
+4. The Pi answers `200` with the active snapshot or `304` when the ETag
+   still matches.
+5. The PC keeps one validated snapshot in memory. A `200` replaces the LLM
+   context and the local matcher together. A `304` reuses both.
+6. The PC transcribes the WAV and interprets the text with that context.
+   Aliases are phrases in the prompt, not product identities.
+7. The PC checks the canonical attributes against the same snapshot.
+8. The PC returns the existing version-1 contract. It does not assign
+   `product_id`.
+9. The Pi resolves that description with `SqliteProductResolver` on the
+   audio-processing thread.
+10. `PendingOperationFlow` stores one pending operation or rejects the cycle.
+    Confirm and cancel do not change quantities.
+
+`stub` mode skips steps 3 to 7 and does not call the catalog. A catalog
+failure in `groq` mode returns `catalog_unavailable` and does not call
+Whisper or the language model. The next WAV tries again. Reaching the
+catalog endpoint does not mean the microphone, the button or Groq are
+healthy.
+
+The snapshot contract, the ETag rules and the domain errors are specified
+once in the [product catalog](../interfaces/product-catalog.md). Why the PC
+asks before every interpretation is
+[ADR-0016](../decisions/0016-synchronize-product-catalog-over-http.md).
+How to run the two processes is the
+[Pi runtime](../setup/pi-runtime.md) and the
+[PC audio pipeline](../setup/pc-audio-pipeline.md). The manual checks that
+have not been executed on hardware are
+[the integration procedure](../testing/product-catalog-integration.md).
+
+| Concern | Owner |
+| --- | --- |
+| Product identity, categories, aliases, retirement | `pi.catalog` |
+| Spoken attributes and alias phrases | PC prompt, from the snapshot |
+| Stable `product_id` | Pi `OperationValidator` |
+| Quantities | `pi.inventory` |
+| Movements | `pi.movement_history` |
+| Confirm writes stock | Not this feature. The provisional executor returns success and writes nothing. |

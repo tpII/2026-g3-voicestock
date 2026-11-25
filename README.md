@@ -6,8 +6,9 @@ La Raspberry Pi captura audio con un botón y lo envía a la PC. Con
 `VOICESTOCK_AUDIO_PIPELINE=groq`, la PC transcribe el WAV con Groq Whisper
 y pide un borrador a `openai/gpt-oss-20b`. La Raspberry Pi valida el
 contrato, mantiene una sola operación pendiente en memoria y muestra la
-página para confirmarla o cancelarla. El inventario en SQLite no se
-modifica: confirmar informa éxito y no persiste stock.
+página para confirmarla o cancelarla. El inventario en SQLite ya guarda el catálogo, las existencias y el
+historial. Confirmar una operación de voz todavía no los modifica: el
+ejecutor provisional informa éxito y no escribe stock.
 
 El alcance aceptado para v0.5.0, con la limitación de productos ambiguos,
 está en [las notas de v0.5.0](docs/releases/v0.5.0.md). El servidor sigue
@@ -132,10 +133,13 @@ la respuesta
 ### Ciclo de operación en la Raspberry Pi
 
 `voicestock-pi` es el proceso que junta el botón, el micrófono, el cliente
-hacia la PC, la validación del contrato y la página. El pin, el micrófono, el
-directorio de grabaciones y el catálogo JSON son obligatorios. En desarrollo:
+hacia la PC, la validación del contrato y la página. El catálogo es el de la
+base SQLite, no un JSON. Hay que prepararla antes, con
+`voicestock-pi-database init`. El pin, el micrófono y el directorio de
+grabaciones son obligatorios. En desarrollo:
 
 ```bash
+voicestock-pi-database init
 VOICESTOCK_PC_URL=http://127.0.0.1:8000 \
 VOICESTOCK_WEB_HOST=127.0.0.1 \
 VOICESTOCK_WEB_PORT=8123 \
@@ -143,8 +147,7 @@ VOICESTOCK_WEB_PORT=8123 \
   --pin 17 \
   --bounce-time 0.05 \
   --input-device "USB Audio" \
-  --output-directory recordings \
-  --catalog path/to/catalog.json
+  --output-directory recordings
 ```
 
 `USB Audio` es un ejemplo de nombre de dispositivo, no un valor fijo.
@@ -173,6 +176,26 @@ VOICESTOCK_WEB_HOST=127.0.0.1 VOICESTOCK_WEB_PORT=8123 voicestock-pi-web
 - [Cómo instalar y abrir solo la página](docs/setup/pi-web.md)
 - [Contrato HTTP](docs/interfaces/pending-operation-web-api.md)
 - [Qué muestra la página](docs/interfaces/pending-operation-web-ui.md)
+
+## Catálogo de productos
+
+La Raspberry Pi es la única fuente de identidad. El catálogo vive en la
+misma SQLite que el stock y el historial. `voicestock-pi` resuelve los
+productos contra esa base y publica el snapshot activo en
+`GET /api/v1/catalog`, con `ETag`. Antes de cada interpretación Groq, la PC
+pide ese snapshot: `200` lo instala y `304` reutiliza el que ya validó. El
+modelo ve alias como frases; el contrato lleva atributos canónicos. La Pi
+asigna el `product_id`. Confirmar sigue sin escribir stock.
+
+- [Interfaz del catálogo](docs/interfaces/product-catalog.md)
+- [ADR-0006](docs/decisions/0006-identify-products-by-unique-attribute-match.md),
+  [ADR-0014](docs/decisions/0014-keep-catalog-stock-and-history-in-one-pi-sqlite-database.md),
+  [ADR-0015](docs/decisions/0015-persist-the-product-catalog-in-the-pi-database.md)
+  y [ADR-0016](docs/decisions/0016-synchronize-product-catalog-over-http.md)
+- [Runtime de la Pi](docs/setup/pi-runtime.md) y
+  [pipeline de la PC](docs/setup/pc-audio-pipeline.md)
+- [Recorrido de audio](docs/architecture/audio-interpretation-integration.md)
+- [Procedimiento de validación, sin ejecución](docs/testing/product-catalog-integration.md)
 
 ## Estado de la evaluación de voz
 
@@ -225,6 +248,8 @@ no persiste stock.
 - [Catálogo de productos](docs/interfaces/product-catalog.md)
 - [ADR-0014: catálogo, stock e historial en una sola SQLite de la Pi](docs/decisions/0014-keep-catalog-stock-and-history-in-one-pi-sqlite-database.md)
 - [ADR-0015: identidad y ciclo de vida del catálogo en la SQLite de la Pi](docs/decisions/0015-persist-the-product-catalog-in-the-pi-database.md)
+- [ADR-0016: sincronizar el catálogo por HTTP](docs/decisions/0016-synchronize-product-catalog-over-http.md)
+- [Validación de la integración del catálogo](docs/testing/product-catalog-integration.md)
 - [Bitácora](docs/bitacora/bitacora.md)
 - [Campaña de validación de la Raspberry Pi](docs/testing/raspberry-validation/README.md)
 

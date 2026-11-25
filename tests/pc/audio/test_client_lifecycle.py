@@ -1,8 +1,5 @@
 """Groq client ownership follows the ASGI lifespan. No live API call is made."""
 
-import json
-from pathlib import Path
-
 import httpx
 import pytest
 
@@ -41,22 +38,6 @@ def _audio() -> ReceivedAudio:
     )
 
 
-def _catalog(path: Path) -> None:
-    path.write_text(
-        json.dumps(
-            [
-                {
-                    "name": "Arroz",
-                    "brand": "Marolio",
-                    "variant": None,
-                    "presentation": "1 kg",
-                }
-            ]
-        ),
-        encoding="utf-8",
-    )
-
-
 async def test_stub_session_does_not_open_a_client(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -85,7 +66,7 @@ async def test_stub_session_does_not_open_a_client(
 
 
 async def test_groq_client_is_shared_and_closes_once(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     created: list[TrackingClient] = []
 
@@ -95,14 +76,8 @@ async def test_groq_client_is_shared_and_closes_once(
         return client
 
     monkeypatch.setattr("pc.audio.factory.httpx.Client", build_client)
-    catalog = tmp_path / "catalog.json"
-    _catalog(catalog)
     session = audio_session_for(
-        AudioPipelineSettings(
-            mode="groq",
-            catalog_path=catalog,
-            api_key="not-a-real-key",
-        ),
+        AudioPipelineSettings(mode="groq", api_key="not-a-real-key"),
         describe_received_audio,
     )
     assert created == []
@@ -113,9 +88,10 @@ async def test_groq_client_is_shared_and_closes_once(
         session.lifespan,
     )
     async with app.router.lifespan_context(app):
-        assert len(created) == 1
+        assert len(created) == 2
         assert session._transcriber is not None
         assert session._poster is not None
+        assert session._catalog is not None
         assert session._transcriber._client is created[0]
         assert session._poster._client is created[0]
         transport = httpx.ASGITransport(app=app)
@@ -125,5 +101,7 @@ async def test_groq_client_is_shared_and_closes_once(
             response = await client.post("/api/v1/interpret", json={"text": "hola"})
         assert response.status_code == 200
     assert created[0].close_calls == 1
+    assert created[1].close_calls == 1
     session.close()
     assert created[0].close_calls == 1
+    assert created[1].close_calls == 1

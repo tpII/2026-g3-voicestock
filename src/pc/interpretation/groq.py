@@ -56,7 +56,7 @@ class GroqDraftProvider:
         self,
         *,
         poster: ChatPoster,
-        catalog: list[dict[str, str | None]],
+        catalog: list[dict[str, Any]],
         model: str = DEFAULT_LLM_MODEL,
     ) -> None:
         if not model.strip():
@@ -92,7 +92,7 @@ class GroqDraftProvider:
         return _draft_from_body(body)
 
 
-def _instructions(catalog: list[dict[str, str | None]]) -> str:
+def _instructions(catalog: list[dict[str, Any]]) -> str:
     catalog_json = json.dumps(catalog, ensure_ascii=False)
     return (
         "Convertí un pedido de inventario dicho en español a JSON. "
@@ -104,7 +104,10 @@ def _instructions(catalog: list[dict[str, str | None]]) -> str:
         "Copiá nombre, marca, variante y presentacion tal como figuran. "
         "Si un atributo no fue dicho, usá null. "
         "No elijas una presentación cuando el pedido coincide con más de un "
-        "producto. No inventes product_id ni productos fuera del catálogo. "
+        "producto. Un alias es una frase del mismo producto, no un producto "
+        "nuevo: si el pedido usa un alias, copiá los atributos canónicos de "
+        "esa fila y no uses el alias como nombre. "
+        "No inventes product_id ni productos fuera del catálogo. "
         f"Catálogo: {catalog_json}"
     )
 

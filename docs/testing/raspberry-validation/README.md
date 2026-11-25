@@ -66,6 +66,13 @@ interpretation, and more than one operation in a single command. The
 pipeline reports `unsupported_command` when the draft does not contain
 exactly one operation. This campaign has no execution of that report.
 
+Catalog synchronization between the Pi and the PC is not a result of this
+campaign. The unchecked procedure is
+[product catalog integration](../product-catalog-integration.md).
+Stock and history across a restart were later executed as
+[TC-PER-001](test-cases/TC-PER-001.md). That execution is not the v0.5.0
+claim in the paragraph above, and it does not cover the catalog HTTP step.
+
 [PendingOperationWeb-08](https://app.clickup.com/t/86e3evek6) expects a real
 end-to-end flow that includes real speech-to-text and interpretation.
 TC-E2E-001 would have replaced that PC-side processing with a deterministic

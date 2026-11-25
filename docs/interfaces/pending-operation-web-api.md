@@ -41,8 +41,8 @@ The standalone `voicestock-pi-web` command does not receive ports. `/health`,
 return `503` with `application_not_ready`. `GET /api/v1/catalog` returns
 `503` with `catalog_not_ready` until a catalog port is provided. `/health`
 does not check the ports. `voicestock-pi` passes the three
-pending-operation ports and does not open the catalog database yet. See the
-[integrated runtime](../setup/pi-runtime.md).
+pending-operation ports and a snapshot reader for the persistent catalog.
+See the [integrated runtime](../setup/pi-runtime.md).
 
 ## Read the cycle
 

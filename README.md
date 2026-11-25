@@ -132,10 +132,13 @@ la respuesta
 ### Ciclo de operación en la Raspberry Pi
 
 `voicestock-pi` es el proceso que junta el botón, el micrófono, el cliente
-hacia la PC, la validación del contrato y la página. El pin, el micrófono, el
-directorio de grabaciones y el catálogo JSON son obligatorios. En desarrollo:
+hacia la PC, la validación del contrato y la página. El catálogo es el de la
+base SQLite, no un JSON. Hay que prepararla antes, con
+`voicestock-pi-database init`. El pin, el micrófono y el directorio de
+grabaciones son obligatorios. En desarrollo:
 
 ```bash
+voicestock-pi-database init
 VOICESTOCK_PC_URL=http://127.0.0.1:8000 \
 VOICESTOCK_WEB_HOST=127.0.0.1 \
 VOICESTOCK_WEB_PORT=8123 \
@@ -143,8 +146,7 @@ VOICESTOCK_WEB_PORT=8123 \
   --pin 17 \
   --bounce-time 0.05 \
   --input-device "USB Audio" \
-  --output-directory recordings \
-  --catalog path/to/catalog.json
+  --output-directory recordings
 ```
 
 `USB Audio` es un ejemplo de nombre de dispositivo, no un valor fijo.

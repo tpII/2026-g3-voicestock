@@ -8,6 +8,7 @@ from fastapi import APIRouter, FastAPI, Request
 from fastapi.responses import JSONResponse, Response
 
 from pi.pending_operation.resolution import ResolutionResult, ResolutionStatus
+from pi.web.conditional import if_none_match_is_current, quoted_etag
 from pi.web.dependencies import (
     APIError,
     CatalogPortDep,
@@ -62,14 +63,21 @@ def resolution_http_response(result: ResolutionResult) -> JSONResponse:
 
 
 @router.get("/catalog")
-async def read_catalog(catalog_port: CatalogPortDep) -> JSONResponse:
-    """Return the active catalog snapshot. The route does not change it.
+async def read_catalog(request: Request, catalog_port: CatalogPortDep) -> Response:
+    """Return the active catalog, or 304 when ``If-None-Match`` is current.
 
-    It is async so the read stays on the server thread. That is the thread
-    that owns the SQLite connection; a worker thread would be rejected.
+    The handler stays on the server thread. The integrated runtime opens a
+    SQLite connection inside ``read_snapshot`` and closes it before returning.
+    A reader that already owns a connection must have opened it on this thread.
     """
-    body = CatalogSnapshotResponse.from_snapshot(catalog_port.read_snapshot())
-    return JSONResponse(content=body.model_dump(mode="json"), headers=NO_STORE)
+    snapshot = catalog_port.read_snapshot()
+    headers = {**NO_STORE, "ETag": quoted_etag(snapshot.revision)}
+    if if_none_match_is_current(
+        request.headers.get("if-none-match"), snapshot.revision
+    ):
+        return Response(status_code=304, headers=headers)
+    body = CatalogSnapshotResponse.from_snapshot(snapshot)
+    return JSONResponse(content=body.model_dump(mode="json"), headers=headers)
 
 
 @router.get("/system-status")

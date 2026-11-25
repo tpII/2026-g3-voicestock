@@ -211,9 +211,16 @@ The result is the existing `ProductResolution`: `identified`, `unknown`,
 candidates. The resolver does not create products and does not change stock.
 `OperationValidator` still decides whether the operation is acceptable.
 
-`InMemoryProductResolver` remains the implementation used by `voicestock-pi`
-today. Both implementations share `ensure_catalog_identifiable` and
-`match_products`.
+`InMemoryProductResolver` remains for isolated tests and diagnostic use. It
+is not the catalog of `voicestock-pi`. Both implementations share
+`ensure_catalog_identifiable` and `match_products`.
+
+`voicestock-pi` validates with `OpeningProductResolver`. That adapter opens
+one connection on the thread that is resolving, constructs
+`SqliteProductResolver`, and closes the connection before returning, including
+when resolution raises. The audio worker and the HTTP server therefore never
+receive a connection created at startup. `check_same_thread` is left at the
+SQLite default.
 
 ## Snapshot
 
@@ -237,17 +244,26 @@ retiring a product, changing a canonical attribute, or adding or removing an
 alias changes the revision. Changing only the category does not. Retired
 products are absent.
 
-`GET /api/v1/catalog` on the existing FastAPI app returns that snapshot with
-`Cache-Control: no-store`. Without a catalog port the route returns `503` and
-`catalog_not_ready`. The handler is async so the read stays on the server
-thread that owns the SQLite connection.
+`GET /api/v1/catalog` on the integrated runtime returns that snapshot from
+the same SQLite file used for resolution. `Cache-Control` is `no-store`.
+The `ETag` is the snapshot revision in double quotes. The value is the
+`revision` field of the body, not a second counter.
 
-`voicestock-pi` does not open the database and does not pass a catalog port,
-so that route answers `503` in the current process. The voice workflow keeps
-validating with the JSON file from `--catalog`. Replacing that file with
-`SqliteProductResolver` is a separate wiring step: it has to happen together
-with the process becoming the single owner of the database, without a second
-catalog source beside it.
+`If-None-Match` uses weak HTTP comparison. A missing header returns `200`
+and the snapshot. A quoted ETag, a weak `W/"<revision>"`, one matching tag
+in a comma-separated list, or `*` returns `304` with an empty body and the
+current `ETag`. Any other tag returns `200` and the full snapshot. The
+header is not compared as a raw string against the revision.
+
+The handler is async. The runtime reader opens and closes its connection
+inside `read_snapshot`, on the server thread. A caller that passes
+`CatalogService` directly must have opened that connection on the same
+thread. Without a catalog port the route returns `503` and
+`catalog_not_ready`. The standalone `voicestock-pi-web` command does not
+pass a port. `voicestock-pi` does, after `voicestock-pi-database init`.
+
+The PC does not request this endpoint yet. Stock changes do not change the
+revision, because the snapshot does not include quantities.
 
 ## Inventory initialization
 
@@ -325,9 +341,6 @@ All catalog failures derive from `CatalogError`.
 
 ## Known limits
 
-- `voicestock-pi` still validates operations with the JSON catalog. The
-  SQLite resolver and the HTTP snapshot are ready and are not connected to
-  that process.
 - The PC does not download the snapshot and does not change its prompt.
 - There is no API to correct a canonical attribute in place.
 - A retired product is not reactivated.

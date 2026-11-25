@@ -183,6 +183,6 @@ startup thread, the audio worker and the HTTP server.
 `GET /health` on this process means the HTTP server is responding. It does
 not mean the microphone, the button, the PC, or the catalog are healthy.
 
-The PC still does not download this catalog. Its prompt and its own catalog
-file are unchanged. `InMemoryProductResolver` remains for isolated tests and
-is not what `voicestock-pi` uses.
+The PC downloads this catalog with `GET /api/v1/catalog` before each Groq
+interpretation. It does not open the database. `InMemoryProductResolver`
+remains for isolated tests and is not what `voicestock-pi` uses.

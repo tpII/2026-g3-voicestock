@@ -262,8 +262,12 @@ thread. Without a catalog port the route returns `503` and
 `catalog_not_ready`. The standalone `voicestock-pi-web` command does not
 pass a port. `voicestock-pi` does, after `voicestock-pi-database init`.
 
-The PC does not request this endpoint yet. Stock changes do not change the
-revision, because the snapshot does not include quantities.
+The PC requests this endpoint before every Groq interpretation. The first
+request omits `If-None-Match`. Later requests send the installed revision.
+`304` reuses that snapshot. `200` replaces it only after the body validates.
+Stock changes do not change the revision, because the snapshot does not
+include quantities. The PC does not assign `product_id` and does not write
+the catalog back.
 
 ## Inventory initialization
 
@@ -341,7 +345,8 @@ All catalog failures derive from `CatalogError`.
 
 ## Known limits
 
-- The PC does not download the snapshot and does not change its prompt.
+- The PC keeps the snapshot in memory only. A restart synchronizes again.
+  There is no local catalog file in the Groq pipeline.
 - There is no API to correct a canonical attribute in place.
 - A retired product is not reactivated.
 - Stock is counted only in `unit`. There is no conversion and no fractional

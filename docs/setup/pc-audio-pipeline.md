@@ -19,7 +19,8 @@ responde con `received_audio` y no llama a Groq.
 | Variable | Uso |
 | --- | --- |
 | `VOICESTOCK_AUDIO_PIPELINE` | `stub` o `groq` |
-| `VOICESTOCK_CATALOG_PATH` | JSON del catálogo. Obligatorio en `groq` |
+| `VOICESTOCK_PI_URL` | Base HTTP de la Raspberry. Por defecto `http://192.168.50.1:8000` |
+| `VOICESTOCK_CATALOG_TIMEOUT_SECONDS` | Timeout del `GET /api/v1/catalog`. Por defecto 5 |
 | `VOICESTOCK_GROQ_API_KEY` | Credencial. Si falta, se lee `GROQ_API_KEY` |
 | `VOICESTOCK_STT_MODEL` | Por defecto `whisper-large-v3-turbo` |
 | `VOICESTOCK_LLM_MODEL` | Por defecto `openai/gpt-oss-20b` |
@@ -42,7 +43,7 @@ Desde el entorno del proyecto, con la clave ya exportada:
 
 ```bash
 VOICESTOCK_AUDIO_PIPELINE=groq \
-VOICESTOCK_CATALOG_PATH=/ruta/catalogo.json \
+VOICESTOCK_PI_URL=http://192.168.50.1:8000 \
 VOICESTOCK_PC_HOST=192.168.50.2 \
 VOICESTOCK_PC_PORT=8000 \
 voicestock-pc-server
@@ -57,23 +58,40 @@ VOICESTOCK_PC_PORT=8000 \
 voicestock-pc-server
 ```
 
-En modo `groq`, el proceso abre un solo cliente HTTP cuando el servidor
-arranca y lo cierra al terminar. Whisper y el modelo de interpretación lo
-comparten. El modo `stub` no lo crea. La transcripción y la interpretación
+En modo `groq`, el proceso abre el cliente de Groq y el cliente del catálogo
+cuando el servidor arranca, y cierra ambos al terminar. No descarga el
+catálogo en el arranque: la Raspberry puede levantarse después. La primera
+interpretación hace `GET /api/v1/catalog` antes de Whisper. Si esa llamada
+falla, no hay transcripción ni llamada al modelo, y el resultado es
+`catalog_unavailable`. El pedido siguiente vuelve a intentar la sincronización.
+
+Un `200` valida la versión, la revisión, el `ETag`, los productos y que cada
+uno sea identificable por sus atributos canónicos. Recién entonces reemplaza
+el prompt y el matcher, juntos. Un `304` con el mismo `ETag` reutiliza ese
+par. Un snapshot inválido no pisa el anterior, pero el audio de ese pedido
+falla igual: no se interpreta con el catálogo viejo. El modo `stub` no abre
+ninguno de los dos clientes y no exige la Raspberry ni la clave de Groq.
+
+Whisper y el modelo de interpretación comparten el cliente de Groq. El
+timeout del catálogo es independiente. La transcripción y la interpretación
 corren fuera del bucle de eventos de HTTP: una llamada lenta no deja muda la
 otra ruta.
 
 ## Catálogo y contrato
 
-El modelo debe copiar `nombre`, `marca`, `variante` y `presentacion` del
-catálogo. `map_draft` arma el `ContractPayload` versión 1. La Raspberry
-sigue siendo quien asigna `product_id`.
+Antes de cada WAV, la PC pide `GET /api/v1/catalog` a `VOICESTOCK_PI_URL`.
+El cuerpo es el snapshot de productos activos. El prompt copia `nombre`,
+`marca`, `variante`, `presentacion` y la lista `alias`. Un alias le permite
+al modelo reconocer una frase, pero el contrato debe llevar los atributos
+canónicos, no el alias y no un `product_id`. `map_draft` arma el
+`ContractPayload` versión 1. La Raspberry sigue asignando `product_id`.
 
 Si el texto no distingue una fila, el servidor responde error de servicio
-`ambiguous_product` y no elige una presentación. Con el catálogo de las dos
-presentaciones de Arroz Marolio, «agregá dos paquetes de arroz» es ambiguo.
-Un pedido que nombra la presentación de 1 kg puede identificarse solo si el
-modelo copia `presentacion` igual a `1 kg`.
+`ambiguous_product` y no elige una presentación. «Agregá arroz» sigue siendo
+ambiguo cuando hay más de un arroz. Un alias que corresponde a una sola fila
+puede hacer que el modelo complete los atributos de esa fila. El matcher
+local no resuelve alias por su cuenta: compara los atributos que devolvió el
+modelo.
 
 Un comando con cero operaciones o con más de una no se recorta: el resultado
 es `unsupported_command`.
@@ -96,10 +114,11 @@ juntos. `PcResponseInterpreter` separa ese texto antes de validar.
 
 ## Límites
 
-- No hay persistencia de inventario.
-- Los tests automáticos simulan Groq. No demuestran la API real ni la
-  prueba física de punta a punta.
+- No hay persistencia de inventario ni caché del catálogo en disco.
+- Los tests automáticos simulan Groq y la Raspberry. No demuestran la API
+  real ni la prueba física de punta a punta.
 - El texto `POST /api/v1/interpret` sigue el proveedor de
-  `VOICESTOCK_INTERPRETATION_PROVIDER`, que por defecto es `stub`.
+  `VOICESTOCK_INTERPRETATION_PROVIDER`, que por defecto es `stub`. Ese
+  endpoint no sincroniza el catálogo.
 - El alcance de esta versión es una sola operación `add_stock` o
   `remove_stock`.

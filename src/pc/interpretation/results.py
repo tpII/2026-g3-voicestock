@@ -20,6 +20,7 @@ class ServiceErrorCode(StrEnum):
     UNKNOWN_PRODUCT = "unknown_product"
     INSUFFICIENT_PRODUCT = "insufficient_product"
     CONTRACT_MAPPING_FAILURE = "contract_mapping_failure"
+    CATALOG_UNAVAILABLE = "catalog_unavailable"
 
 
 class ServiceError(BaseModel):

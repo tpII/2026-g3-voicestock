@@ -156,7 +156,7 @@ These variables are the ones `WebServerSettings`, `ClientSettings` and
 | `VOICESTOCK_WEB_HOST` | `192.168.50.1` | Address the operator page binds. |
 | `VOICESTOCK_WEB_PORT` | `8000` | TCP port of the operator page. Integer from 1 to 65535. |
 | `VOICESTOCK_PC_URL` | `http://127.0.0.1:8000` | Base URL of the PC interpretation server. |
-| `VOICESTOCK_PC_TIMEOUT` | `10` | Client timeout in seconds. Finite and positive. |
+| `VOICESTOCK_PC_TIMEOUT` | `10` | Client timeout in seconds for the whole PC call. Finite and positive. It is not a measured budget for catalog plus Groq. See the [PC pipeline](pc-audio-pipeline.md). |
 
 ## Lifecycle
 

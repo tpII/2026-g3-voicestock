@@ -27,6 +27,11 @@ PushToTalk ── WAV ──► RecordingSender
                               └──── TransportEnvelope ◄── InterpretationService)
 ```
 
+The diagram shows the transport. The default handler is still the stub.
+`VOICESTOCK_AUDIO_PIPELINE=groq` asks the Pi for the catalog before
+transcription. That step is the
+[product catalog](product-catalog.md), not part of this audio body.
+
 | Layer | Owner | Answers |
 |---|---|---|
 | `TransportEnvelope` | RaspberryPiPCAudioTransfer | Did the audio travel between Raspberry Pi and PC? |

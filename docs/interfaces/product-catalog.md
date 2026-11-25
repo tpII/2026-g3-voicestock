@@ -220,7 +220,12 @@ one connection on the thread that is resolving, constructs
 `SqliteProductResolver`, and closes the connection before returning, including
 when resolution raises. The audio worker and the HTTP server therefore never
 receive a connection created at startup. `check_same_thread` is left at the
-SQLite default.
+SQLite default. Startup opens the database only long enough to migrate and
+to require at least one active product, then closes that connection. The
+path is `VOICESTOCK_DATABASE` or
+`~/.local/share/voicestock/voicestock.sqlite3`. The runtime does not load
+the seed. Prepare the file with `voicestock-pi-database init`, as described
+in the [Pi runtime](../setup/pi-runtime.md).
 
 ## Snapshot
 
@@ -268,6 +273,30 @@ request omits `If-None-Match`. Later requests send the installed revision.
 Stock changes do not change the revision, because the snapshot does not
 include quantities. The PC does not assign `product_id` and does not write
 the catalog back.
+
+## PC consumer
+
+`groq` mode calls the endpoint before transcription. The first call sends no
+`If-None-Match`. Later calls send the revision of the snapshot held in
+memory. That copy is not written to disk and disappears when the PC process
+exits.
+
+The PC accepts schema version `1` only. The ETag must be the body's
+`revision`. The product list must be non-empty, with unique ids and with
+every product identifiable by its own canonical attributes. Aliases are
+included in the prompt and are not matched by the local checker. The
+contract still carries canonical attributes.
+
+A valid `200` replaces the prompt and the local matcher as one step. A
+`304` keeps both. An invalid body does not replace the previous snapshot,
+and that audio still fails: the old snapshot is not a fallback. The service
+code is `catalog_unavailable`. The following audio synchronizes again.
+Stub mode does not call the endpoint.
+
+Startup commands, `VOICESTOCK_PI_URL` and
+`VOICESTOCK_CATALOG_TIMEOUT_SECONDS` are in the
+[PC audio pipeline](../setup/pc-audio-pipeline.md). The decision is
+[ADR-0016](../decisions/0016-synchronize-product-catalog-over-http.md).
 
 ## Inventory initialization
 

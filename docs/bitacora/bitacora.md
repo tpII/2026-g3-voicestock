@@ -1634,3 +1634,78 @@ cursor coincidieron con lo guardado, y repetir las causas de voz no creó
 duplicados. Las dos bases tenían el mismo SHA-256 antes y después del
 reinicio. El punto de acceso y Tailscale volvieron solos. Resultado en
 [EX-TC-PER-001-20261108-01](../testing/raspberry-validation/executions/EX-TC-PER-001-20261108-01.md).
+
+### Catálogo persistente (`ProductCatalog`, #51)
+
+El mismo día quedó el catálogo que esa carga inicial usa. Los commits son
+`3073e4d` y `1b7facf`, mergeados en #51 (`5cb6c24`).
+
+La identidad sigue siendo ADR-0006: `name`, `brand`, `variant` y
+`presentation`, normalizados, sin desempate. `product_id` es opaco y no se
+reutiliza. La categoría no identifica al producto. Los alias son frases
+para quien interpreta; el resolver de la Pi no los usa como clave.
+
+Las migraciones 4 y 5 extienden `catalog_products` y agregan categorías y
+alias. Las migraciones 1 a 3 no se reescribieron. Una fila anterior sin
+nombre queda provisional y no entra al catálogo activo. El alta es una
+transacción: si el producto no se puede identificar con sus propios
+atributos, no se confirma. El retiro es lógico y exige stock ausente o en
+cero. El stock y el historial de ese id se conservan.
+
+La semilla es fija: 8 categorías, 91 productos y 21 alias. Los 26 ids
+originales conservan sus atributos. `load_initial_catalog` no abre la base,
+no aplica migraciones y no escribe existencias.
+
+## 25/11/2026
+
+### Integración del catálogo en el runtime de la Pi (`497ba6f`)
+
+`voicestock-pi` dejó de pedir `--catalog`. Valida con
+`OpeningProductResolver`, que abre una conexión SQLite en el hilo que
+resuelve, delega en `SqliteProductResolver` y la cierra, también si falla.
+`check_same_thread` sigue activo. Al arrancar, el proceso migra la base de
+`VOICESTOCK_DATABASE` o `~/.local/share/voicestock/voicestock.sqlite3`,
+exige al menos un producto activo y cierra esa conexión. No carga la
+semilla ni repone el stock. Si el catálogo está vacío, sale con código 1
+antes de abrir el micrófono y el GPIO.
+
+`GET /api/v1/catalog` publica el snapshot activo de esa misma base. El
+`ETag` es la revisión SHA-256. `If-None-Match` responde `304` sin cuerpo
+cuando coincide. El contrato de la operación no lleva la revisión.
+
+### Sincronización en la PC (`d0720e8`)
+
+Con `VOICESTOCK_AUDIO_PIPELINE=groq`, la PC pide ese endpoint antes de
+Whisper y del modelo. `VOICESTOCK_PI_URL` apunta a la Pi; el default es
+`http://192.168.50.1:8000`. El timeout de ese GET es
+`VOICESTOCK_CATALOG_TIMEOUT_SECONDS` (5). Ya no hace falta
+`VOICESTOCK_CATALOG_PATH` en ese modo.
+
+El primer pedido no manda `If-None-Match`. Un `200` se valida y reemplaza
+juntos el prompt y el matcher local. Un `304` reutiliza ese par. Los alias
+entran al prompt como frases; el contrato lleva atributos canónicos y no
+un `product_id`. Si la Pi no responde, el cuerpo es inválido o el `ETag` no
+coincide, el audio termina en `catalog_unavailable`, sin transcripción y
+sin operación pendiente. El snapshot anterior queda en memoria y no se usa
+para ese audio. El pedido siguiente vuelve a sincronizar. El servidor de
+la PC puede arrancar con la Pi apagada. El modo `stub` no consulta el
+catálogo.
+
+La decisión quedó en ADR-0016. ADR-0015 no se reescribió: describe el
+momento en que el runtime todavía leía JSON.
+
+### Qué se verificó y qué no
+
+La suite automática se ejecutó en la máquina de desarrollo el 25/11, con
+`ruff format --check`, `ruff check` y `pytest`. En esa corrida pasaron 913
+pruebas y falló una ajena al catálogo:
+`tests/integration/test_pi_pc_roundtrip.py::test_refused_connection_is_reported`,
+porque un puerto local cerrado se informó como `timeout` y el test espera
+`connection_failed`. No es una corrida de CI publicada en el repositorio.
+
+La persistencia de stock e historial en la placa sigue siendo la de
+[EX-TC-PER-001-20261108-01](../testing/raspberry-validation/executions/EX-TC-PER-001-20261108-01.md).
+La sincronización HTTP del catálogo entre Pi y PC no tiene ejecución física.
+El procedimiento, sin resultados, está en
+[la validación de integración](../testing/product-catalog-integration.md).
+Confirmar una operación de voz sigue sin escribir stock.

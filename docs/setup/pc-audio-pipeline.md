@@ -29,10 +29,12 @@ responde con `received_audio` y no llama a Groq.
 | `VOICESTOCK_PC_HOST` | Bind existente de `ServerSettings` |
 | `VOICESTOCK_PC_PORT` | Bind existente de `ServerSettings` |
 
-La Raspberry no necesita la clave. El timeout del cliente,
-`VOICESTOCK_PC_TIMEOUT`, tiene que cubrir la transferencia más la
-transcripción y la interpretación. Diez segundos puede no alcanzar cuando
-cada etapa espera hasta 20. Hay que medirlo con un WAV real; no es un SLA.
+La Raspberry no necesita la clave. El timeout del catálogo
+(`VOICESTOCK_CATALOG_TIMEOUT_SECONDS`, 5 por defecto) es solo de ese GET.
+Los de STT y del modelo siguen en 20. `VOICESTOCK_PC_TIMEOUT`, en la
+Raspberry, tiene que cubrir la transferencia más el catálogo, la
+transcripción y la interpretación. El valor por defecto es 10 segundos y
+puede no alcanzar. Hay que medirlo con un WAV real; no es un SLA.
 
 La plantilla sin secretos está en
 `config/pc-audio-pipeline.env.example`. No commitees la clave.

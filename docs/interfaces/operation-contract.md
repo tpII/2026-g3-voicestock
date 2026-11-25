@@ -160,6 +160,10 @@ else:
     ...  # result.reason explains why; no pending operation is created
 ```
 
+The snippet shows the port. `voicestock-pi` does not load that JSON file.
+It uses `SqliteProductResolver` through a connection opened on the resolving
+thread. See the [product catalog](product-catalog.md).
+
 The validator runs three stages in order. The first stage that fails decides
 the rejection:
 
@@ -208,10 +212,9 @@ class ProductResolver(Protocol):
     def resolve(self, query: ProductQuery) -> ProductResolution: ...
 ```
 
-`InMemoryProductResolver` is the current implementation. When it is built, it
+`InMemoryProductResolver` remains for tests and for a JSON list. When it is built, it
 checks that every product is identifiable by its own attributes and that no
-identifier repeats. ProductCatalog must implement the same port and pass the
-contract tests in `tests/pi/operation_contract/test_products.py`. Replacing the
+identifier repeats. `SqliteProductResolver` implements the same port. Replacing the
 catalog source does not change the JSON contract.
 
 The October catalog is provisional:

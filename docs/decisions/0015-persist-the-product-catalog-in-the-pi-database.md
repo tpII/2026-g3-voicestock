@@ -135,3 +135,10 @@ sources. The PC is not changed and does not read the snapshot yet.
 - The HTTP catalog route answers `503` until the runtime passes a port.
 - The PC prompt can drift from the database until a later change delivers
   the snapshot to the interpreter.
+
+The runtime paragraph above is the state when this ADR was accepted. The
+JSON catalog was later removed from `voicestock-pi`, and the PC started
+reading this snapshot, in
+[ADR-0016](0016-synchronize-product-catalog-over-http.md). That later
+decision does not change the schema, the seed or the identity rules recorded
+here.

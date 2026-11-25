@@ -2,18 +2,14 @@
 
 import sqlite3
 import threading
+import wave
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-from tests.pi.test_runtime import (
-    FakeButton,
-    FakeClient,
-    OneTake,
-    _envelope,
-)
 
+from pi.audio.artifact import AudioArtifact
 from pi.catalog import CatalogService, Category, Product
 from pi.catalog.access import (
     CatalogNotInitializedError,
@@ -28,6 +24,68 @@ from pi.runtime import build_runtime, main
 from pi.storage import apply_migrations, connect, open_database
 from pi.web.app import create_app
 from pi.web.settings import WebServerSettings
+from shared.communication import TransportEnvelope
+
+
+class FakeButton:
+    def __init__(self) -> None:
+        self.closed = False
+
+    def close(self) -> None:
+        self.closed = True
+
+
+class FakeClient:
+    def __init__(self, envelope: TransportEnvelope) -> None:
+        self.envelope = envelope
+        self.closed = False
+        self.calls = 0
+
+    def interpret_audio(self, wav_path: Path) -> TransportEnvelope:
+        self.calls += 1
+        wav_path.read_bytes()
+        return self.envelope
+
+    def close(self) -> None:
+        self.closed = True
+
+
+class OneTake:
+    def __init__(self, path: Path) -> None:
+        self._path = path
+        self.starts = 0
+
+    def start(self) -> None:
+        self.starts += 1
+
+    def stop(self) -> AudioArtifact:
+        with wave.open(str(self._path), "wb") as wav_file:
+            wav_file.setnchannels(1)
+            wav_file.setsampwidth(2)
+            wav_file.setframerate(16_000)
+            wav_file.writeframes(b"\x00\x00" * 1600)
+        return AudioArtifact(self._path.stem, self._path)
+
+
+def _envelope() -> TransportEnvelope:
+    return TransportEnvelope.success(
+        {
+            "status": "success",
+            "payload": {
+                "contract_version": "1",
+                "recognized_text": "sumá dos",
+                "operations": [
+                    {
+                        "operation": "add_stock",
+                        "product": {"name": "Coca Cola Zero 2L"},
+                        "quantity": 2,
+                        "unit": "unit",
+                    }
+                ],
+            },
+            "error": None,
+        }
+    )
 
 
 def _database(tmp_path: Path) -> Path:
